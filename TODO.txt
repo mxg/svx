@@ -32,4 +32,8 @@ Things to do to improve SVX.
 
 * Add graphs to the set of linked data structures
 
-* Update test suite to latest version of SVUNIT, currently 3.0
+* Update test suite to latest version of SVUNIT, currently 3.6
+
+* Add an arbiter as a shared object.  The arbiter would provide the
+  ability for independent processes to syncrhonize with each other.
+

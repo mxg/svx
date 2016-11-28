@@ -209,7 +209,7 @@ class list_bkwd_iterator#(type T=int, type P=void_traits)
 
   // last
   //
-  // Most the current position to the last item in the vector -- i.e. to
+  // Move the current position to the last item in the vector -- i.e. to
   // position N-1.
   virtual function bit last();
     if(m_list == null)

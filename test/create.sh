@@ -45,6 +45,7 @@ create_testsuite.pl -add containers/container_unit_test.sv            \
                     -add containers/deque_unit_test.sv                \
                     -add containers/stack_unit_test.sv                \
                     -add containers/sorter_unit_test.sv               \
+                    -add containers/dictionary_unit_test.sv           \
                     -out containers/containers_testsuite.sv           \
                     -overwrite
 

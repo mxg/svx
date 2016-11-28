@@ -169,8 +169,10 @@ class map_fwd_iterator#(type KEY=int, type T=int, type P=void_traits)
       return 0;
 
     // Reteive the last key from the associative array and see if the
-    // index is pointing to that item.
-    void'(m_map.last(last_key));
+    // index is pointing to that item.  We use the non-virtual function
+    // get_last() to ensure that we do not modify the state of any
+    // iterator.
+    last_key = m_map.get_last();
     return (index == last_key);
 
   endfunction

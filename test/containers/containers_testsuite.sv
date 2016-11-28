@@ -19,6 +19,7 @@ module containers_testsuite;
   deque_unit_test deque_ut();
   stack_unit_test stack_ut();
   sorter_unit_test sorter_ut();
+  dictionary_unit_test dictionary_ut();
 
 
   //===================================
@@ -35,6 +36,7 @@ module containers_testsuite;
     deque_ut.build();
     stack_ut.build();
     sorter_ut.build();
+    dictionary_ut.build();
     svunit_ts = new(name);
     svunit_ts.add_testcase(container_ut.svunit_ut);
     svunit_ts.add_testcase(type_handle_ut.svunit_ut);
@@ -46,6 +48,7 @@ module containers_testsuite;
     svunit_ts.add_testcase(deque_ut.svunit_ut);
     svunit_ts.add_testcase(stack_ut.svunit_ut);
     svunit_ts.add_testcase(sorter_ut.svunit_ut);
+    svunit_ts.add_testcase(dictionary_ut.svunit_ut);
   endfunction
 
 
@@ -64,6 +67,7 @@ module containers_testsuite;
     deque_ut.run();
     stack_ut.run();
     sorter_ut.run();
+    dictionary_ut.run();
     svunit_ts.report();
   endtask
 

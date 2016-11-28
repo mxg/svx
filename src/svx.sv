@@ -26,6 +26,9 @@ package svx;
   `include "linked/linked.svh"
   `include "behaviors/behaviors.svh"
 
+  // dictionary depends on both containers and iterators
+  `include "containers/dictionary.svh"
+
 endpackage
 
 

@@ -226,6 +226,18 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
     return m_map.last(index);
   endfunction
 
+  // function: get_last
+  // non-virtual function
+  // The reason this is non-virtal is so that any overriding virtual
+  // functions still correctly get the last element without modifying
+  // the state of the iterator.
+  //
+  function KEY get_last();
+    KEY k;
+    m_map.last(k);
+    return k;
+  endfunction
+
   // function: next
   //
   virtual function bit next(ref KEY index);
