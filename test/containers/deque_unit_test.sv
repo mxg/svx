@@ -26,6 +26,8 @@
 // permissions and limitations under the License.
 //======================================================================
 
+`include "svunit_defines.svh"
+
 module deque_unit_test;
   import svunit_pkg::svunit_testcase;
 

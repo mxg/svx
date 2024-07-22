@@ -73,7 +73,7 @@ virtual class map_iterator_base#(type KEY=int,
   virtual function void set(T t);
     if(m_map == null)
       return;
-    m_map.insert(index, t);
+    void'(m_map.insert(index, t));
   endfunction
   
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -390,8 +390,8 @@ class map_random_iterator#(type KEY=int, type T=int, type P=void_traits)
       return 0;
 
     n = $urandom() % m_map.size();
-    first();
-    skip(n);
+    void'(first());
+    void'(skip(n));
     
     return 1;
 

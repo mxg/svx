@@ -48,7 +48,7 @@ class restrict_traits extends void_t;
         return 0;   // a == b
   endfunction
 
-  static function sort(restrict_t vec[$]);
+  static function void sort(restrict_t vec[$]);
     vec.sort with (item);
   endfunction
 

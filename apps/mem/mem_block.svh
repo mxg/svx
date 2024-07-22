@@ -166,12 +166,12 @@ class mem_block#(int unsigned ADDR_BITS = 32,
     byte_addr_t word_addr;
 
     iter = new(security_map);
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       restrict_t r = iter.get();
       word_addr = iter.get_index();
       $display("word: %x  restriction = %s", word_addr, r.name());
-      iter.next();
+      void'(iter.next());
     end
 
   endfunction
@@ -205,7 +205,7 @@ class mem_block#(int unsigned ADDR_BITS = 32,
 	$display();
       end
       
-      byte_iter.next();
+      void'(byte_iter.next());
     end
     $display();
     

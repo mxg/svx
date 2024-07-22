@@ -193,7 +193,7 @@ class vector #(type T=int, type P=void_traits)
   // for this type.
   //--------------------------------------------------------------------
   function void sort();
-    P::sort(m_vector);
+    void'(P::sort(m_vector));
   endfunction
 
   //====================================================================

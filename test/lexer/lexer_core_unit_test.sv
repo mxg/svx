@@ -26,6 +26,8 @@
 // permissions and limitations under the License.
 //======================================================================
 
+`include "svunit_defines.svh"
+
 module lexer_core_unit_test;
   import svunit_pkg::svunit_testcase;
 
@@ -106,7 +108,7 @@ module lexer_core_unit_test;
                             input queue#(token_t, token_traits) q);
 
     token_t token;
-    lexer_core lex = new();
+    automatic lexer_core lex = new();
 
     lex.start(s);
 

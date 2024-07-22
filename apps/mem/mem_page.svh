@@ -68,7 +68,7 @@ class mem_page#(int unsigned ADDR_BITS = 32,
     block = block_map.get(block_addr);
     if(block == null) begin
       block = new(mem_root);
-      block_map.insert(block_addr, block);
+      void'(block_map.insert(block_addr, block));
     end
 
     block.write(addr, data);
@@ -120,7 +120,7 @@ class mem_page#(int unsigned ADDR_BITS = 32,
     block = block_map.get(block_addr);
     if(block == null) begin
       block = new(mem_root);
-      block_map.insert(block_addr, block);
+      void'(block_map.insert(block_addr, block));
     end
 
     block.write_byte(addr, data);
@@ -171,7 +171,7 @@ class mem_page#(int unsigned ADDR_BITS = 32,
     // it.
     if(block == null) begin
       block = new(mem_root);
-      block_map.insert(block_addr, block);
+      void'(block_map.insert(block_addr, block));
     end
 
     block.set_restriction(get_aligned_byte_addr(addr), r);
@@ -179,7 +179,7 @@ class mem_page#(int unsigned ADDR_BITS = 32,
   endfunction
 
 
-  function clear_word_restriction(addr_t addr);
+  function void clear_word_restriction(addr_t addr);
 
     block_t block = block_map.get(get_block_addr(addr));
 
@@ -218,23 +218,23 @@ class mem_page#(int unsigned ADDR_BITS = 32,
     page_key_t page_key;
 
     iter = new(security_map);
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       restrict_t r = iter.get();
       page_key = iter.get_index();
       $display("block: %x  restriction = %s", page_key, r.name());
-      iter.next();
+      void'(iter.next());
     end
 
     // Traverse the page map
     block_iter = new(block_map);
-    block_iter.first();
+    void'(block_iter.first());
     while(!block_iter.at_end()) begin
       block = block_iter.get();
       block_addr = block_iter.get_index();
       $display("security map for block %x", block_addr);
       block.dump_security(construct_addr(get_page_key(addr), block_addr, 0));
-      block_iter.next();
+      void'(block_iter.next());
     end
     
   endfunction
@@ -251,13 +251,13 @@ class mem_page#(int unsigned ADDR_BITS = 32,
     page_key = get_page_key(addr);
 
     block_iter = new(block_map);
-    block_iter.first();
+    void'(block_iter.first());
     while(!block_iter.at_end()) begin
       block = block_iter.get();
       $display("block addr = %x", block_iter.get_index());
       if(block != null)
 	block.dump(construct_addr(page_key, block_iter.get_index(), 0));
-      block_iter.next();
+      void'(block_iter.next());
     end
     
   endfunction

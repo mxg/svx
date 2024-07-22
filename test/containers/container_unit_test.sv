@@ -32,6 +32,8 @@
 // Test base container class
 //----------------------------------------------------------------------
 
+`include "svunit_defines.svh"
+
 module container_unit_test;
   import svunit_pkg::svunit_testcase;
 

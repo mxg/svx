@@ -26,6 +26,8 @@
 // permissions and limitations under the License.
 //======================================================================
 
+`include "svunit_defines.svh"
+
 module type_handle_unit_test;
   import svunit_pkg::svunit_testcase;
 
@@ -138,9 +140,9 @@ module type_handle_unit_test;
     `SVTEST(set)
 
       // Put object in their respective object containers
-      c1c.set(c1_obj);
-      c2c.set(c2_obj);
-      c3c.set(c3_obj);
+      void'(c1c.set(c1_obj));
+      void'(c2c.set(c2_obj));
+      void'(c3c.set(c3_obj));
 
       `FAIL_IF(c1c.get() != c1_obj)
       `FAIL_IF(c2c.get() != c2_obj)
@@ -150,14 +152,14 @@ module type_handle_unit_test;
   //--------------------------------------------------------------------
   // map
   //--------------------------------------------------------------------
-    `SVTEST(map)
+    `SVTEST(map_test)
 
      base t1;
 
       // create a map that maps types to objects
-      type_map.insert(c1c.get_type_handle(), c1_obj);
-      type_map.insert(c2c.get_type_handle(), c2_obj);
-      type_map.insert(c3c.get_type_handle(), c3_obj);
+      void'(type_map.insert(c1c.get_type_handle(), c1_obj));
+      void'(type_map.insert(c2c.get_type_handle(), c2_obj));
+      void'(type_map.insert(c3c.get_type_handle(), c3_obj));
 
       `FAIL_IF(type_map.size() != 3)
 
@@ -175,10 +177,10 @@ module type_handle_unit_test;
       base b;
       int unsigned iter_count = 0;
 
-      iter.first();
+      void'(iter.first());
       while(!iter.at_end()) begin
         b = iter.get();
-        iter.next();
+        void'(iter.next());
         iter_count++;
       end
    

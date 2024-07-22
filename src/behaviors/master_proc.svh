@@ -110,7 +110,7 @@ class master_control;
     $write("available :");
     while(!iter.at_end()) begin
       $write("%4d", iter.get());
-      iter.next();
+      void'(iter.next());
     end
     $display();
 
@@ -126,11 +126,11 @@ class master_control;
     map_fwd_iterator#(process_base, pid_t, int_traits) iter = new(active_processes);
 
     $write("active :");
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       p = iter.get_index();
       $write("%4d", p.get_pid());
-      iter.next();
+      void'(iter.next());
     end
     $display();
 
@@ -255,7 +255,7 @@ class master_process extends process_behavior #(master_control);
           automatic process_base p = proc;
           p.set_process_handle(process::self());
           p.set_pid(master_context.get_new_pid());
-          master_context.active_processes.insert(p, p.get_pid());
+          void'(master_context.active_processes.insert(p, p.get_pid()));
 
 	  // execute task
           p.exec();
@@ -263,7 +263,7 @@ class master_process extends process_behavior #(master_control);
 	  // task postamble.
 	  // Remove the process from the active list and put the pid on
 	  // the available list.
-          master_context.active_processes.delete(p);
+          void'(master_context.active_processes.delete(p));
           master_context.available.push_back(p.get_pid());
         end
 

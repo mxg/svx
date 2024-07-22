@@ -26,6 +26,8 @@
 // permissions and limitations under the License.
 //======================================================================
 
+`include "svunit_defines.svh"
+
 module mem_unit_test;
   `include "svunit_defines.svh"
   import svunit_pkg::svunit_testcase;
@@ -304,8 +306,7 @@ module mem_unit_test;
       // intentionally violate the restriction
       m.write(addr, ($urandom() & 'hffff));
 
-      `FAIL_UNLESS(m.last_operation_failed() &&
-                   (m.get_last_error() == ERROR_PAGE_SECURITY_VIOLATION))
+      `FAIL_UNLESS(m.last_operation_failed() && (m.get_last_error() == ERROR_PAGE_SECURITY_VIOLATION))
 
       r = m.get_addr_restriction(addr);
 
@@ -330,8 +331,7 @@ module mem_unit_test;
       // intentionally violate the restriction
       m.write(addr, ($urandom() & 'hffff));
 
-      `FAIL_UNLESS(m.last_operation_failed() &&
-                   (m.get_last_error() == ERROR_BLOCK_SECURITY_VIOLATION))
+      `FAIL_UNLESS(m.last_operation_failed() && (m.get_last_error() == ERROR_BLOCK_SECURITY_VIOLATION))
 
       r = m.get_addr_restriction(addr);
 

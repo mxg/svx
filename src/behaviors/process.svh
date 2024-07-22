@@ -232,7 +232,7 @@ class process_traits extends void_t;
     return !equal(a,b);
   endfunction
 
-  static function sort(process_base vec[$]);
+  static function void sort(process_base vec[$]);
   endfunction
 
 endclass

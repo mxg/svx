@@ -26,6 +26,8 @@
 // permissions and limitations under the License.
 //======================================================================
 
+`include "svunit_defines.svh"
+
 module sorter_unit_test;
   import svunit_pkg::svunit_testcase;
 
@@ -68,7 +70,7 @@ module sorter_unit_test;
 	return -1;
     endfunction
 
-    static function sort(ref coordinate vec[$]);
+    static function void sort(ref coordinate vec[$]);
       sorter#(coordinate,coordinate_traits)::sort(vec);
     endfunction
     
@@ -176,8 +178,8 @@ module sorter_unit_test;
       const int N=20;
 
       for(i = 0; i < N; i++) begin
-	c = new();
-	c.randomize();
+	    c = new();
+	    void'(c.randomize());
         v.appendc(c);
       end
 
@@ -212,9 +214,9 @@ module sorter_unit_test;
       const int N=20;
 
       for(i = 0; i < N; i++) begin
-	c = new();
-	c.randomize();
-	c.x = N-i;
+	    c = new();
+	    void'(c.randomize());
+	    c.x = N-i;
         v.appendc(c);
       end
 

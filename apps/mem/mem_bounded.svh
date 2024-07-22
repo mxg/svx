@@ -151,7 +151,7 @@ class mem_bounded #(int unsigned ADDR_BITS = 32,
 
     if(addr < lower_bound || addr > upper_bound) begin
       set_error(ERROR_ADDRESS_BOUNDS);
-      return;
+      return 0;
     end
 
     return super.read_byte(addr);

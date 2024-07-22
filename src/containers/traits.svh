@@ -34,7 +34,7 @@ class void_traits extends void_t;
     return !equal(a,b);
   endfunction
 
-  static function sort(ref void_t vec[$]);
+  static function void sort(ref void_t vec[$]);
   endfunction
 
 endclass
@@ -55,7 +55,7 @@ class object_traits extends void_t;
     return a.compare(b);
   endfunction
 
-  static function sort(ref object vec[$]);
+  static function void sort(ref object vec[$]);
   endfunction
 
 endclass
@@ -76,7 +76,7 @@ class class_traits#(type T=int) extends void_t;
     return !equal(a,b);
   endfunction
 
-  static function sort(ref T vec[$]);
+  static function void sort(ref T vec[$]);
   endfunction
 
 endclass
@@ -103,7 +103,7 @@ class base_int_traits #(type T=int) extends void_t;
         return 0;
   endfunction
 
-  static function sort(ref T vec[$]);
+  static function void sort(ref T vec[$]);
     vec.sort();
   endfunction
 
@@ -182,7 +182,7 @@ class real_traits extends void_t;
         return 0;
   endfunction
 
-  static function sort(ref real vec[$]);
+  static function void sort(ref real vec[$]);
     vec.sort with (item);
   endfunction
 
@@ -204,7 +204,7 @@ class string_traits extends void_t;
     return (!equal(a,b));
   endfunction
 
-  static function sort(ref string vec[$]);
+  static function void sort(ref string vec[$]);
     vec.sort with (item);
   endfunction
 

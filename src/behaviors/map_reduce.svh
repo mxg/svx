@@ -59,10 +59,10 @@ class map_task#(type T=int,
     beh = new();
     iter = new(v);
     
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       beh.apply(iter.get());
-      iter.next();
+      void'(iter.next());
     end
 
   endtask
@@ -92,10 +92,10 @@ class map_fcn#(type T=int,
     beh = new();
     iter = new(v);
     
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       beh.nb_apply(iter.get());
-      iter.next();
+      void'(iter.next());
     end
 
   endfunction
@@ -129,13 +129,13 @@ class map_concurrent#(type T=int,
     // Create a behavior and a process; bind the behavior to the
     // process; set the context as the next item in the vector; and
     // place the process in the process group.
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       beh = new();
       p = new(beh);
       p.bind_context(iter.get());
       pg.add_process(p);
-      iter.next();
+      void'(iter.next());
     end
 
     // Launch all the processes in parallel and wait until they are all
@@ -175,10 +175,10 @@ class reduce #(type T=int,
     beh = new();
     iter = new(v);
     
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       accum = beh.reduce(iter.get(), accum);
-      iter.next();
+      void'(iter.next());
     end
 
     return accum;

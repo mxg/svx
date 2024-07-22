@@ -26,6 +26,8 @@
 // permissions and limitations under the License.
 //======================================================================
 
+`include "svunit_defines.svh"
+
 module vector_unit_test;
   import svunit_pkg::svunit_testcase;
 
@@ -178,7 +180,7 @@ module vector_unit_test;
   //--------------------------------------------------------------------
   // real_vector
   //--------------------------------------------------------------------
-    `SVTEST(real_vector)
+    `SVTEST(real_vector_test)
       begin
         int unsigned i;
         vector#(real, real_traits) vr = new();
@@ -202,7 +204,7 @@ module vector_unit_test;
   //--------------------------------------------------------------------
   // string_vector
   //--------------------------------------------------------------------
-    `SVTEST(string_vector)
+    `SVTEST(string_vector_test)
       begin
         rand_string rs; // random string generator
         int unsigned i;

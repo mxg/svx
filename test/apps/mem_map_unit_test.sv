@@ -257,7 +257,7 @@ module mem_field_unit_test;
       // connect the sub-region into the top region
       rg.insert_space(sub_rg);
 
-      rg.calculate_and_check();
+      void'(rg.calculate_and_check());
       `FAIL_IF(rg.get_error())
       
     `SVTEST_END
@@ -366,7 +366,7 @@ module mem_field_unit_test;
       sys_region sys;
 
       sys = new("system", null, 'h0000_0000, 'h1_0000_0000);
-      sys.calculate_and_check();
+      void'(sys.calculate_and_check());
       sys.dump();
 
 

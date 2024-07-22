@@ -50,6 +50,7 @@ virtual class tree_iterator_base
   endfunction
 
   virtual function tree get();
+    return null;
   endfunction
 
   virtual function void set(tree t);
@@ -58,6 +59,7 @@ virtual class tree_iterator_base
   endfunction
 
   virtual function bit skip(signed_index_t distance);
+    return 0;
   endfunction
 
   //--------------------------------------------------------------------

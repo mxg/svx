@@ -113,7 +113,7 @@ module map_iterators_unit_test;
     name = rs.rand_string;
     val = $random() % 1000;
     sym = new(name, val);
-    one_map.insert(name, sym);
+    void'(one_map.insert(name, sym));
 
   endtask
 
@@ -160,9 +160,9 @@ module map_iterators_unit_test;
 
       // Iterate through the map
       iter_count = 0;
-      iter.first();
+      void'(iter.first());
       while(!iter.at_end()) begin
-        iter.next();
+        void'(iter.next());
         iter_count++;
       end
 
@@ -170,10 +170,10 @@ module map_iterators_unit_test;
 
       // Another idiom for traversing the map
       iter_count = 0;
-      iter.first();
+      void'(iter.first());
       do begin
         iter_count++;
-        iter.next();
+        void'(iter.next());
       end while(!iter.at_end());
 
       `FAIL_IF(iter_count != symbol_table.size())
@@ -207,9 +207,9 @@ module map_iterators_unit_test;
       iter.bind_map(symbol_table);
 
       // Iterate through the map
-      iter.last();
+      void'(iter.last());
       while(!iter.at_beginning()) begin
-        iter.prev();
+        void'(iter.prev());
         iter_count++;
       end
 
@@ -217,9 +217,9 @@ module map_iterators_unit_test;
 
       // Another idiom for traversing in the backward direction
       iter_count = 0;
-      iter.last();
+      void'(iter.last());
       do begin
-        iter.prev();
+        void'(iter.prev());
         iter_count++;
       end while(!iter.at_beginning());
 
@@ -424,9 +424,9 @@ module map_iterators_unit_test;
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // Iterate through the map in the forward direction
       iter_count = 0;
-      iter.first();
+      void'(iter.first());
       while(!iter.at_end()) begin
-        iter.next();
+        void'(iter.next());
         iter_count++;
       end
 
@@ -436,9 +436,9 @@ module map_iterators_unit_test;
       // Iterate through the map in the forward direction using the
       // alternate idiom
       iter_count = 0;
-      iter.first();
+      void'(iter.first());
       do begin
-        iter.next();
+        void'(iter.next());
         iter_count++;
       end while(!iter.at_end());
 
@@ -447,9 +447,9 @@ module map_iterators_unit_test;
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // Iterate through the map in the backward direction
       iter_count = 0;
-      iter.last();
+      void'(iter.last());
       while(!iter.at_beginning()) begin
-        iter.prev();
+        void'(iter.prev());
         iter_count++;
       end
 
@@ -459,9 +459,9 @@ module map_iterators_unit_test;
       // Iterate through the list in the backward direction using the
       // alternate idiom
       iter_count = 0;
-      iter.last();
+      void'(iter.last());
       do begin
-        iter.prev();
+        void'(iter.prev());
         iter_count++;
       end while(!iter.at_beginning());
 
@@ -576,8 +576,8 @@ module map_iterators_unit_test;
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // First and last should be the same element
-      fwd_iter.first();
-      bkwd_iter.last();
+      void'(fwd_iter.first());
+      void'(bkwd_iter.last());
 
       `FAIL_IF(!fwd_iter.is_last())
       `FAIL_IF(!bkwd_iter.is_first())
@@ -586,9 +586,9 @@ module map_iterators_unit_test;
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // Iterate through the map in the foward direction
       iter_count = 0;
-      fwd_iter.first();
+      void'(fwd_iter.first());
       while(!fwd_iter.at_end()) begin
-        fwd_iter.next();
+        void'(fwd_iter.next());
         iter_count++;
       end
 
@@ -597,9 +597,9 @@ module map_iterators_unit_test;
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // Iterate through the map in the backward direction
       iter_count = 0;
-      bkwd_iter.last();
+      void'(bkwd_iter.last());
       while(!bkwd_iter.at_beginning()) begin
-        bkwd_iter.prev();
+        void'(bkwd_iter.prev());
         iter_count++;
       end
 
@@ -607,9 +607,9 @@ module map_iterators_unit_test;
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // First and last should be the same element
-      bidir_iter.first();
+      void'(bidir_iter.first());
       t = bidir_iter.get();
-      bidir_iter.last();
+      void'(bidir_iter.last());
 
       `FAIL_IF(t != bidir_iter.get())
 
@@ -617,9 +617,9 @@ module map_iterators_unit_test;
       // Iterate through the map in the foward direction using the
       // bidirectional iterator
       iter_count = 0;
-      bidir_iter.first();
+      void'(bidir_iter.first());
       while(!bidir_iter.at_end()) begin
-        bidir_iter.next();
+        void'(bidir_iter.next());
         iter_count++;
       end
 
@@ -629,9 +629,9 @@ module map_iterators_unit_test;
       // Iterate through the map in the backward direction using the
       // bidirectional iterator
       iter_count = 0;
-      bidir_iter.last();
+      void'(bidir_iter.last());
       while(!bidir_iter.at_beginning()) begin
-        bidir_iter.prev();
+        void'(bidir_iter.prev());
         iter_count++;
       end
 

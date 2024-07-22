@@ -26,6 +26,8 @@
 // permissions and limitations under the License.
 //======================================================================
 
+`include "svunit_defines.svh"
+
 module mapper_unit_test;
   import svunit_pkg::svunit_testcase;
 
@@ -56,7 +58,7 @@ module mapper_unit_test;
   // Setup for running the Unit Tests
   //===================================
   task setup();
-    master_process mp = master_process::get_master_process();
+    automatic master_process mp = master_process::get_master_process();
     svunit_ut.setup();
     /* Place Setup Code Here */
     mp.reboot();
@@ -136,11 +138,11 @@ module mapper_unit_test;
       map_fcn#(thingy, class_traits#(thingy), add_five)::map(v);
 
       i = 0;
-      iter.first();
+      void'(iter.first());
       while(!iter.at_end()) begin
         t = iter.get();
         `FAIL_UNLESS(t.t == (a[i]+5))
-        iter.next();
+        void'(iter.next());
         i++;
      end
       
@@ -191,7 +193,7 @@ module mapper_unit_test;
       time t1;
       time t2;
       int unsigned i;
-      int unsigned d;
+       int unsigned d;
       int unsigned max;
       vector#(int unsigned, int_unsigned_traits) v = new();
       list_fwd_iterator#(int unsigned, int_unsigned_traits) iter = new(v);

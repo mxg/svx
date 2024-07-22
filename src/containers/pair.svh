@@ -86,6 +86,8 @@ endclass
 class quadruple#(type T1=int, type T2=int, type T3=int, T4=int)
   extends triple#(T1,T2,T3);
 
+  T4 t4;
+
   function new(T1 a, T2 b, T3 c, T4 d);
     super.new(a, b, c);
     t4 = d;

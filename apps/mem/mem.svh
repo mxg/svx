@@ -74,7 +74,7 @@ class mem#(int unsigned ADDR_BITS = 32,
     if(page == null) begin
       // add a new page
       page = new(mem_root);
-      page_map.insert(page_key, page);
+      void'(page_map.insert(page_key, page));
     end
 
     page.write(addr, data);
@@ -129,7 +129,7 @@ class mem#(int unsigned ADDR_BITS = 32,
     if(page == null) begin
       // add a new page
       page = new(mem_root);
-      page_map.insert(page_key, page);
+      void'(page_map.insert(page_key, page));
     end
 
     page.write_byte (addr, data);
@@ -194,7 +194,7 @@ class mem#(int unsigned ADDR_BITS = 32,
 
     if(page == null) begin
       page = new(mem_root);
-      page_map.insert(page_key, page);
+      void'(page_map.insert(page_key, page));
     end
 
     page.set_restriction(get_block_addr(addr), r);
@@ -220,7 +220,7 @@ class mem#(int unsigned ADDR_BITS = 32,
 
     if(page == null) begin
       page = new(mem_root);
-      page_map.insert(page_key, page);
+      void'(page_map.insert(page_key, page));
     end
 
     page.set_word_restriction(addr, r);
@@ -232,7 +232,7 @@ class mem#(int unsigned ADDR_BITS = 32,
     page_t page = page_map.get(get_page_key(addr));
 
     if(page != null)
-      page.clear_word_restriction(addr);
+      void'(page.clear_word_restriction(addr));
 
   endfunction
 
@@ -366,23 +366,23 @@ class mem#(int unsigned ADDR_BITS = 32,
     $display("\n----- SECURITY MAP -----");
 
     iter = new(security_map);
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       restrict_t r = iter.get();
       page_key = iter.get_index();
       $display("page: %x  restriction = %s", page_key, r.name());
-      iter.next();
+      void'(iter.next());
     end
 
     // Traverse the page map
     page_iter = new(page_map);
-    page_iter.first();
+    void'(page_iter.first());
     while(!page_iter.at_end()) begin
       page = page_iter.get();
       page_key = page_iter.get_index();
       $display("security map for page %x", page_key);
       page.dump_security(construct_addr(page_key, 0, 0));
-      page_iter.next();
+      void'(page_iter.next());
     end
 
     $display("----- END SECURITY MAP -----");
@@ -406,12 +406,12 @@ class mem#(int unsigned ADDR_BITS = 32,
     page_iter = new(page_map);
 
     // Traverse the page map
-    page_iter.first();
+    void'(page_iter.first());
     while(!page_iter.at_end()) begin
       page = page_iter.get();
       page_key = page_iter.get_index();
       page.dump(construct_addr(page_key, 0, 0));
-      page_iter.next();
+      void'(page_iter.next());
     end
     
   endfunction

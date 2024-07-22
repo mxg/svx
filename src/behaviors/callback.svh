@@ -55,9 +55,9 @@ class fcn_callbacks#(type T=int) extends fcn_behavior#(T);
       return 0;
 
     do begin
-      cb = iter.curr();
-      if(!cb.exec_with_context(c))
-        return 0;
+      cb = iter.get();
+      cb.nb_apply(c);
+      
     end
     while(iter.next());
 
@@ -96,7 +96,7 @@ class task_callbacks#(type T=int) extends task_behavior#(T);
       return;
 
     do begin
-      cb = iter.curr();
+      cb = iter.get();
       cb.bind_context(c);
       cb.tsk();
     end

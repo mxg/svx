@@ -40,7 +40,7 @@ module svx_anchor;
   import svx::*;
   
   initial begin
-    ver::print_banner();
+    void'(ver::print_banner());
   end
 
 endmodule

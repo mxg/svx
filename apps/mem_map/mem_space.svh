@@ -137,7 +137,7 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
   // memory space object or an entire (sub)tree.
   //--------------------------------------------------------------------
   function void insert_space(mem_space_t space);
-    check_child(space);
+    void'(check_child(space));
     insert(space);
   endfunction
   
@@ -277,11 +277,11 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
     children = get_children();
     iter = new(children);
 
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       assert($cast(child, iter.get()));
       child.calculate(get_addr());
-      iter.next();
+      void'(iter.next());
     end
 
   endfunction
@@ -306,11 +306,11 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
     children = get_children();
     iter = new(children);
 
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       assert($cast(child, iter.get()));
       ok &= child.check();
-      iter.next();
+      void'(iter.next());
     end
 
     return ok;
@@ -356,38 +356,38 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
     //----------------------------------------
     // outer loop
     ok = 1;
-    outer_iter.first();
+    void'(outer_iter.first());
     while(!outer_iter.at_end()) begin
       assert($cast(outer_space, outer_iter.get()));
 
       //----------------------------------------
       // inner loop
-      inner_iter.first();
+      void'(inner_iter.first());
       // skip ahead to avoid checking things twice.
-      inner_iter.skip(count);
+      void'(inner_iter.skip(count));
       while(!inner_iter.at_end()) begin
-	assert($cast(inner_space, inner_iter.get()));
+	    assert($cast(inner_space, inner_iter.get()));
 	
 	// do not check a space against itself and do not check to see
 	// if views overlap since they are allowed to do so.
 
-	if((inner_space != outer_space) &&
-	   (inner_space.get_type() != VIEW) &&
-	   (outer_space.get_type() != VIEW)) begin
-	  if(overlaps(outer_space, inner_space)) begin
-	    outer_space.has_error = 1;
-	    inner_space.has_error = 1;
-	    $display("*** error: The following two spaces overlap:\n%s\n%s",
-		     outer_space.to_str(), inner_space.to_str());
-	    ok = 0;
-	  end
-	end
+	    if((inner_space != outer_space) &&
+	       (inner_space.get_type() != VIEW) &&
+	       (outer_space.get_type() != VIEW)) begin
+	      if(overlaps(outer_space, inner_space)) begin
+	        outer_space.has_error = 1;
+	        inner_space.has_error = 1;
+	        $display("*** error: The following two spaces overlap:\n%s\n%s",
+		             outer_space.to_str(), inner_space.to_str());
+	        ok = 0;
+	      end
+	    end
 
-	inner_iter.next();
+	    void'(inner_iter.next());
       end  // inner loop
       
       count++;
-      outer_iter.next();
+      void'(outer_iter.next());
     end // outer loop
 
     return ok;
@@ -501,12 +501,12 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
 
     deq = get_children();
     iter = new(deq);
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       t = iter.get();
       assert($cast(space, t));
       space.find_addr_recurse(search_addr, list, all);
-      iter.next();
+      void'(iter.next());
     end
     
   endfunction
@@ -524,11 +524,11 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
 
     $display("--- Memory Map Dump for: %s ---", get_full_name());
     
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       t = iter.get();
       $display("%s", t.to_str());
-      iter.next();
+      void'(iter.next());
     end
 
     $display("--- End Memory Map Dump ---");

@@ -26,6 +26,8 @@
 // permissions and limitations under the License.
 //======================================================================
 
+`include "svunit_defines.svh"
+
 module map_unit_test;
   import svunit_pkg::svunit_testcase;
 
@@ -97,7 +99,7 @@ module map_unit_test;
   // are all there.
   //--------------------------------------------------------------------
 
-    `SVTEST(string_map)
+    `SVTEST(string_map_test)
       string s;
       string t;
       int unsigned i;
@@ -107,14 +109,14 @@ module map_unit_test;
       // Load up the map
       for(i = 0; i < MAP_SIZE; i++) begin
         s = rs.rand_string();
-        m.insert(s, i);
+        void'(m.insert(s, i));
         array[s] = i;
       end 
 
       `FAIL_IF(m.size() != MAP_SIZE)
 
       foreach (array[s]) begin
-	`FAIL_UNLESS(string_traits::equal(array[s], m.get(s)))
+	    `FAIL_UNLESS(array[s] == m.get(s))
       end
     `SVTEST_END
 
@@ -125,7 +127,7 @@ module map_unit_test;
   // previously does indeed exist.  Also ensure that a hardcoded (not
   // randomly generated) string key does NOT exist.
   //--------------------------------------------------------------------
-    `SVTEST(exists)
+    `SVTEST(exists_test)
       int unsigned i;
       int unsigned n;
       string s;
@@ -155,7 +157,7 @@ module map_unit_test;
   //--------------------------------------------------------------------
   // clone
   //--------------------------------------------------------------------
-    `SVTEST(clone)
+    `SVTEST(clone_test)
 
       int unsigned i;
       int unsigned n;
@@ -194,7 +196,7 @@ module map_unit_test;
   //--------------------------------------------------------------------
   // delete
   //--------------------------------------------------------------------
-    `SVTEST(delete)
+    `SVTEST(delete_test)
       int unsigned i;
       int unsigned n;
       string s;
@@ -214,7 +216,7 @@ module map_unit_test;
       end
 
       `FAIL_IF(!m.exists(s))
-      m.delete(s);
+      void'(m.delete(s));
       // Let's make sure it's really gone
       `FAIL_IF(m.exists(s))
       `FAIL_IF(m.size() != (MAP_SIZE - 1))
@@ -292,7 +294,7 @@ module singleton_map_unit_test;
   // Ensure that each call to get() returns the same handle
   //--------------------------------------------------------------------
 
-    `SVTEST(singleton)
+    `SVTEST(singleton_test)
       map_t m1;
       map_t m2;
 

@@ -407,7 +407,7 @@ class permute_fwd_iterator#(type T=int, type P=void_traits)
     if((m_vec == null) || (m_vec.size() == 0))
       return 0;
     initialize();
-    set_permutation(0);
+    void'(set_permutation(0));
     return 1;
   endfunction
 
@@ -475,7 +475,7 @@ class permute_bkwd_iterator#(type T=int, type P=void_traits)
       return 0;
     initialize();
     pix = max_pix - 1;
-    set_permutation(pix);
+    void'(set_permutation(pix));
     return 1;
   endfunction
 
@@ -486,7 +486,7 @@ class permute_bkwd_iterator#(type T=int, type P=void_traits)
     if(m_vec == null || m_vec.size() == 0 || pix < 0)
       return 0;
     pix--;
-    set_permutation(pix);
+    void'(set_permutation(pix));
     return 1;
   endfunction
 
@@ -566,7 +566,7 @@ class permute_random_iterator#(type T=int, type P=void_traits)
 
     tmp_pix = $urandom() % max_pix;
     pix = tmp_pix;
-    set_permutation(pix);
+    void'(set_permutation(pix));
     return 1;
   endfunction
 
@@ -589,7 +589,7 @@ class permute_bidir_iterator#(type T=int, type P=void_traits)
     if((m_vec == null) || (m_vec.size() == 0))
       return 0;
     initialize();
-    set_permutation(0);
+    void'(set_permutation(0));
     return 1;
   endfunction
 
@@ -613,7 +613,7 @@ class permute_bidir_iterator#(type T=int, type P=void_traits)
     if(m_vec == null)
       return 0;
     pix = max_pix - 1;
-    set_permutation(pix);
+    void'(set_permutation(pix));
     return 1;
   endfunction
 
@@ -621,7 +621,7 @@ class permute_bidir_iterator#(type T=int, type P=void_traits)
     if(m_vec == null || m_vec.size() == 0 || pix < 0)
       return 0;
     pix--;
-    set_permutation(pix);
+    void'(set_permutation(pix));
     return 1;
   endfunction
   

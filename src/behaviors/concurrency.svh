@@ -76,7 +76,7 @@ class process_group extends process_base;
       process_base p = iter.get();
       p.start();
       #0;
-      iter.next();
+      void'(iter.next());
     end    
     while(!iter.at_end());
 
@@ -97,7 +97,7 @@ class process_group extends process_base;
     do begin
       process_base p = iter.get();
       p.suspend();
-      iter.next();
+      void'(iter.next());
     end
     while(!iter.at_end());
 
@@ -118,7 +118,7 @@ class process_group extends process_base;
     do begin
       process_base p = iter.get();
       p.resume();
-      iter.next();
+      void'(iter.next());
     end
     while(!iter.at_end());
 
@@ -139,7 +139,7 @@ class process_group extends process_base;
     do begin
       process_base p = iter.get();
       p.kill();
-      iter.next();
+      void'(iter.next());
     end
     while(!iter.at_end());
 
@@ -160,7 +160,7 @@ class process_group extends process_base;
     do begin
       process_base p = iter.get();
       p.await();
-      iter.next();
+      void'(iter.next());
     end
     while(!iter.at_end());
 
@@ -184,7 +184,7 @@ class process_group extends process_base;
     do begin
       p = iter.get();
       done &= p.is_done();
-      iter.next();
+      void'(iter.next());
     end
     while(!iter.at_end());
 

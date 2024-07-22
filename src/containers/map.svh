@@ -134,7 +134,7 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
     if(rhs.first(idx)) begin
        do begin
          t = rhs.get(idx);
-         insert(idx, t);
+         void'(insert(idx, t));
        end
        while(rhs.next(idx));
      end

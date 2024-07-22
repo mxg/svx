@@ -102,7 +102,7 @@ class token_traits extends void_t;
         return 0;   // a == b
   endfunction
 
-  static function sort(token_t vec[$]);
+  static function void sort(token_t vec[$]);
     vec.sort with (item);
   endfunction
 

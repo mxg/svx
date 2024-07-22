@@ -26,6 +26,8 @@
 // permissions and limitations under the License.
 //======================================================================
 
+`include "svunit_defines.svh"
+
 module behavior_unit_test;
   import svunit_pkg::svunit_testcase;
 
@@ -119,7 +121,7 @@ module behavior_unit_test;
   //--------------------------------------------------------------------
   // fcn_behavior
   //--------------------------------------------------------------------
-    `SVTEST(fcn_behavior)
+    `SVTEST(fcn_behavior_test)
 
       int_fcn_behavior f = new();
       f.bind_context(12);
@@ -136,7 +138,7 @@ module behavior_unit_test;
   //--------------------------------------------------------------------
   // task_behavior
   //--------------------------------------------------------------------
-    `SVTEST(task_behavior)
+    `SVTEST(task_behavior_test)
 
       int_task_behavior f = new();
       f.bind_context(12);
@@ -153,7 +155,7 @@ module behavior_unit_test;
   //--------------------------------------------------------------------
   // process_behavior
   //--------------------------------------------------------------------
-    `SVTEST(process_behavior)
+    `SVTEST(process_behavior_test)
 
       int_task_behavior t = new();
       int_process_behavior f = new(t);
@@ -189,11 +191,11 @@ module behavior_unit_test;
       vec.push_back(fi);
 
       iter = new(vec);
-      iter.first();
+      void'(iter.first());
       do begin
         gb = iter.get();
         gb.exec();
-        iter.next();
+        void'(iter.next());
       end while(!iter.at_end());
 
       `FAIL_UNLESS(fi.get_context() == 94)
@@ -221,11 +223,11 @@ module behavior_unit_test;
       vec.push_back(fi);
 
       iter = new(vec);
-      iter.first();
+      void'(iter.first());
       do begin
         gb = iter.get();
         gb.nb_exec();
-        iter.next();
+        void'(iter.next());
       end while(!iter.at_end());
 
       // have to wait for the task to finish because it was

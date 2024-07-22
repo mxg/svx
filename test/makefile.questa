@@ -1,0 +1,99 @@
+#=======================================================================
+#
+#               .oooooo..o oooooo     oooo ooooooo  ooooo     
+#              d8P'    `Y8  `888.     .8'   `8888    d8'      
+#              Y88bo.        `888.   .8'      Y888..8P        
+#               `"Y8888o.     `888. .8'        `8888'         
+#                   `"Y88b     `888.8'        .8PY888.        
+#              oo     .d8P      `888'        d8'  `888b       
+#              8""88888P'        `8'       o888o  o88888o
+#
+#                  SystemVerilog Extension Library
+#
+#
+# Copyright 2016 NVIDIA Corporation
+# Copyright 2024 Mark Glasser
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http:#www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.  See the License for the specific language governing
+# permissions and limitations under the License.
+#=======================================================================
+
+#-----------------------------------------------------------------------
+#
+# Test Makefile
+#
+# Makefile for building and running the SVX test suite
+#-----------------------------------------------------------------------
+
+TEST		:= test
+
+COMPILELOG	:= compile.log
+RUNLOG		:= run.log
+
+QUESTA      = /home/questasim
+VLOG        = ${QUESTA}/bin/vlog
+VSIM        = ${QUESTA}/bin/vsim
+
+SVX_SRC		:= ../src/svx.sv
+SVUNIT_INSTALL ?= /home/training18/tools/svunit-3.38.0
+SVUNIT_SRC	:= ${SVUNIT_INSTALL}/svunit_base/junit-xml/junit_xml.sv \
+               ${SVUNIT_INSTALL}/svunit_base/svunit_pkg.sv
+               
+
+UNIT_TESTS      := ${wildcard */*_unit_test.sv}
+TESTSUITES      := ${wildcard */*_testsuite.sv}
+
+APPS		:= ../apps
+APPS_SRC	:= ${wildcard ${APPS}/mem/*.sv}             \
+                   ${wildcard ${APPS}/mem_map/*.sv}
+
+APPS_INC	:= +incdir+${APPS}/mem                      \
+                   +incdir+${APPS}/mem_map
+
+SRC		= test_utils.sv                             \
+          ${SVUNIT_SRC}                             \
+          ${SVX_SRC}                                \
+          ${APPS_SRC}                               \
+          ${UNIT_TESTS}                             \
+          ${TESTSUITES}                             \
+          testrunner.sv
+
+INC		= +incdir+.                                 \
+          +incdir+${SVUNIT_INSTALL}/svunit_base     \
+          +incdir+${SVUNIT_INSTALL}/svunit_base/junit-xml     \
+          +incdir+../src                            \
+          ${APPS_INC}
+
+COMPILE_OPTS    = -timescale=1ns/1ps
+
+VLOG_CMD	= ${VLOG} ${INC} ${SRC} ${COMPILE_OPTS} -l ${COMPILELOG}
+
+RUN_OPTS	= -64 -batch -lib work work.testrunner -do 'run -all; quit' \
+                   +UVM_NO_RELNOTES +UVM_TESTNAME=${TEST}
+
+VSIM_CMD	= ${VSIM} -l ${RUNLOG} ${RUN_OPTS}
+
+
+all: compile run
+
+compile: ${SRC}
+	${VLOG_CMD}
+
+run: 
+	${VSIM_CMD}
+
+
+clean:
+	rm -f ${COMPILELOG} ${RUNLOG} *.log
+	rm -rf work
+	rm -f tests.xml transcript
+	rm -f xx* *~ #*

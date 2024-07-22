@@ -51,7 +51,7 @@ class ver;
     return `SVX_VERSION ;
   endfunction
 
-  static function print_banner();
+  static function void print_banner();
     $display("----------------------------------------------------------------------");
     $display("SystemVerilog Extension Library");
     $display("%s", get_version_string());

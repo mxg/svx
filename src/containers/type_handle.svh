@@ -71,6 +71,7 @@ class type_container_base;
   endfunction
 
   virtual function type_handle_base get_type_handle();
+    return null;
   endfunction
   
 endclass
@@ -96,7 +97,7 @@ class type_container#(type T) extends type_container_base;
 
   // Put a new object into the container.  This will replace the current
   // object.
-  virtual function set(T x);
+  virtual function void set(T x);
     t = x;
   endfunction
 

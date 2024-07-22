@@ -236,7 +236,7 @@ virtual class mem_base#(int unsigned ADDR_BITS = 32,
 
   //  set a security restriction in the local component secuirity map
   virtual function void set_restriction(addr_t addr, restrict_t r);
-    security_map.insert(addr, r);
+    void'(security_map.insert(addr, r));
   endfunction
 
   // Retrieve the security restriction in the local component security
@@ -251,7 +251,7 @@ virtual class mem_base#(int unsigned ADDR_BITS = 32,
   // clear the security restirction in the local component security map,
   // if there is one.
   virtual function void clear_restriction(addr_t addr);
-    security_map.delete(addr);
+    void'(security_map.delete(addr));
   endfunction
 
   // For a given address, return any security restriction associated
