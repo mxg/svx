@@ -112,7 +112,7 @@ class vector #(type T=int, type P=void_traits)
   // function:  size
   //--------------------------------------------------------------------
   function size_t size();
-    return m_vector.size();
+    return size_t'(m_vector.size());
   endfunction
 
   //--------------------------------------------------------------------
@@ -133,7 +133,7 @@ class vector #(type T=int, type P=void_traits)
   function void copy(this_t vec);
 
     T t;
-    int unsigned idx;
+    index_t idx;
 
     if(vec == null)
       return;
@@ -166,7 +166,7 @@ class vector #(type T=int, type P=void_traits)
   // is undefined.
   // --------------------------------------------------------------------
   function int compare(this_t v);
-    return !equal(v);
+    return int'(!equal(v));
   endfunction
 
   //--------------------------------------------------------------------
@@ -175,7 +175,7 @@ class vector #(type T=int, type P=void_traits)
   // Compare a member of the vector with another for equality
   //--------------------------------------------------------------------
   virtual function bit equal(this_t v);
-    int unsigned i;
+    index_t i;
 
     if(v.size() != size())
       return 0;

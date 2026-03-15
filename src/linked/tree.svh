@@ -139,10 +139,10 @@ class tree extends node;
 
   // Return the number of children of the current node.
 
-  function int unsigned num_children();
+  function size_t num_children();
     if(m_children == null)
       return 0;
-    return m_children.size();
+    return size_t'(m_children.size());
   endfunction
 
   //--------------------------------------------------------------------

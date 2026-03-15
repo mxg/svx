@@ -68,7 +68,7 @@ module map_iterators_unit_test;
 
   map#(string, symbol, void_traits) symbol_table;
   map#(string, symbol, void_traits) one_map;
-  int unsigned map_size;
+  size_t map_size;
 
   //===================================
   // Build
@@ -84,17 +84,17 @@ module map_iterators_unit_test;
   //===================================
   task setup();
 
-    int unsigned i;
+    index_t i;
     rand_string rs;
     string name;
     int val;
     symbol sym;
-    int unsigned dup;
+    index_t dup;
 
     svunit_ut.setup();
 
     //randomize the size of the test vector;
-    map_size = $urandom() % 1000;
+    map_size = size_t'($urandom()) % 1000;
 
     rs = new();
     symbol_table = new();
@@ -105,7 +105,7 @@ module map_iterators_unit_test;
       name = rs.rand_string;
       val = $random() % 1000;
       sym = new(name, val);
-      dup += !(symbol_table.insert(name, sym));
+      dup += index_t'(!(symbol_table.insert(name, sym)));
     end
 
     one_map = new();
@@ -148,8 +148,8 @@ module map_iterators_unit_test;
   //--------------------------------------------------------------------    
     `SVTEST(forward_iteration)
   
-      int unsigned iter_count;
-      int unsigned i;
+      index_t iter_count;
+      index_t i;
   
       map_fwd_iterator#(string, symbol, void_traits) iter = new();
 
@@ -199,8 +199,8 @@ module map_iterators_unit_test;
   //--------------------------------------------------------------------    
     `SVTEST(backward_iteration)
 
-      int unsigned iter_count;
-      int unsigned i;
+      index_t iter_count;
+      index_t i;
       map_bkwd_iterator#(string, symbol, void_traits) iter;
 
       iter = new();
@@ -417,7 +417,7 @@ module map_iterators_unit_test;
     `SVTEST(bidir_fwd_bkwd)
 
       map_bidir_iterator#(string, symbol, void_traits) iter;
-      int unsigned iter_count;
+      index_t iter_count;
 
       iter = new(symbol_table);
 
@@ -503,7 +503,7 @@ module map_iterators_unit_test;
 
       map_random_iterator#(string, symbol, void_traits) iter;
       symbol t;
-      int unsigned i;
+      index_t i;
       int unsigned iterations;
       symbol array1[];
       symbol array2[];
@@ -512,7 +512,7 @@ module map_iterators_unit_test;
       iter = new(symbol_table);
 
       // randomize the number of iterations
-      iterations = $urandom() % symbol_table.size();
+      iterations = int'($urandom()) % int'(symbol_table.size());
       array1 = new [iterations];
       array2 = new [iterations];
       seed = $random();
@@ -520,7 +520,7 @@ module map_iterators_unit_test;
       // Use the default seed (which is 1) to generate a stream of
       // randomized acesses.
       iter.set_default_seed();
-      for(i = 0; i < iterations; i++) begin
+      for(i = 0; i < index_t'(iterations); i++) begin
         `FAIL_IF(!iter.random())
         t = iter.get();
         array1[i] = t;
@@ -528,7 +528,7 @@ module map_iterators_unit_test;
 
       // Change the seed to get a different stream of accesses.
       iter.set_seed(seed);
-      for(i = 0; i < iterations; i++) begin
+      for(i = 0; i < index_t'(iterations); i++) begin
         `FAIL_IF(!iter.random())
         t = iter.get();
         array2[i] = t;
@@ -536,7 +536,7 @@ module map_iterators_unit_test;
 
       // Go back to the default seed to get the same stream as the first set.
       iter.set_seed(1);
-      for(i = 0; i < iterations; i++) begin
+      for(i = 0; i < index_t'(iterations); i++) begin
         `FAIL_IF(!iter.random())
         t = iter.get();
         `FAIL_IF(t != array1[i])
@@ -544,7 +544,7 @@ module map_iterators_unit_test;
 
       // Repeat the non-default seed to make sure that we can still get the same stream.
       iter.set_seed(seed);
-      for(i = 0; i < iterations; i++) begin
+      for(i = 0; i < index_t'(iterations); i++) begin
         `FAIL_IF(!iter.random())
         t = iter.get();
         `FAIL_IF(t != array2[i])
@@ -562,7 +562,7 @@ module map_iterators_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(one)
 
-      int unsigned iter_count;
+      index_t iter_count;
       symbol t;
 
       map_fwd_iterator#(string, symbol, void_traits) fwd_iter;

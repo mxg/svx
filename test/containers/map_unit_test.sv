@@ -74,7 +74,7 @@ module map_unit_test;
     svunit_ut.teardown();
   endtask
 
-  parameter int unsigned MAP_SIZE = 20;
+  parameter size_t MAP_SIZE = 20;
 
   //===================================
   // All tests are defined between the
@@ -101,16 +101,15 @@ module map_unit_test;
 
     `SVTEST(string_map_test)
       string s;
-      string t;
-      int unsigned i;
+      index_t i;
 
       m = new();
 
       // Load up the map
       for(i = 0; i < MAP_SIZE; i++) begin
         s = rs.rand_string();
-        void'(m.insert(s, i));
-        array[s] = i;
+        void'(m.insert(s, int'(i)));
+        array[s] = int'(i);
       end 
 
       `FAIL_IF(m.size() != MAP_SIZE)
@@ -128,14 +127,14 @@ module map_unit_test;
   // randomly generated) string key does NOT exist.
   //--------------------------------------------------------------------
     `SVTEST(exists_test)
-      int unsigned i;
-      int unsigned n;
+      index_t i;
+      index_t n;
       string s;
-      string t;
+      string t = "";
       const string s_cmp = "abcdef";
 
       // Randomly choose an item that is in the map
-      n = $urandom() % MAP_SIZE;
+      n = index_t'($urandom()) % MAP_SIZE;
       i = 0;
       foreach (array[t]) begin
         s = t;
@@ -159,8 +158,8 @@ module map_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(clone_test)
 
-      int unsigned i;
-      int unsigned n;
+      index_t i;
+      index_t n;
       string s;
       map#(string, int, int_traits) cloned_map;
 
@@ -173,7 +172,7 @@ module map_unit_test;
       // should no longer be equal.
 
       // Randomly choose an item that is in the map
-      n = $urandom() % MAP_SIZE;
+      n = index_t'($urandom()) % MAP_SIZE;
       i = 0;
       foreach (array[t]) begin
         s = t;
@@ -197,8 +196,8 @@ module map_unit_test;
   // delete
   //--------------------------------------------------------------------
     `SVTEST(delete_test)
-      int unsigned i;
-      int unsigned n;
+      index_t i;
+      index_t n;
       string s;
       string t;
 
@@ -206,7 +205,7 @@ module map_unit_test;
       `FAIL_IF(m.size() != MAP_SIZE)
 
       // Randomly choose an item that is in the map
-      n = $urandom() % MAP_SIZE;
+      n = index_t'($urandom()) % MAP_SIZE;
       i = 0;
       foreach (array[t]) begin
         s = t;

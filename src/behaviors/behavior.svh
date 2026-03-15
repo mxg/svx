@@ -166,6 +166,7 @@ class reduce_behavior#(type T=int,
 
   virtual function R reduce(T t, R accum);
     $display("Doh! Someone forgot to implement reduce() in reduce_behavior");
+    return accum;
   endfunction
 
 endclass
@@ -191,7 +192,7 @@ endclass
 //----------------------------------------------------------------------
 class task_behavior #(type T=int) extends generic_context_behavior#(T);
 
-  local process proc;
+  local std::process proc;
 
   // tsk
   //

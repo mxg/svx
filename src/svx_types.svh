@@ -29,11 +29,11 @@
 //----------------------------------------------------------------------
 // types
 //
-// Special types used in svlib
+// Special types used in svx
 //----------------------------------------------------------------------
 
 // represents sizes of various things
-typedef int unsigned size_t;
+typedef longint unsigned size_t;
 
 // used for indexes
 typedef longint unsigned index_t;

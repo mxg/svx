@@ -90,8 +90,8 @@ module vector_unit_test;
   //===================================
 
 
-  parameter int unsigned VECTOR_SIZE = 17;
-  parameter int unsigned OTHER_SIZE = 9;
+  parameter index_t VECTOR_SIZE = 17;
+  parameter index_t OTHER_SIZE = 9;
 
   `SVUNIT_TESTS_BEGIN
 
@@ -120,13 +120,13 @@ module vector_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(fill_vector)
       begin
-        int unsigned i;
+        index_t i;
         int value;
         int array[VECTOR_SIZE];
 
         for(i = 0; i < VECTOR_SIZE; i++) begin
           value = $random();
-          array[i] = value;
+          array[i[4:0]] = value;
           vi.write(i, value);
         end
 
@@ -135,7 +135,7 @@ module vector_unit_test;
         // check to see if everything in the vector is in the right place
         for(i = 0; i < VECTOR_SIZE; i++) begin
 	  value = vi.read(i);
-          `FAIL_IF(!int_traits::equal(value,array[i]))
+          `FAIL_IF(!int_traits::equal(value,array[i[4:0]]))
         end
 
       end
@@ -149,7 +149,7 @@ module vector_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(clone)
       begin
-        int unsigned i;
+        index_t i;
         vector#(int, int_traits) cloned_vector;
         cloned_vector = vi.clone();
 
@@ -182,21 +182,21 @@ module vector_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(real_vector_test)
       begin
-        int unsigned i;
+        index_t i;
         vector#(real, real_traits) vr = new();
         real array[VECTOR_SIZE];
         real value;
 
         for(i = 0; i < VECTOR_SIZE; i++) begin
           value = real'(i * 20);
-          array[i] = value;
+          array[i[4:0]] = value;
           vr.write(i, value);
         end
 
         `FAIL_IF(vr.size() != VECTOR_SIZE)
 
         for(i = 0; i < VECTOR_SIZE; i++) begin
-          `FAIL_IF(!real_traits::equal(vr.read(i), array[i]))
+          `FAIL_IF(!real_traits::equal(vr.read(i), array[i[4:0]]))
         end
       end
     `SVTEST_END
@@ -207,7 +207,7 @@ module vector_unit_test;
     `SVTEST(string_vector_test)
       begin
         rand_string rs; // random string generator
-        int unsigned i;
+        index_t i;
         vector#(string, string_traits) vs = new();
         string array[VECTOR_SIZE];
         string value;
@@ -215,14 +215,14 @@ module vector_unit_test;
         rs = new();
         for(i = 0; i < VECTOR_SIZE; i++) begin
           value = rs.rand_string();
-          array[i] = value;
+          array[i[4:0]] = value;
           vs.write(i, value);
         end
 
         `FAIL_IF(vs.size() != VECTOR_SIZE)
 
         for(i = 0; i < VECTOR_SIZE; i++) begin
-          `FAIL_IF(!string_traits::equal(vs.read(i), array[i]))
+          `FAIL_IF(!string_traits::equal(vs.read(i), array[i[4:0]]))
         end
       end
     `SVTEST_END
@@ -232,7 +232,7 @@ module vector_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(append)
       begin
-        int unsigned i;
+        index_t i;
         intus_vector v_a = new();
         intus_vector v_b = new();
         int unsigned value;
@@ -243,15 +243,15 @@ module vector_unit_test;
         // Fill vector A
         for(i = 0; i < VECTOR_SIZE; i++) begin
           value = $urandom();
-          array[i] = value;
-          v_a.write(i, value);
+          array[i[4:0]] = value;
+          v_a.write(i, int'(value));
         end
 
         // Fill vector B
         for(i = 0; i < OTHER_SIZE; i++) begin
           value = $urandom();
-          array[VECTOR_SIZE + i] = value;
-          v_b.write(i, value);
+          array[5'(VECTOR_SIZE + i)] = value;
+          v_b.write(i, int'(value));
         end
 
         // Append B to A
@@ -261,7 +261,7 @@ module vector_unit_test;
         `FAIL_IF(v_a.size() != (VECTOR_SIZE + OTHER_SIZE))
 
         for(i = 0; i < (VECTOR_SIZE + OTHER_SIZE); i++) begin
-          `FAIL_IF(!int_unsigned_traits::equal(v_a.read(i),array[i]))
+          `FAIL_IF(!int_unsigned_traits::equal(v_a.read(i), array[i[4:0]]))
         end
 
       end
@@ -276,7 +276,7 @@ module vector_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(appendc)
       begin
-        int unsigned i;
+        index_t i;
         intus_vector v_a = new();
         int unsigned value;
         int unsigned array[VECTOR_SIZE + OTHER_SIZE];
@@ -285,14 +285,14 @@ module vector_unit_test;
         // Fill vector A
         for(i = 0; i < VECTOR_SIZE; i++) begin
           value = $urandom();
-          array[i] = value;
+          array[i[4:0]] = value;
           v_a.write(i, value);
         end
 
         // Append items to v_a
         for(i = 0; i < OTHER_SIZE; i++) begin
           value = $urandom();
-          array[VECTOR_SIZE + i] = value;
+          array[5'(VECTOR_SIZE + i)] = value;
           v_a.appendc(value);
         end
 
@@ -300,7 +300,7 @@ module vector_unit_test;
         `FAIL_IF(v_a.size() != (VECTOR_SIZE + OTHER_SIZE))
 
         for(i = 0; i < (VECTOR_SIZE + OTHER_SIZE); i++) begin
-          `FAIL_IF(!int_unsigned_traits::equal(v_a.read(i),array[i]))
+          `FAIL_IF(!int_unsigned_traits::equal(v_a.read(i),array[i[4:0]]))
         end
 
       end

@@ -52,7 +52,7 @@ class rand_string;
       n = ($urandom % (maxlen - 1)) + 1;
 
     for(i = 0; i < n; i++) begin
-      assert(randomize());
+      assert(bit'(randomize()));
       s = { s, c };
     end
 

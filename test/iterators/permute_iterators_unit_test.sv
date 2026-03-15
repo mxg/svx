@@ -44,7 +44,7 @@ module permute_iterator_unit_test;
   //===================================
 
   vector#(string, string_traits) vec;
-  longint fact;
+  longint unsigned fact;
 
   //===================================
   // Build
@@ -62,7 +62,7 @@ module permute_iterator_unit_test;
 //    vec.write(5, "F");
 //    vec.write(6, "G");
 
-    fact = factorial(vec.size());
+    fact = factorial(index_t'(vec.size()));
 
     $sformat(msg, "permutation vector size = %0d, permutations = %0d", vec.size(), fact);
     `INFO(msg);
@@ -94,7 +94,7 @@ module permute_iterator_unit_test;
   //
   // A little utility to compute n!
   //--------------------------------------------------------------------
-  function longint unsigned factorial(int unsigned n);
+  function longint unsigned factorial(longint unsigned n);
     return (n <= 2)
       ? n
       : (n * factorial(n-1));
@@ -129,18 +129,18 @@ module permute_iterator_unit_test;
   //--------------------------------------------------------------------    
     `SVTEST(forward)
 
-      int unsigned i;
+      index_t i;
       longint unsigned iter_count;
       permute_fwd_iterator#(string, string_traits) iter;
       string permutation;
-      int perm_map[string];
+      index_t perm_map[string];
 
       iter = new(vec);
 
       void'(iter.first());
       while(!iter.at_end()) begin
         permutation = "";
-        for(i = 0; i < vec.size(); i++) begin
+        for(i = 0; i < index_t'(vec.size()); i++) begin
           permutation = { permutation, "-", iter.get_nth(i) };
         end
         perm_map[permutation] = iter_count;
@@ -149,7 +149,7 @@ module permute_iterator_unit_test;
       end
 
       `FAIL_IF(iter_count != factorial(vec.size()))
-      `FAIL_IF(perm_map.size() != factorial(vec.size()))
+      `FAIL_IF(index_t'(perm_map.size()) != factorial(vec.size()))
 
       // Another idiom for traversing the vector
       perm_map.delete(); // clean out the map from the previous part of the test.
@@ -166,7 +166,7 @@ module permute_iterator_unit_test;
       end while(!iter.at_end());
 
       `FAIL_IF(iter_count != fact)
-      `FAIL_IF(perm_map.size() != fact)
+      `FAIL_IF(index_t'(perm_map.size()) != fact)
 
      // Reset to the first item in the list and then move to the last item.
       `FAIL_IF(!iter.first())
@@ -188,10 +188,10 @@ module permute_iterator_unit_test;
   //--------------------------------------------------------------------    
    `SVTEST(backward)
 
-      int unsigned iter_count;
-      int unsigned i;
+      index_t iter_count;
+      index_t i;
       string permutation;
-      int perm_map[string];
+      index_t perm_map[string];
 
       permute_bkwd_iterator#(string, string_traits) iter = new();
       iter.bind_vector(vec);
@@ -213,7 +213,7 @@ module permute_iterator_unit_test;
       end
 
       `FAIL_IF(iter_count != fact)
-      `FAIL_IF(perm_map.size() != fact)
+      `FAIL_IF(index_t'(perm_map.size()) != fact)
 
       // Another idiom for traversing in the backward direction
       perm_map.delete();
@@ -230,7 +230,7 @@ module permute_iterator_unit_test;
       end while(!iter.at_beginning());
 
       `FAIL_IF(iter_count != fact)
-      `FAIL_IF(perm_map.size() != fact)
+      `FAIL_IF(index_t'(perm_map.size()) != fact)
 
        // Reset to the last item in the list and then skip backwards to
        // the first item.
@@ -257,9 +257,9 @@ module permute_iterator_unit_test;
     `SVTEST(random)
 
       permute_random_iterator#(string, string_traits) iter;
-      int unsigned i;
-      int unsigned j;
-      int unsigned iterations;
+      index_t i;
+      index_t j;
+      index_t iterations = 20;
       int seed;
 
       iter = new(vec);
@@ -297,8 +297,8 @@ module permute_iterator_unit_test;
     `SVTEST(bidir_fwd_bkwd)
 
       permute_bidir_iterator#(string, string_traits) iter;
-      int unsigned iter_count;
-      int unsigned i;
+      index_t iter_count;
+      index_t i;
 
       iter = new(vec);
 
@@ -388,7 +388,7 @@ module permute_iterator_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(one)
 
-      int unsigned iter_count;
+      index_t iter_count;
       string t;
 
       vector#(string, string_traits) one_list;

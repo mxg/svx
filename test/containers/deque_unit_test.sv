@@ -74,7 +74,7 @@ module deque_unit_test;
     /* Place Teardown Code Here */
   endtask
 
-  parameter int unsigned DEQUE_SIZE = 25;
+  parameter size_t DEQUE_SIZE = 25;
 
 
   //===================================
@@ -97,14 +97,14 @@ module deque_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(fwd_queue)
       begin
-        int unsigned i;
+        index_t i;
         int value;
         int array[DEQUE_SIZE];
 
         // fill deque from the front
         for(i = 0; i < DEQUE_SIZE; i++) begin
           value = $random();
-          array[i] = value;
+          array[i[4:0]] = value;
           my_deque.push_front(value);
         end
 
@@ -115,25 +115,25 @@ module deque_unit_test;
         // in the same order as the array
         for(i = 0; i < DEQUE_SIZE; i++) begin
           value = my_deque.pop_back();
-          `FAIL_IF(value != array[i])
+          `FAIL_IF(value != array[i[4:0]])
         end
 
       end
     `SVTEST_END
 
-  //--------------------------------------------------------------------
+  //--------------------------------------------------------------<------
   // Backward queue behavior
   //--------------------------------------------------------------------
     `SVTEST(bkwd_queue)
       begin
-        int unsigned i;
+        index_t i;
         int value;
         int array[DEQUE_SIZE];
 
         // fill deque from the back
         for(i = 0; i < DEQUE_SIZE; i++) begin
           value = $random();
-          array[i] = value;
+          array[i[4:0]] = value;
           my_deque.push_back(value);
         end
 
@@ -144,7 +144,7 @@ module deque_unit_test;
         // in the same order as the array
         for(i = 0; i < DEQUE_SIZE; i++) begin
           value = my_deque.pop_front();
-          `FAIL_IF(value != array[i])
+          `FAIL_IF(value != array[i[4:0]])
         end
 
       end
@@ -155,14 +155,14 @@ module deque_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(reverse)
       begin
-        int unsigned i;
+        index_t i;
         int value;
         int array[DEQUE_SIZE];
 
         // fill deque from the back
         for(i = 0; i < DEQUE_SIZE; i++) begin
           value = $random();
-          array[i] = value;
+          array[i[4:0]] = value;
           my_deque.push_front(value);
         end
 
@@ -174,7 +174,7 @@ module deque_unit_test;
         my_deque.reverse();
         for(i = 0; i < DEQUE_SIZE; i++) begin
           value = my_deque.pop_front();
-          `FAIL_IF(value != array[i])
+          `FAIL_IF(value != array[i[4:0]])
         end
 
       end
@@ -188,7 +188,6 @@ module deque_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(clone)
       begin
-        int unsigned i;
         deque#(int, int_traits) cloned_deque;
         cloned_deque = my_deque.clone();
 

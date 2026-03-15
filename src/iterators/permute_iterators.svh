@@ -31,7 +31,7 @@
 //
 // A permutation is an ordering of elements in a list.  The permutation
 // iterators allow you to retrieve elements of a list in various
-// permutation.  Like the other iterators in this library, the
+// permutations.  Like the other iterators in this library, the
 // permutation iterator binds to a container, in this case a vector.
 // The permutation iterator generates a permutation and then makes it
 // available externally.  The bound vector is not modified in any way.
@@ -80,7 +80,7 @@
 // permutation algorithms. Using a macro in this case makes the code
 // look a little cleaner.
 
-`define SWAP(a, b) begin int unsigned t = a; a = b; b = t; end
+`define SWAP(a, b) begin index_t t = a; a = b; b = t; end
 
 //----------------------------------------------------------------------
 // permute_iterator_base
@@ -97,7 +97,7 @@ class permute_iterator_base#(type T=int, type P=void_traits)
   // list of indexes into the bound vector.  It is the same size as the
   // bound vector, so every element in the bound vector is represented
   // in the permutation vector (pv).
-  protected int unsigned pv[];
+  protected index_t pv[];
 
   // This is somewhat arbitrary. Computing the factorial of numbers
   // larger than 34 results in a value that is too large to hold
@@ -141,7 +141,7 @@ class permute_iterator_base#(type T=int, type P=void_traits)
   //
   // A little utility to compute n!
   //--------------------------------------------------------------------
-  protected function longint unsigned factorial(int unsigned n);
+  protected function longint unsigned factorial(longint unsigned n);
     return (n <= 2)
       ? n
       : (n * factorial(n-1));
@@ -153,7 +153,7 @@ class permute_iterator_base#(type T=int, type P=void_traits)
   protected function void initialize();
     index_t i;
 
-    pv = new [m_vec.size()];
+    pv = new [int'(m_vec.size())];
 
     // create a list of small integers from 0 to n-1.
     for (i = 0; i < m_vec.size(); i++) begin
@@ -223,11 +223,11 @@ class permute_iterator_base#(type T=int, type P=void_traits)
   // vector contains the ordering of the elements for the current
   // permutation.
   // --------------------------------------------------------------------
-  virtual function vector#(int, int_traits)get_permutation_vector();
-    int unsigned i;
-    vector#(int, int_traits) v = new();
+  virtual function vector#(index_t, longint_unsigned_traits)get_permutation_vector();
+    index_t i;
+    vector#(index_t, longint_unsigned_traits) v = new();
 
-    for(i = 0; i < pv.size(); i++)
+    for(i = 0; i < index_t'(pv.size()); i++)
       v.appendc(pv[i]);
 
     return v;
@@ -277,11 +277,11 @@ class permute_iterator_base#(type T=int, type P=void_traits)
   // --------------------------------------------------------------------
   protected function bit set_permutation(index_t n);
 
-    int unsigned i;
-    int unsigned j;
-    int unsigned tempi;
-    int unsigned temp;
-    int unsigned len;
+    index_t i;
+    index_t j;
+    index_t tempi;
+    index_t temp;
+    index_t len;
     index_t f;
 
     // If the iterator has not been initialized then there is nothing we
@@ -290,7 +290,7 @@ class permute_iterator_base#(type T=int, type P=void_traits)
       return 0;
     end
 
-    len = pv.size();
+    len = index_t'(pv.size());
     f = fact; // sets f to the pre-computed value of len! (i.e. factorial of len).
 
     // reset pv vector
@@ -325,7 +325,7 @@ class permute_iterator_base#(type T=int, type P=void_traits)
   //--------------------------------------------------------------------
   protected function bit next_permutation();
 
-    int i;
+    signed_index_t i;
     signed_index_t j;
     signed_index_t k;
     signed_index_t n;
@@ -334,7 +334,7 @@ class permute_iterator_base#(type T=int, type P=void_traits)
       return 0;
     end
 
-    n = pv.size();
+    n = signed_index_t'(pv.size());
     for(i = n - 2; (i >= 0) && (pv[i] > pv[i + 1]); i--);
   
     // If i is smaller than 0, then there are no more permutations,
@@ -367,7 +367,7 @@ class permute_iterator_base#(type T=int, type P=void_traits)
   //--------------------------------------------------------------------
   function void print();
 
-    int unsigned i;
+    index_t i;
 
     if(!initialized) begin
       $display("<uninitialized>");
@@ -376,7 +376,7 @@ class permute_iterator_base#(type T=int, type P=void_traits)
 
     $write("%0d:", pix);
 
-    for(i = 0; i < pv.size(); i++) begin
+    for(i = 0; i < index_t'(pv.size()); i++) begin
       $write(" %0d", pv[i]);
     end
     $display();
@@ -564,11 +564,20 @@ class permute_random_iterator#(type T=int, type P=void_traits)
     if((m_vec == null) || (m_vec.size() == 0))
       return 0;
 
-    tmp_pix = $urandom() % max_pix;
+    tmp_pix = signed_index_t'($urandom()) % max_pix;
     pix = tmp_pix;
     void'(set_permutation(pix));
     return 1;
   endfunction
+
+  // skip
+  //
+  // The Verilator compiler could not find the skip() implementation
+  // in the base class, so we gave it a hint.
+  virtual function bit skip(signed_index_t distance);
+    return permute_iterator_base#(T,P)::skip(distance);    
+  endfunction
+    
 
 endclass
 
@@ -634,5 +643,16 @@ class permute_bidir_iterator#(type T=int, type P=void_traits)
       return 1;
     return (pix < 0);
   endfunction
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  // skip
+  //
+  // The Verilator compiler could not find the skip() implementation
+  // in the base class, so we gave it a hint.
+  virtual function bit skip(signed_index_t distance);
+    return permute_iterator_base#(T,P)::skip(distance);
+  endfunction
+  
 
 endclass

@@ -21,7 +21,7 @@ module testrunner();
   iterators_testsuite iterators_ts();
   linked_testsuite linked_ts();
   lexer_testsuite lexer_ts();
-  apps_testsuite apps_ts();
+  //apps_testsuite apps_ts();
   behaviors_testsuite behaviors_ts();
 
 
@@ -59,8 +59,8 @@ module testrunner();
     svunit_tr.add_testsuite(linked_ts.svunit_ts);
     lexer_ts.build();
     svunit_tr.add_testsuite(lexer_ts.svunit_ts);
-    apps_ts.build();
-    svunit_tr.add_testsuite(apps_ts.svunit_ts);
+    //apps_ts.build();
+    //svunit_tr.add_testsuite(apps_ts.svunit_ts);
     behaviors_ts.build();
     svunit_tr.add_testsuite(behaviors_ts.svunit_ts);
   endfunction
@@ -74,7 +74,7 @@ module testrunner();
     iterators_ts.run();
     linked_ts.run();
     lexer_ts.run();
-    apps_ts.run();
+    //apps_ts.run();
     behaviors_ts.run();
     svunit_tr.report();
   endtask

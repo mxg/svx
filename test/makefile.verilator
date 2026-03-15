@@ -1,0 +1,111 @@
+# =============================================================================
+# Makefile for SystemVerilog Simulation with Verilator
+# =============================================================================
+
+#------------------------------------------------------------
+# Command Verbosity
+
+#V               = @
+V               =
+
+#------------------------------------------------------------
+# Tools
+
+VERILATOR       := /usr/local/bin/verilator
+SVUNIT_INSTALL	?= /home/mark-glasser/projects/svunit
+
+CXX		:= /usr/bin/c++
+CXXFLAGS        := -std=c++17 -O2
+
+#------------------------------------------------------------
+# Source
+
+SVX_SRC		:= ../src/svx.sv
+
+APPS		:= ../apps
+APPS_SRC	:= ${wildcard ${APPS}/mem/*.sv}             \
+                   ${wildcard ${APPS}/mem_map/*.sv}
+
+APPS_INC	:= +incdir+${APPS}/mem                      \
+                   +incdir+${APPS}/mem_map
+
+SVUNIT_SRC	:= ${SVUNIT_INSTALL}/svunit_base/svunit_pkg.sv  \
+                   ${SVUNIT_INSTALL}/svunit_base/junit-xml/junit_xml.sv
+SVUNIT_INC	:= +incdir+${SVUNIT_INSTALL}/svunit_base        \
+		   +incdir+${SVUNIT_INSTALL}/svunit_base/junit-xml
+UNIT_TESTS      := ${wildcard */*_unit_test.sv}
+TESTSUITES      := ${wildcard */*_testsuite.sv}
+
+SV_SRC		= test_utils.sv                             \
+                  ${SVUNIT_SRC}                             \
+                  ${SVX_SRC}                                \
+                  ${APPS_SRC}                               \
+                  ${UNIT_TESTS}                             \
+                  ${TESTSUITES}                             \
+                  testrunner.sv
+
+SV_INC		= +incdir+.                                 \
+                  ${SVUNIT_INC}                             \
+                  +incdir+../src                            \
+                  ${APPS_INC}
+
+SC_SRC	       :=
+SC_INC	       :=
+
+C_SRC	       := main.cpp
+C_INC	       :=
+
+SRC	       := ${SV_SRC} ${SC_SRC} ${C_SRC}
+INC	       := ${SV_INC} ${SC_INC} ${C_INC}
+
+#------------------------------------------------------------
+# Configuration
+
+TOP_MODULE      := testrunner
+
+# Output / build paths
+BUILD_DIR       := build_dir
+SIM_BIN         := $(BUILD_DIR)/V$(TOP_MODULE)
+
+BUILDLOG	:= build.log
+RUNLOG		:= run.log
+
+#------------------------------------------------------------
+# Commands
+ 
+COMPILE_OPTS	:= --cc --exe --build --sv -Mdir $(BUILD_DIR)
+COMPILE_OPTS	+= --top ${TOP_MODULE}
+COMPILE_OPTS 	+= -Wall
+# turn off pedantry
+COMPILE_OPTS	+= --Wno-DECLFILENAME -Wno-VARHIDDEN -Wno-UNUSEDSIGNAL -Wno-UNDRIVEN
+COMPILE_OPTS	+= --timing
+
+COMPILE_CMD    := ${VERILATOR} ${COMPILE_OPTS} ${INC} ${SRC}
+
+RUN_OPTS       := +UVM_NO_RELNOTES +UVM_TESTNAME=${TEST} 
+
+RUN_CMD	       := ${SIM_BIN} ${RUN_OPTS}
+
+#------------------------------------------------------------
+# Rules
+
+all: build run
+ 
+build: ${SRC}
+	@echo "[BUILD]" `pwd`
+	${V}mkdir -p $(BUILD_DIR)	
+	${V}echo ${COMPILE_CMD} > ${BUILDLOG} 2>&1
+	${V}${COMPILE_CMD} >> ${BUILDLOG} 2>&1
+
+run:
+	@echo "[RUN]" `pwd`
+	${V}echo ${RUN_CMD} > ${RUNLOG} 2>&1
+	${V}${RUN_CMD} >> ${RUNLOG} 2>&1
+ 
+clean:
+	@echo "[CLEAN]" `pwd`
+	${V}rm -f ${BUILDLOG} ${RUNLOG}
+	${V}rm -f xx* *~ #*
+	${V}rm -rf $(BUILD_DIR) *.vcd *.fst
+	${V}rm -f *.xml
+ 

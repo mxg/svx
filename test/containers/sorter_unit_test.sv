@@ -123,8 +123,8 @@ module sorter_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(int_sort)
 
-      int i;
-      const int N = 50;
+      index_t i;
+      const index_t N = 50;
       vector#(int, int_traits) v = new();
 
       for(i = 0; i < N; i++) begin
@@ -147,12 +147,12 @@ module sorter_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(worst_case_sort)
 
-      int i;
-      const int N = 50;
+      index_t i;
+      const index_t N = 50;
       vector#(int, int_traits) v = new();
 
       for(i = 0; i < N; i++) begin
-        v.appendc(N-i);
+        v.appendc(int'(N-i));
       end
 
       v.sort();
@@ -169,13 +169,13 @@ module sorter_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(coordinate_sort)
 
-      int unsigned i;
+      index_t i;
       coordinate c;
   
 
       vector#(coordinate, coordinate_traits) v = new();
       list_fwd_iterator#(coordinate, coordinate_traits) iter = new(v);
-      const int N=20;
+      const index_t N = 20;
 
       for(i = 0; i < N; i++) begin
 	    c = new();
@@ -205,18 +205,18 @@ module sorter_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(coordinate_worst_case_sort)
 
-      int unsigned i;
+      index_t i;
       coordinate c;
   
 
       vector#(coordinate, coordinate_traits) v = new();
       list_fwd_iterator#(coordinate, coordinate_traits) iter = new(v);
-      const int N=20;
+      const index_t N = 20;
 
       for(i = 0; i < N; i++) begin
 	    c = new();
 	    void'(c.randomize());
-	    c.x = N-i;
+	    c.x = int'(N-i);
         v.appendc(c);
       end
 
@@ -234,11 +234,11 @@ module sorter_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(string_sort)
 
-      int unsigned i;
+      index_t i;
       rand_string r = new();
       vector#(string, string_traits) v = new();
       list_fwd_iterator#(string, string_traits) iter = new(v);
-      const int N=20;
+      const index_t N = 20;
 
       for(i = 0; i < N; i++) begin
         v.appendc(r.rand_string());

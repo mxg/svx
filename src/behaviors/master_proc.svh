@@ -149,7 +149,7 @@ class master_process extends process_behavior #(master_control);
 
   static local  master_process mp;
   //local mailbox#(process_base) process_queue;
-  local semaphore sm;
+  local std::semaphore sm;
   local queue#(process_base, class_traits#(process_base)) process_queue;
   local master_control master_context;
 
@@ -200,7 +200,7 @@ class master_process extends process_behavior #(master_control);
   local function void bootup();
 
     process_base p;
-    process ph;
+    std::process ph;
     
     // clear out the input queue
     process_queue.clear();

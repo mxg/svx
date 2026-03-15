@@ -26,6 +26,8 @@
 // permissions and limitations under the License.
 //======================================================================
 
+/* verilator lint_off DECLFILENAME */
+
 package test_utils;
 
   `include "rand_string.svh"

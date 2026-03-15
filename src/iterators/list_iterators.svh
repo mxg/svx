@@ -184,6 +184,16 @@ class list_fwd_iterator#(type T=int, type P=void_traits)
     return (idx >= m_list.size());
   endfunction
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  // skip
+  //
+  // The Verilator compiler could not find the skip() implementation
+  // in the base class, so we gave it a hint.
+  virtual function bit skip(signed_index_t distance);
+    return list_iterator_base#(T,P)::skip(distance);
+  endfunction
+
 endclass
 
 
@@ -255,6 +265,16 @@ class list_bkwd_iterator#(type T=int, type P=void_traits)
     return (idx < 0);
   endfunction
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  // skip
+  //
+  // The Verilator compiler could not find the skip() implementation
+  // in the base class, so we gave it a hint.
+  virtual function bit skip(signed_index_t distance);
+    return list_iterator_base#(T,P)::skip(distance);
+  endfunction
+
 endclass
 
 //----------------------------------------------------------------------
@@ -303,15 +323,25 @@ class list_random_iterator#(type T=int, type P=void_traits)
   // Choose a random item in the vector and set the current position to
   // this randomly chosen item.
   virtual function bit random();
-    int unsigned n;
+    size_t n;
 
     if((m_list == null) || (m_list.size() == 0))
       return 0;
 
-    n = $urandom() % m_list.size();
+    n = size_t'($urandom()) % m_list.size();
     idx = n;
     return 1;
 
+  endfunction
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  // skip
+  //
+  // The Verilator compiler could not find the skip() implementation
+  // in the base class, so we gave it a hint.
+  virtual function bit skip(signed_index_t distance);
+    return list_iterator_base#(T,P)::skip(distance);
   endfunction
 
 endclass
@@ -392,6 +422,16 @@ class list_bidir_iterator#(type T=int, type P=void_traits)
     if(m_list == null || m_list.size() == 0)
       return 1;
     return (idx < 0);
+  endfunction
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  // skip
+  //
+  // The Verilator compiler could not find the skip() implementation
+  // in the base class, so we gave it a hint.
+  virtual function bit skip(signed_index_t distance);
+    return list_iterator_base#(T,P)::skip(distance);
   endfunction
 
 endclass

@@ -122,9 +122,9 @@ module mem_bounded_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(read_write)
 
-      typedef mem_bounded#(16,4,4,2) mem_t;
-      mem_t::word_t data;
-      mem_t m = new('h3000, 'h3fff);
+      //typedef mem_bounded#(16,4,4,2) mem_t;
+      mem_bounded#(16,4,4,2)::word_t data;
+      mem_bounded#(16,4,4,2) m = new('h3000, 'h3fff);
 
       `FAIL_IF(m.get_bounds_lock() == 1)
       data = $urandom();

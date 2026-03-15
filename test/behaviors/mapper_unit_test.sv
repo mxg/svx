@@ -75,7 +75,9 @@ module mapper_unit_test;
   endtask
 
   class thingy;
+    /* verilator lint_off UNUSEDSIGNAL */
     int t;
+    /* verilator lint_on UNUSEDSIGNAL */
   endclass
 
   class add_five extends fcn_behavior#(thingy);
@@ -161,7 +163,7 @@ module mapper_unit_test;
       time t2;
       int unsigned i;
       int unsigned d;
-      int unsigned total_delay;
+      time total_delay;
       vector#(int unsigned, int_unsigned_traits) delay_v = new();
       list_fwd_iterator#(int unsigned, int_unsigned_traits) iter = new(delay_v);
 
@@ -170,13 +172,13 @@ module mapper_unit_test;
       for(i = 0; i < 5; i++) begin
         d = ($urandom() % 90) + 10;
         delay_v.appendc(d);
-        total_delay += d;
+        total_delay += time'(d);
       end
       
       map_task#(int unsigned, int_unsigned_traits, delays)::map(delay_v);
 
       t2 = $time;
-      `FAIL_UNLESS((t2 -t1) == total_delay)
+      `FAIL_UNLESS((t2 - t1) == total_delay)
 
     `SVTEST_END
 
@@ -190,11 +192,11 @@ module mapper_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(simple_map_concurrent)
 
-      time t1;
+      time t1 = $time;
       time t2;
       int unsigned i;
-       int unsigned d;
-      int unsigned max;
+      int unsigned d;
+      time max;
       vector#(int unsigned, int_unsigned_traits) v = new();
       list_fwd_iterator#(int unsigned, int_unsigned_traits) iter = new(v);
 
@@ -202,8 +204,8 @@ module mapper_unit_test;
       for(i = 0; i < 10; i++) begin
         d = ($urandom() % 90) + 10;
         v.appendc(d);
-	if(d > max)
-	  max = d;
+	if(time'(d) > max)
+	  max = time'(d);
       end
       
       map_concurrent#(int unsigned, int_unsigned_traits, delay_task)::map(v);

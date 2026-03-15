@@ -121,24 +121,24 @@ module mem_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(masks)
 
-      typedef mem#(16,4,4,2) mem1_t;
-      typedef mem#(19,7,3,4) mem2_t;
-      typedef mem#(128, 32, 64, 8) mem3_t;
+      // typedef mem#(16,4,4,2) mem1_t;
+      // typedef mem#(19,7,3,4) mem2_t;
+      // typedef mem#(128, 32, 64, 8) mem3_t;
 
-      `FAIL_UNLESS(mem1_t::page_addr_mask  == 'h000f)
-      `FAIL_UNLESS(mem1_t::block_addr_mask == 'h000f)
-      `FAIL_UNLESS(mem1_t::byte_addr_mask  == 'h00ff)
-      `FAIL_UNLESS(mem1_t::word_addr_mask  == 'h0001)
+      `FAIL_UNLESS(mem#(16,4,4,2)::page_addr_mask  == 'h000f)
+      `FAIL_UNLESS(mem#(16,4,4,2)::block_addr_mask == 'h000f)
+      `FAIL_UNLESS(mem#(16,4,4,2)::byte_addr_mask  == 'h00ff)
+      `FAIL_UNLESS(mem#(16,4,4,2)::word_addr_mask  == 'h0001)
 
-      `FAIL_UNLESS(mem2_t::page_addr_mask  == 'h007f)
-      `FAIL_UNLESS(mem2_t::block_addr_mask == 'h0007)
-      `FAIL_UNLESS(mem2_t::byte_addr_mask  == 'h01ff)
-      `FAIL_UNLESS(mem2_t::word_addr_mask  == 'h0003)
+      `FAIL_UNLESS(mem#(19,7,3,4)::page_addr_mask  == 'h007f)
+      `FAIL_UNLESS(mem#(19,7,3,4)::block_addr_mask == 'h0007)
+      `FAIL_UNLESS(mem#(19,7,3,4)::byte_addr_mask  == 'h01ff)
+      `FAIL_UNLESS(mem#(19,7,3,4)::word_addr_mask  == 'h0003)
 
-      `FAIL_UNLESS(mem3_t::page_addr_mask  == 'h0000_0000_0000_0000_0000_0000_ffff_ffff)
-      `FAIL_UNLESS(mem3_t::block_addr_mask == 'h0000_0000_0000_0000_ffff_ffff_ffff_ffff)
-      `FAIL_UNLESS(mem3_t::byte_addr_mask  == 'h0000_0000_0000_0000_0000_0000_ffff_ffff)
-      `FAIL_UNLESS(mem3_t::word_addr_mask  == 'h0000_0000_0000_0000_0000_0000_0000_0007)
+      `FAIL_UNLESS(mem#(128,32,64,8)::page_addr_mask  == 'h0000_0000_0000_0000_0000_0000_ffff_ffff)
+      `FAIL_UNLESS(mem#(128,32,64,8)::block_addr_mask == 'h0000_0000_0000_0000_ffff_ffff_ffff_ffff)
+      `FAIL_UNLESS(mem#(128,32,64,8)::byte_addr_mask  == 'h0000_0000_0000_0000_0000_0000_ffff_ffff)
+      `FAIL_UNLESS(mem#(128,32,64,8)::word_addr_mask  == 'h0000_0000_0000_0000_0000_0000_0000_0007)
 
     `SVTEST_END
 
@@ -150,15 +150,18 @@ module mem_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(small_mem)
 
-      typedef mem#(16,4,4,2) mem_t;
-      typedef mem_t::addr_t addr_t;
-      typedef mem_t::word_t word_t;
+      // typedef mem#(16,4,4,2) mem_t;
+      // typedef mem_t::addr_t addr_t;
+      // typedef mem_t::word_t word_t;
+      typedef mem#(16,4,4,2)::addr_t addr_t;
+      typedef mem#(16,4,4,2)::word_t word_t;
 
       int unsigned i;
       word_t word;
       addr_t base_addr;
       word_t array[1000];
-      mem_t m = new();
+      //mem_t m = new();
+      mem#(16,4,4,2) m = new();
 
       base_addr = ($random() & 'hfffc);
       for(i = 0; i < 1000; i++) begin
@@ -189,14 +192,21 @@ module mem_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(pages)
 
-      typedef mem#(16,4,4,2) mem_t;
-      typedef mem_t::addr_t addr_t;
-      typedef mem_t::word_t word_t;
-      typedef mem_t::page_key_t page_key_t;
-      typedef mem_t::block_addr_t block_addr_t;
-      typedef mem_t::byte_addr_t byte_addr_t;
+      // typedef mem#(16,4,4,2) mem_t;
+      // typedef mem_t::addr_t addr_t;
+      // typedef mem_t::word_t word_t;
+      // typedef mem_t::page_key_t page_key_t;
+      // typedef mem_t::block_addr_t block_addr_t;
+      // typedef mem_t::byte_addr_t byte_addr_t;
 
-      mem_t m;
+      typedef mem#(16,4,4,2) mem_t;
+      typedef mem#(16,4,4,2)::addr_t addr_t;
+      typedef mem#(16,4,4,2)::word_t word_t;
+      typedef mem#(16,4,4,2)::page_key_t page_key_t;
+      typedef mem#(16,4,4,2)::block_addr_t block_addr_t;
+      typedef mem#(16,4,4,2)::byte_addr_t byte_addr_t;
+  
+      mem#(16,4,4,2) m;
 
       int unsigned page;
       int unsigned idx;
@@ -240,14 +250,20 @@ module mem_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(big_mem)
 
-      typedef mem#(64,40, 16,8) mem_t;
-      typedef mem_t::addr_t addr_t;
-      typedef mem_t::word_t word_t;
-      typedef mem_t::page_key_t page_key_t;
-      typedef mem_t::block_addr_t block_addr_t;
-      typedef mem_t::byte_addr_t byte_addr_t;
+      // typedef mem#(64,40, 16,8) mem_t;
+      // typedef mem_t::addr_t addr_t;
+      // typedef mem_t::word_t word_t;
+      // typedef mem_t::page_key_t page_key_t;
+      // typedef mem_t::block_addr_t block_addr_t;
+      // typedef mem_t::byte_addr_t byte_addr_t;
 
-      mem_t m;
+      typedef mem#(64,40,16,8)::addr_t addr_t;
+      typedef mem#(64,40,16,8)::word_t word_t;
+      typedef mem#(64,40,16,8)::page_key_t page_key_t;
+      typedef mem#(64,40,16,8)::block_addr_t block_addr_t;
+      typedef mem#(64,40,16,8)::byte_addr_t byte_addr_t;
+
+      mem#(64,40,16,8) m;
       int unsigned idx;
       addr_t addr;
       word_t word;
@@ -257,7 +273,7 @@ module mem_unit_test;
       m = new();
 
       for(idx = 0; idx < 10000; idx++) begin
-        addr = (($urandom() << 32) | $urandom()) & ~mem_t::word_addr_mask;
+        addr = (($urandom() << 32) | $urandom()) & ~mem#(64,40,16,8)::word_addr_mask;
         word = ($urandom() << 32) | $urandom();
         word_array[idx] = word;
         addr_array[idx] = addr;
@@ -284,17 +300,23 @@ module mem_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(security)
   
-      typedef mem#(16,8,4,2) mem_t;
-      typedef mem_t::addr_t addr_t;
-      typedef mem_t::word_t word_t;
-      typedef mem_t::page_key_t page_key_t;
-      typedef mem_t::block_addr_t block_addr_t;
-      typedef mem_t::byte_addr_t byte_addr_t;
+      // typedef mem#(16,8,4,2) mem_t;
+      // typedef mem_t::addr_t addr_t;
+      // typedef mem_t::word_t word_t;
+      // typedef mem_t::page_key_t page_key_t;
+      // typedef mem_t::block_addr_t block_addr_t;
+      // typedef mem_t::byte_addr_t byte_addr_t;
 
+      typedef mem#(16,8,4,2)::addr_t addr_t;
+      typedef mem#(16,8,4,2)::word_t word_t;
+      typedef mem#(16,8,4,2)::page_key_t page_key_t;
+      typedef mem#(16,8,4,2)::block_addr_t block_addr_t;
+      typedef mem#(16,8,4,2)::byte_addr_t byte_addr_t;
+  
       addr_t addr;
       restrict_t r;
 
-      mem_t m = new();
+      mem#(16,8,4,2) m = new();
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

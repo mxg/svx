@@ -74,7 +74,7 @@ module queue_unit_test;
     /* Place Teardown Code Here */
   endtask
 
-    parameter int unsigned QUEUE_SIZE = 25;
+    parameter size_t QUEUE_SIZE = 25;
 
   //===================================
   // All tests are defined between the
@@ -110,14 +110,14 @@ module queue_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(fifo)
       begin
-        int unsigned i;
+        index_t i;
         int value;
         int array[QUEUE_SIZE];
 
         // fill queue from the front
         for(i = 0; i < QUEUE_SIZE; i++) begin
           value = $random();
-          array[i] = value;
+          array[i[4:0]] = value;
           my_queue.put(value);
         end
 
@@ -128,7 +128,7 @@ module queue_unit_test;
         // in the same order as the array
         for(i = 0; i < QUEUE_SIZE; i++) begin
           value = my_queue.get();
-          `FAIL_IF(value != array[i])
+          `FAIL_IF(value != array[i[4:0]])
         end
 
         // queue should be empty again
@@ -170,7 +170,6 @@ module queue_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(clone)
       begin
-        int unsigned i;
         queue#(int, int_traits) cloned_queue;
 	
         cloned_queue = my_queue.clone();
@@ -251,14 +250,14 @@ module fixed_size_queue_unit_test;
   // full
   //--------------------------------------------------------------------
     `SVTEST(full)
-      int unsigned i;
+      index_t i;
       int t;
 
       `FAIL_IF(fq.size != 0)
       `FAIL_IF(!fq.is_empty())
 
       for(i = 0; i < 4; i++) begin
-        fq.put(i);
+        fq.put(int'(i));
       end
 
       `FAIL_IF(fq.size() != 4)

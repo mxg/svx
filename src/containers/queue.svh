@@ -110,13 +110,13 @@ class fixed_size_queue #(type T=int, type P=void_traits)
 
   typedef fixed_size_queue#(T,P) this_t;
 
-  local int unsigned max_size;
+  local size_t max_size;
   local bit push_ok;
 
   //--------------------------------------------------------------------
   // constructor
   //--------------------------------------------------------------------
-  function new(int unsigned n = 1);
+  function new(size_t n = 1);
     set_max_size(n);
     push_ok = 0;
   endfunction
@@ -133,7 +133,7 @@ class fixed_size_queue #(type T=int, type P=void_traits)
   // That way we an never have more elements in the queue than allowed
   // by the current setting of max_size
   //--------------------------------------------------------------------
-  virtual function void set_max_size(int unsigned n);
+  virtual function void set_max_size(size_t n);
     if(n == 0)
       n = 1;
     if(n < size())
@@ -146,7 +146,7 @@ class fixed_size_queue #(type T=int, type P=void_traits)
   //
   // Return the current value of max_size
   //--------------------------------------------------------------------
-  virtual function int unsigned get_max_size();
+  virtual function size_t get_max_size();
     return max_size;
   endfunction
 

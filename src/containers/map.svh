@@ -81,7 +81,7 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   // Returns the number of uniquely keyed items stored in the map.
   //--------------------------------------------------------------------
   virtual function size_t size();
-    return m_map.num();
+    return size_t'(m_map.num());
   endfunction
 
   //--------------------------------------------------------------------
@@ -161,7 +161,7 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   // are.  It will never return a value less than zero.
   // --------------------------------------------------------------------
   virtual function int compare(this_t m);
-    return !equal(m);
+    return int'(!equal(m));
   endfunction
 
 
@@ -193,12 +193,12 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
     // return P::empty.  IN that case P::equal() compares the element
     // with P::empty.
     eq = 1;
-    if(m_map.first(idx)) begin
+    if(bit'(m_map.first(idx))) begin
        do begin
          t = m_map[idx];
          eq &= P::equal(t, m.get(idx));
        end
-      while(eq && m_map.next(idx));
+      while(eq && bit'(m_map.next(idx)));
     end
 
     return eq;
@@ -217,25 +217,25 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   // function: first
   //
   virtual function bit first(ref KEY index);
-    return m_map.first(index);
+    return bit'(m_map.first(index));
   endfunction
 
   // function: last
   //
   virtual function bit last (ref KEY index);
-    return m_map.last(index);
+    return bit'(m_map.last(index));
   endfunction
 
   // function: next
   //
   virtual function bit next(ref KEY index);
-    return m_map.next(index);
+    return bit'(m_map.next(index));
   endfunction
 
   // function: prev()
   //
   virtual function bit prev(ref KEY index);
-    return m_map.prev(index);
+    return bit'(m_map.prev(index));
   endfunction
 
 endclass

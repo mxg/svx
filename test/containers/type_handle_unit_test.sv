@@ -184,7 +184,7 @@ module type_handle_unit_test;
         iter_count++;
       end
    
-      `FAIL_IF(iter_count != type_map.size())
+      `FAIL_IF(index_t'(iter_count) != type_map.size())
     `SVTEST_END
 
   `SVUNIT_TESTS_END

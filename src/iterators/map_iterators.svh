@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------
 // class: map_iterator_base
 //
-// Base clss for all map iterators.  It provides a means for binding a
+// Base class for all map iterators.  It provides a means for binding a
 // map to the iterator and for setting and getting the item at the
 // current iterator position.
 // ----------------------------------------------------------------------
@@ -389,13 +389,24 @@ class map_random_iterator#(type KEY=int, type T=int, type P=void_traits)
     if((m_map == null) || (m_map.size() == 0))
       return 0;
 
-    n = $urandom() % m_map.size();
+    n = index_t'($urandom()) % m_map.size();
     void'(first());
     void'(skip(n));
     
     return 1;
 
   endfunction
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  // skip
+  //
+  // The Verilator compiler could not find the skip() implementation
+  // in the base class, so we gave it a hint.
+  virtual function bit skip(signed_index_t distance);
+    return map_fwd_iterator#(KEY,T,P)::skip(distance);
+  endfunction
+
 
 endclass
 

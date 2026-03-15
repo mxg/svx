@@ -72,7 +72,7 @@ endclass
 class process_base
   implements process_if, behavior_if;
 
-  local process process_handle;
+  local std::process process_handle;
   local pid_t pid;
   local generic_behavior beh;
 
@@ -80,11 +80,11 @@ class process_base
   // process handle management methods
   //--------------------------------------------------------------------
 
-  function process get_process_handle();
+  function std::process get_process_handle();
     return process_handle;
   endfunction
 
-  function void set_process_handle(process ph);
+  function void set_process_handle(std::process ph);
     process_handle = ph;
   endfunction
 
@@ -229,7 +229,7 @@ class process_traits extends void_t;
 
   static function int compare(input process_base a,
 			      input process_base b);
-    return !equal(a,b);
+    return int'(!equal(a,b));
   endfunction
 
   static function void sort(process_base vec[$]);

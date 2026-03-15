@@ -31,7 +31,7 @@ class void_traits extends void_t;
   endfunction
 
   static function int compare(input void_t a, input void_t b);
-    return !equal(a,b);
+    return int'(!equal(a,b));
   endfunction
 
   static function void sort(ref void_t vec[$]);
@@ -73,7 +73,7 @@ class class_traits#(type T=int) extends void_t;
   endfunction
 
   static function int compare(input T a, input T b);
-    return !equal(a,b);
+    return int'(!equal(a,b));
   endfunction
 
   static function void sort(ref T vec[$]);
@@ -87,7 +87,7 @@ endclass
 class base_int_traits #(type T=int) extends void_t;
 
   typedef T empty_t;
-  const static empty_t empty = 0;
+  static empty_t empty = 0;
 
   static function bit equal(T a, T b);
     return (a == b);
@@ -124,13 +124,53 @@ endclass
 //----------------------------------------------------------------------
 // int_traits
 //----------------------------------------------------------------------
-class int_traits extends base_int_traits#(int);
+class int_traits;
+  typedef int empty_t;
+  static empty_t empty = 0;
+
+  static function bit equal(int a, int b);
+    return (a == b);
+  endfunction
+
+  static function int compare(int a, int b);
+    if(a > b)
+      return 1;
+    else
+      if(a < b)
+        return -1;
+      else
+        return 0;
+  endfunction
+
+  static function void sort(ref int vec[$]);
+    vec.sort();
+  endfunction
 endclass
 
 //----------------------------------------------------------------------
 // int_unsigned_traits
 //----------------------------------------------------------------------
-class int_unsigned_traits extends base_int_traits#(int unsigned);
+class int_unsigned_traits;
+  typedef int unsigned empty_t;
+  static empty_t empty = 0;
+
+  static function bit equal(int unsigned a, int unsigned b);
+    return (a == b);
+  endfunction
+
+  static function int compare(int unsigned a, int unsigned b);
+    if(a > b)
+      return 1;
+    else
+      if(a < b)
+        return -1;
+      else
+        return 0;
+  endfunction
+
+  static function void sort(ref int unsigned vec[$]);
+    vec.sort();
+  endfunction
 endclass
 
 //----------------------------------------------------------------------
@@ -143,6 +183,26 @@ endclass
 // longint_unsigned_traits
 //----------------------------------------------------------------------
 class longint_unsigned_traits extends base_int_traits#(longint unsigned);
+  typedef longint unsigned empty_t;
+  static empty_t empty = 0;
+
+  static function bit equal(longint unsigned a, longint unsigned b);
+    return (a == b);
+  endfunction
+
+  static function int compare(longint unsigned a, longint unsigned b);
+    if(a > b)
+      return 1;
+    else
+      if(a < b)
+        return -1;
+      else
+        return 0;
+  endfunction
+
+  static function void sort(ref longint unsigned vec[$]);
+    vec.sort();
+  endfunction
 endclass
 
 //----------------------------------------------------------------------
@@ -201,7 +261,7 @@ class string_traits extends void_t;
   endfunction
 
   static function int compare(string a, string b);
-    return (!equal(a,b));
+    return int'(!equal(a,b));
   endfunction
 
   static function void sort(ref string vec[$]);
