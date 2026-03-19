@@ -45,7 +45,7 @@
 // the process.
 // ----------------------------------------------------------------------
 class map_task#(type T=int,
-                type P=int_traits,
+                type P=int32_traits,
                 type B=task_behavior#(T));
 
   static task map(vector#(T,P) v);
@@ -78,7 +78,7 @@ endclass
 // element of the context vector.
 // ----------------------------------------------------------------------
 class map_fcn#(type T=int,
-               type P=int_traits,
+               type P=int32_traits,
                type B=fcn_behavior#(T));
   
   static function void map(vector#(T,P) v);
@@ -109,7 +109,7 @@ endclass
 // concurrently.
 // ----------------------------------------------------------------------
 class map_concurrent#(type T=int,
-                      type P=int_traits,
+                      type P=int32_traits,
                       type B=task_behavior#(T));
 
   static task map(vector#(T,P) v);
@@ -160,7 +160,7 @@ endclass
 // ----------------------------------------------------------------------
 class reduce #(type T=int,
                type R=int,
-               type P=int_traits,
+               type P=int32_traits,
                type B=reduce_behavior#(T,R));
 
   static function R reduce(vector#(T,P) v);

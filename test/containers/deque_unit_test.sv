@@ -43,7 +43,7 @@ module deque_unit_test;
   // This is the UUT that we're 
   // running the Unit Tests on
   //===================================
-  int_deque my_deque;
+  int32_deque my_deque;
 
 
   //===================================
@@ -188,7 +188,7 @@ module deque_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(clone)
       begin
-        deque#(int, int_traits) cloned_deque;
+        deque#(int, int32_traits) cloned_deque;
         cloned_deque = my_deque.clone();
 
         `FAIL_IF(my_deque.size() != cloned_deque.size())

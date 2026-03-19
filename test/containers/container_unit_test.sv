@@ -59,7 +59,7 @@ module container_unit_test;
 	
   endclass
 
-  class int_container extends typed_container#(int, int_traits);
+  class int32_container extends typed_container#(int, int32_traits);
     function size_t size();
       return 32;
     endfunction
@@ -70,7 +70,7 @@ module container_unit_test;
   // running the Unit Tests on
   //===================================
   bucket my_bucket;
-  int_container my_int_container;
+  int32_container my_int32_container;
 
 
   //===================================
@@ -80,7 +80,7 @@ module container_unit_test;
     svunit_ut = new(name);
 
     my_bucket = new();
-    my_int_container = new();
+    my_int32_container = new();
   endfunction
 
 
@@ -135,7 +135,7 @@ module container_unit_test;
   //--------------------------------------------------------------------
   `SVTEST(typed_container_test)
     begin
-      `FAIL_IF(my_int_container.size() != 32)
+      `FAIL_IF(my_int32_container.size() != 32)
     end
   `SVTEST_END
 

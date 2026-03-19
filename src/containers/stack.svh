@@ -78,10 +78,11 @@ endclass
 
 //----------------------------------------------------------------------
 // Common stack types
-typedef stack#(int,              int_traits               ) int_stack;
-typedef stack#(int unsigned,     int_unsigned_traits      ) intus_stack;
-typedef stack#(longint,          longint_traits           ) longint_stack;
-typedef stack#(longint unsigned, longint_unsigned_traits  ) longintus_stack;
-typedef stack#(long_long_int_t,  long_long_int_traits     ) longlongint_stack;
-typedef stack#(real,             real_traits              ) real_stack;
-typedef stack#(string,           string_traits            ) string_stack;
+typedef stack#(int32_t,   int32_traits  ) int32_stack;
+typedef stack#(uint32_t,  uint32_traits ) uint32_stack;
+typedef stack#(int64_t,   int64_traits  ) int64_stack;
+typedef stack#(uint64_t,  uint64_traits ) uint64_stack;
+typedef stack#(int128_t,  int128_traits ) int128_stack;
+typedef stack#(uint128_t, uint128_traits) uint128_stack;
+typedef stack#(real,      real_traits   ) real_stack;
+typedef stack#(string,    string_traits ) string_stack;

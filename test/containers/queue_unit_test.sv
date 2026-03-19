@@ -43,7 +43,7 @@ module queue_unit_test;
   // This is the UUT that we're 
   // running the Unit Tests on
   //===================================
-  queue#(int, int_traits) my_queue;
+  queue#(int, int32_traits) my_queue;
 
 
   //===================================
@@ -101,7 +101,7 @@ module queue_unit_test;
         `FAIL_IF(!my_queue.is_empty())
 
         // get() should return an empty object
-        `FAIL_IF(my_queue.get() != int_traits::empty)
+        `FAIL_IF(my_queue.get() != int32_traits::empty)
       end
     `SVTEST_END
 
@@ -170,7 +170,7 @@ module queue_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(clone)
       begin
-        queue#(int, int_traits) cloned_queue;
+        queue#(int, int32_traits) cloned_queue;
 	
         cloned_queue = my_queue.clone();
 
@@ -199,7 +199,7 @@ module fixed_size_queue_unit_test;
   // This is the UUT that we're 
   // running the Unit Tests on
   //===================================
-  fixed_size_queue#(int, int_traits) fq;
+  fixed_size_queue#(int, int32_traits) fq;
 
 
   //===================================
@@ -289,7 +289,7 @@ module fixed_size_queue_unit_test;
   // clone
   //--------------------------------------------------------------------
     `SVTEST(clone)
-      fixed_size_queue#(int, int_traits) cloned_queue;
+      fixed_size_queue#(int, int32_traits) cloned_queue;
 
       cloned_queue = fq.clone();
 

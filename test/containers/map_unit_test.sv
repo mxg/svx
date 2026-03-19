@@ -46,7 +46,7 @@ module map_unit_test;
   // running the Unit Tests on
   //===================================
   rand_string rs;
-  map#(string, int, int_traits) m;
+  map#(string, int, int32_traits) m;
   int array[string];
 
   //===================================
@@ -161,7 +161,7 @@ module map_unit_test;
       index_t i;
       index_t n;
       string s;
-      map#(string, int, int_traits) cloned_map;
+      map#(string, int, int32_traits) cloned_map;
 
       cloned_map = m.clone();
 
@@ -240,8 +240,8 @@ module singleton_map_unit_test;
   // This is the UUT that we're 
   // running the Unit Tests on
   //===================================
-  singleton_map#(string, int, int_traits) sm;
-  typedef singleton_map#(string, int, int_traits) map_t;
+  singleton_map#(string, int, int32_traits) sm;
+  typedef singleton_map#(string, int, int32_traits) map_t;
 
 
   //===================================

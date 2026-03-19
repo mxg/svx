@@ -93,16 +93,6 @@ class queue #(type T=int, type P=void_traits) extends vector#(T,P);
 endclass
 
 //----------------------------------------------------------------------
-// Common queue types
-typedef queue#(int,              int_traits               ) int_queue;
-typedef queue#(int unsigned,     int_unsigned_traits      ) intus_queue;
-typedef queue#(longint,          longint_traits           ) longint_queue;
-typedef queue#(longint unsigned, longint_unsigned_traits  ) longintus_queue;
-typedef queue#(long_long_int_t,  long_long_int_traits     ) longlongint_queue;
-typedef queue#(real,             real_traits              ) real_queue;
-typedef queue#(string,           string_traits            ) string_queue;
-
-//----------------------------------------------------------------------
 // fixed_size_queue
 //----------------------------------------------------------------------
 class fixed_size_queue #(type T=int, type P=void_traits)
@@ -231,3 +221,14 @@ class fixed_size_queue #(type T=int, type P=void_traits)
   endfunction
 
 endclass
+
+//----------------------------------------------------------------------
+// Common queue types
+typedef queue#(int32_t,   int32_traits  ) int32_queue;
+typedef queue#(uint32_t,  uint32_traits ) uint32_queue;
+typedef queue#(int64_t,   int64_traits  ) int64_queue;
+typedef queue#(uint64_t,  uint64_traits ) uint64_queue;
+typedef queue#(int128_t,  int128_traits ) int128_queue;
+typedef queue#(uint128_t, uint128_traits) uint128_queue;
+typedef queue#(real,      real_traits   ) real_queue;
+typedef queue#(string,    string_traits ) string_queue;

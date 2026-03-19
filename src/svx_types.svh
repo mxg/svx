@@ -32,16 +32,30 @@
 // Special types used in svx
 //----------------------------------------------------------------------
 
+// Common types
+typedef bit [127:0]          int128_t;
+typedef bit unsigned [127:0] uint128_t;
+typedef longint              int64_t;
+typedef longint unsigned     uint64_t;
+typedef int                  int32_t;
+typedef int unsigned         uint32_t;
+typedef shortint             int16_t;
+typedef shortint unsigned    uint16_t;
+typedef byte                 int8_t;
+typedef byte unsigned        uint8_t;
+
 // represents sizes of various things
-typedef longint unsigned size_t;
+typedef uint64_t size_t;
 
 // used for indexes
-typedef longint unsigned index_t;
-typedef longint signed_index_t;
+typedef uint64_t index_t;
+typedef int64_t signed_index_t;
 
-typedef bit [127:0] long_long_int_t;
 
 // process identifiers
 typedef int unsigned pid_t;
 
 
+
+	     
+	     

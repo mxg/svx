@@ -43,7 +43,7 @@ module stack_unit_test;
   // This is the UUT that we're 
   // running the Unit Tests on
   //===================================
-  int_stack stk;
+  int32_stack stk;
 
 
   //===================================
@@ -128,7 +128,7 @@ module stack_unit_test;
     `SVTEST(clone)
       begin
         int unsigned i;
-        stack#(int, int_traits) cloned_stack;
+        stack#(int, int32_traits) cloned_stack;
         cloned_stack = stk.clone();
 
         `FAIL_IF(stk.size() != cloned_stack.size())

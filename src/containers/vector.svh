@@ -239,10 +239,11 @@ endclass
 
 //----------------------------------------------------------------------
 // Common vector types
-typedef vector#(int,              int_traits               ) int_vector;
-typedef vector#(int unsigned,     int_unsigned_traits      ) intus_vector;
-typedef vector#(longint,          longint_traits           ) longint_vector;
-typedef vector#(longint unsigned, longint_unsigned_traits  ) longintus_vector;
-typedef vector#(long_long_int_t,  long_long_int_traits     ) longlongint_vector;
-typedef vector#(real,             real_traits              ) real_vector;
-typedef vector#(string,           string_traits            ) string_vector;
+typedef vector#(int32_t,   int32_traits  ) int32_vector;
+typedef vector#(uint32_t,  uint32_traits ) uint32_vector;
+typedef vector#(int64_t,   int64_traits  ) int64_vector;
+typedef vector#(uint64_t,  uint64_traits ) uint64_vector;
+typedef vector#(int128_t,  int128_traits ) int128_vector;
+typedef vector#(uint128_t, uint128_traits) uint128_vector;
+typedef vector#(real,      real_traits   ) real_vector;
+typedef vector#(string,    string_traits ) string_vector;

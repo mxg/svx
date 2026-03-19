@@ -119,13 +119,13 @@ module sorter_unit_test;
   `SVUNIT_TESTS_BEGIN
 
   //--------------------------------------------------------------------
-  // int_sort
+  // int32_sort
   //--------------------------------------------------------------------
-    `SVTEST(int_sort)
+    `SVTEST(int32_sort)
 
       index_t i;
       const index_t N = 50;
-      vector#(int, int_traits) v = new();
+      vector#(int, int32_traits) v = new();
 
       for(i = 0; i < N; i++) begin
         v.appendc($random());
@@ -149,7 +149,7 @@ module sorter_unit_test;
 
       index_t i;
       const index_t N = 50;
-      vector#(int, int_traits) v = new();
+      vector#(int, int32_traits) v = new();
 
       for(i = 0; i < N; i++) begin
         v.appendc(int'(N-i));

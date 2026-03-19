@@ -223,9 +223,9 @@ class permute_iterator_base#(type T=int, type P=void_traits)
   // vector contains the ordering of the elements for the current
   // permutation.
   // --------------------------------------------------------------------
-  virtual function vector#(index_t, longint_unsigned_traits)get_permutation_vector();
+  virtual function vector#(index_t, uint64_traits)get_permutation_vector();
     index_t i;
-    vector#(index_t, longint_unsigned_traits) v = new();
+    vector#(index_t, uint64_traits) v = new();
 
     for(i = 0; i < index_t'(pv.size()); i++)
       v.appendc(pv[i]);

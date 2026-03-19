@@ -93,7 +93,7 @@ module mapper_unit_test;
     endtask
   endclass
 
-  class int_reduce extends reduce_behavior#(int);
+  class int32_reduce extends reduce_behavior#(int);
     function int reduce(int t, int accum);
       return t + accum;
     endfunction
@@ -164,8 +164,8 @@ module mapper_unit_test;
       int unsigned i;
       int unsigned d;
       time total_delay;
-      vector#(int unsigned, int_unsigned_traits) delay_v = new();
-      list_fwd_iterator#(int unsigned, int_unsigned_traits) iter = new(delay_v);
+      vector#(int unsigned, uint32_traits) delay_v = new();
+      list_fwd_iterator#(int unsigned, uint32_traits) iter = new(delay_v);
 
       t1 = $time;
 
@@ -175,7 +175,7 @@ module mapper_unit_test;
         total_delay += time'(d);
       end
       
-      map_task#(int unsigned, int_unsigned_traits, delays)::map(delay_v);
+      map_task#(int unsigned, uint32_traits, delays)::map(delay_v);
 
       t2 = $time;
       `FAIL_UNLESS((t2 - t1) == total_delay)
@@ -197,8 +197,8 @@ module mapper_unit_test;
       int unsigned i;
       int unsigned d;
       time max;
-      vector#(int unsigned, int_unsigned_traits) v = new();
-      list_fwd_iterator#(int unsigned, int_unsigned_traits) iter = new(v);
+      vector#(int unsigned, uint32_traits) v = new();
+      list_fwd_iterator#(int unsigned, uint32_traits) iter = new(v);
 
       max = 0;
       for(i = 0; i < 10; i++) begin
@@ -208,7 +208,7 @@ module mapper_unit_test;
 	  max = time'(d);
       end
       
-      map_concurrent#(int unsigned, int_unsigned_traits, delay_task)::map(v);
+      map_concurrent#(int unsigned, uint32_traits, delay_task)::map(v);
 
       t2 = $time;
       `FAIL_UNLESS((t2 - t1) == max);
@@ -222,14 +222,14 @@ module mapper_unit_test;
       int i;
       int result;
       int sum;
-      vector#(int, int_traits) v = new();
+      vector#(int, int32_traits) v = new();
 
       for(i = 0; i < 100; i++) begin
         sum += i;
         v.appendc(i);
       end
 
-      result = reduce#(int, int, int_traits, int_reduce)::reduce(v);
+      result = reduce#(int, int, int32_traits, int32_reduce)::reduce(v);
 
       `FAIL_UNLESS(sum == result)
 

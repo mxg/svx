@@ -58,10 +58,10 @@ class master_control;
   pid_t pid;
 
   // Map of processes to PIDs
-  map#(process_base, pid_t, int_traits) active_processes;
+  map#(process_base, pid_t, int32_traits) active_processes;
 
   // Deque of available PIDs.
-  intus_deque available;
+  uint32_deque available;
 
   // initialize a new master control context
   function new();
@@ -101,7 +101,7 @@ class master_control;
 
   function void show_available();
 
-    list_fwd_intus_iterator iter = new(available);
+    list_fwd_uint32_iterator iter = new(available);
 
     if(!iter.first()) begin
       $display("none available");
@@ -123,7 +123,7 @@ class master_control;
   function void show_active();
 
     process_base p;
-    map_fwd_iterator#(process_base, pid_t, int_traits) iter = new(active_processes);
+    map_fwd_iterator#(process_base, pid_t, int32_traits) iter = new(active_processes);
 
     $write("active :");
     void'(iter.first());

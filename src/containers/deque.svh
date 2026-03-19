@@ -93,10 +93,11 @@ endclass
 
 //----------------------------------------------------------------------
 // Common deque types
-typedef deque#(int,              int_traits               ) int_deque;
-typedef deque#(int unsigned,     int_unsigned_traits      ) intus_deque;
-typedef deque#(longint,          longint_traits           ) longint_deque;
-typedef deque#(longint unsigned, longint_unsigned_traits  ) longintus_deque;
-typedef deque#(long_long_int_t,  long_long_int_traits     ) longlongint_deque;
-typedef deque#(real,             real_traits              ) real_deque;
-typedef deque#(string,           string_traits            ) string_deque;
+typedef deque#(int32_t,   int32_traits  ) int32_deque;
+typedef deque#(uint32_t,  uint32_traits ) uint32_deque;
+typedef deque#(int64_t,   int64_traits  ) int64_deque;
+typedef deque#(uint64_t,  uint64_traits ) uint64_deque;
+typedef deque#(int128_t,  int128_traits ) int128_deque;
+typedef deque#(uint128_t, uint128_traits) uint128_deque;
+typedef deque#(real,      real_traits   ) real_deque;
+typedef deque#(string,    string_traits ) string_deque;

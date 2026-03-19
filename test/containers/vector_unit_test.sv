@@ -45,7 +45,7 @@ module vector_unit_test;
   // This is the UUT that we're 
   // running the Unit Tests on
   //===================================
-  vector#(int, int_traits) vi;
+  vector#(int, int32_traits) vi;
 
   //===================================
   // Build
@@ -61,6 +61,8 @@ module vector_unit_test;
   // Setup for running the Unit Tests
   //===================================
   task setup();
+    
+    $display("doink! - vector");
     svunit_ut.setup();
   endtask
 
@@ -135,7 +137,7 @@ module vector_unit_test;
         // check to see if everything in the vector is in the right place
         for(i = 0; i < VECTOR_SIZE; i++) begin
 	  value = vi.read(i);
-          `FAIL_IF(!int_traits::equal(value,array[i[4:0]]))
+          `FAIL_IF(!int32_traits::equal(value,array[i[4:0]]))
         end
 
       end
@@ -150,7 +152,7 @@ module vector_unit_test;
     `SVTEST(clone)
       begin
         index_t i;
-        vector#(int, int_traits) cloned_vector;
+        vector#(int, int32_traits) cloned_vector;
         cloned_vector = vi.clone();
 
         `FAIL_IF(vi.size() != cloned_vector.size())
@@ -233,8 +235,8 @@ module vector_unit_test;
     `SVTEST(append)
       begin
         index_t i;
-        intus_vector v_a = new();
-        intus_vector v_b = new();
+        uint32_vector v_a = new();
+        uint32_vector v_b = new();
         int unsigned value;
         int unsigned array[VECTOR_SIZE + OTHER_SIZE];
         v_a.extend(VECTOR_SIZE);
@@ -261,7 +263,7 @@ module vector_unit_test;
         `FAIL_IF(v_a.size() != (VECTOR_SIZE + OTHER_SIZE))
 
         for(i = 0; i < (VECTOR_SIZE + OTHER_SIZE); i++) begin
-          `FAIL_IF(!int_unsigned_traits::equal(v_a.read(i), array[i[4:0]]))
+          `FAIL_IF(!int32_traits::equal(v_a.read(i), array[i[4:0]]))
         end
 
       end
@@ -277,7 +279,7 @@ module vector_unit_test;
     `SVTEST(appendc)
       begin
         index_t i;
-        intus_vector v_a = new();
+        uint32_vector v_a = new();
         int unsigned value;
         int unsigned array[VECTOR_SIZE + OTHER_SIZE];
         v_a.extend(VECTOR_SIZE);
@@ -300,7 +302,7 @@ module vector_unit_test;
         `FAIL_IF(v_a.size() != (VECTOR_SIZE + OTHER_SIZE))
 
         for(i = 0; i < (VECTOR_SIZE + OTHER_SIZE); i++) begin
-          `FAIL_IF(!int_unsigned_traits::equal(v_a.read(i),array[i[4:0]]))
+          `FAIL_IF(!int32_traits::equal(v_a.read(i),array[i[4:0]]))
         end
 
       end

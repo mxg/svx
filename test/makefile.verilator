@@ -5,8 +5,8 @@
 #------------------------------------------------------------
 # Command Verbosity
 
-#V               = @
-V               =
+V               = @
+#V               =
 
 #------------------------------------------------------------
 # Tools
@@ -79,6 +79,7 @@ COMPILE_OPTS 	+= -Wall
 # turn off pedantry
 COMPILE_OPTS	+= --Wno-DECLFILENAME -Wno-VARHIDDEN -Wno-UNUSEDSIGNAL -Wno-UNDRIVEN
 COMPILE_OPTS	+= --timing
+COMPILE_OPTS	+= --autoflush
 
 COMPILE_CMD    := ${VERILATOR} ${COMPILE_OPTS} ${INC} ${SRC}
 
@@ -89,7 +90,7 @@ RUN_CMD	       := ${SIM_BIN} ${RUN_OPTS}
 #------------------------------------------------------------
 # Rules
 
-all: build run
+all: clean build run
  
 build: ${SRC}
 	@echo "[BUILD]" `pwd`
