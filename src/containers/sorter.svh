@@ -32,7 +32,7 @@
 // Implementation of quicksort.  Based on algorithm defined in
 // "Algorithms in C" by Robert Sedgewick, Addison-Wesley, 1990
 // ----------------------------------------------------------------------
-class sorter#(type T=int, type P=int);
+class sorter#(type T=uint32_t, type P=uint32_t);
 
   static function void sort(ref T vec[$]);
     if(vec.size() == 0)
@@ -40,10 +40,10 @@ class sorter#(type T=int, type P=int);
     qsort(vec, 0, vec.size() - 1);
   endfunction
 
-  static function void qsort(ref T vec[$], input int l, input int r);
+  static function void qsort(ref T vec[$], input int32_t l, input int32_t r);
     
-    int i;
-    int j;
+    int32_t i;
+    int32_t j;
     T v;
     T t;
     

@@ -119,21 +119,22 @@ module sorter_unit_test;
   `SVUNIT_TESTS_BEGIN
 
   //--------------------------------------------------------------------
-  // int32_sort
+  // uint32_sort
   //--------------------------------------------------------------------
-    `SVTEST(int32_sort)
+    `SVTEST(uint32_sort)
 
       index_t i;
       const index_t N = 50;
-      vector#(int, int32_traits) v = new();
+      vector#(uint32_t, uint32_traits) v = new();
 
+      // Popuate the vector with randomized values.
       for(i = 0; i < N; i++) begin
-        v.appendc($random());
+        v.appendc(uint32_t'($urandom() % 1000));
       end
 
       v.sort();
 
-      // make sure the new array is sorted
+     // make sure the new array is sorted
       for(i = 0; i < N-1; i++) begin
         `FAIL_UNLESS(v.read(i) <= v.read(i+1))
       end
@@ -149,10 +150,10 @@ module sorter_unit_test;
 
       index_t i;
       const index_t N = 50;
-      vector#(int, int32_traits) v = new();
+      vector#(int32_t, int32_traits) v = new();
 
       for(i = 0; i < N; i++) begin
-        v.appendc(int'(N-i));
+        v.appendc(int32_t'(N-i));
       end
 
       v.sort();

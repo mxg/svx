@@ -365,11 +365,11 @@ module mem_field_unit_test;
     `SVTEST(hier)
       sys_region sys;
 
+      $display("mem_map::hier test");
+
       sys = new("system", null, 'h0000_0000, 'h1_0000_0000);
       void'(sys.calculate_and_check());
       sys.dump();
-
-
 
     `SVTEST_END
 

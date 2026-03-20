@@ -62,7 +62,6 @@ module vector_unit_test;
   //===================================
   task setup();
     
-    $display("doink! - vector");
     svunit_ut.setup();
   endtask
 

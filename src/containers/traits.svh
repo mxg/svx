@@ -132,7 +132,7 @@ class int32_traits extends base_int_traits#(int32_t);
     return (a == b);
   endfunction
 
-  static function int32_t compare(int32_t a, int32_t b);
+  static function int compare(int32_t a, int32_t b);
     if(a > b)
       return 1;
     else
@@ -148,7 +148,7 @@ class int32_traits extends base_int_traits#(int32_t);
 endclass
 
 //----------------------------------------------------------------------
-// iuint32_traits
+// uint32_traits
 //----------------------------------------------------------------------
 class uint32_traits;
   typedef uint32_t empty_t;
