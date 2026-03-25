@@ -18,7 +18,9 @@ module lexer_testsuite;
   //===================================
   function void build();
     ctypes_ut.build();
+    ctypes_ut.__register_tests();
     lexer_core_ut.build();
+    lexer_core_ut.__register_tests();
     svunit_ts = new(name);
     svunit_ts.add_testcase(ctypes_ut.svunit_ut);
     svunit_ts.add_testcase(lexer_core_ut.svunit_ut);

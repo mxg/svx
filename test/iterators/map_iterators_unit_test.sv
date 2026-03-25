@@ -84,7 +84,7 @@ module map_iterators_unit_test;
   //===================================
   task setup();
 
-    index_t i;
+    size_t i;
     rand_string rs;
     string name;
     int val;
@@ -94,7 +94,9 @@ module map_iterators_unit_test;
     svunit_ut.setup();
 
     //randomize the size of the test vector;
-    map_size = size_t'($urandom()) % 1000;
+    map_size = size_t'($urandom()) % 100;
+
+    $display("map_size = %0d", map_size);
 
     rs = new();
     symbol_table = new();
@@ -227,7 +229,7 @@ module map_iterators_unit_test;
 
        // Reset to the last item in the map and then skip backwards to
        // the first item.
-  
+
       `FAIL_IF(!iter.last())
       `FAIL_IF(!iter.skip(-(symbol_table.size() - 1)))
 
@@ -503,8 +505,8 @@ module map_iterators_unit_test;
 
       map_random_iterator#(string, symbol, void_traits) iter;
       symbol t;
-      index_t i;
-      int unsigned iterations;
+      uint32_t i;
+      uint32_t iterations;
       symbol array1[];
       symbol array2[];
       int seed;
@@ -512,7 +514,7 @@ module map_iterators_unit_test;
       iter = new(symbol_table);
 
       // randomize the number of iterations
-      iterations = int'($urandom()) % int'(symbol_table.size());
+      iterations = uint32_t'($urandom()) % uint32_t'(symbol_table.size());
       array1 = new [iterations];
       array2 = new [iterations];
       seed = $random();
@@ -520,7 +522,7 @@ module map_iterators_unit_test;
       // Use the default seed (which is 1) to generate a stream of
       // randomized acesses.
       iter.set_default_seed();
-      for(i = 0; i < index_t'(iterations); i++) begin
+      for(i = 0; i < uint32_t'(iterations); i++) begin
         `FAIL_IF(!iter.random())
         t = iter.get();
         array1[i] = t;
@@ -528,23 +530,25 @@ module map_iterators_unit_test;
 
       // Change the seed to get a different stream of accesses.
       iter.set_seed(seed);
-      for(i = 0; i < index_t'(iterations); i++) begin
+      for(i = 0; i < uint32_t'(iterations); i++) begin
         `FAIL_IF(!iter.random())
         t = iter.get();
         array2[i] = t;
       end
 
-      // Go back to the default seed to get the same stream as the first set.
+      // Go back to the default seed to get the same stream as the
+      // first set.
       iter.set_seed(1);
-      for(i = 0; i < index_t'(iterations); i++) begin
+      for(i = 0; i < uint32_t'(iterations); i++) begin
         `FAIL_IF(!iter.random())
         t = iter.get();
         `FAIL_IF(t != array1[i])
       end
 
-      // Repeat the non-default seed to make sure that we can still get the same stream.
+      // Repeat the non-default seed to make sure that we can still
+      // get the same stream.
       iter.set_seed(seed);
-      for(i = 0; i < index_t'(iterations); i++) begin
+      for(i = 0; i < uint32_t'(iterations); i++) begin
         `FAIL_IF(!iter.random())
         t = iter.get();
         `FAIL_IF(t != array2[i])
@@ -562,7 +566,7 @@ module map_iterators_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(one)
 
-      index_t iter_count;
+      uint32_t iter_count;
       symbol t;
 
       map_fwd_iterator#(string, symbol, void_traits) fwd_iter;

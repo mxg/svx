@@ -30,8 +30,8 @@
 #------------------------------------------------------------
 # Command Verbosity
 
-#V               = @
-V               =
+V               = @
+#V               =
 
 #------------------------------------------------------------
 # Tools
@@ -96,7 +96,7 @@ COMPILE_OPTS	+= --autoflush
 
 COMPILE_CMD    := ${VERILATOR} ${COMPILE_OPTS} ${INC} ${SRC}
 
-RUN_OPTS       := +UVM_NO_RELNOTES +UVM_TESTNAME=${TEST} 
+RUN_OPTS       += +UVM_NO_RELNOTES +UVM_TESTNAME=${TEST} 
 
 RUN_CMD	       := ${SIM_BIN} ${RUN_OPTS}
 

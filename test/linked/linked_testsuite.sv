@@ -19,8 +19,11 @@ module linked_testsuite;
   //===================================
   function void build();
     node_ut.build();
+    node_ut.__register_tests();
     tree_ut.build();
+    tree_ut.__register_tests();
     tree_iterator_ut.build();
+    tree_iterator_ut.__register_tests();
     svunit_ts = new(name);
     svunit_ts.add_testcase(node_ut.svunit_ut);
     svunit_ts.add_testcase(tree_ut.svunit_ut);

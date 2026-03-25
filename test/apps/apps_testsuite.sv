@@ -19,8 +19,11 @@ module apps_testsuite;
   //===================================
   function void build();
     mem_ut.build();
+    mem_ut.__register_tests();
     mem_field_ut.build();
+    mem_field_ut.__register_tests();
     mem_bounded_ut.build();
+    mem_bounded_ut.__register_tests();
     svunit_ts = new(name);
     svunit_ts.add_testcase(mem_ut.svunit_ut);
     svunit_ts.add_testcase(mem_field_ut.svunit_ut);

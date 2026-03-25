@@ -404,7 +404,7 @@ class map_random_iterator#(type KEY=int, type T=int, type P=void_traits)
   // The Verilator compiler could not find the skip() implementation
   // in the base class, so we gave it a hint.
   virtual function bit skip(signed_index_t distance);
-    return map_fwd_iterator#(KEY,T,P)::skip(distance);
+    return super.skip(distance);
   endfunction
 
 

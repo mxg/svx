@@ -19,8 +19,11 @@ module behaviors_testsuite;
   //===================================
   function void build();
     behavior_ut.build();
+    behavior_ut.__register_tests();
     concurrency_ut.build();
+    concurrency_ut.__register_tests();
     mapper_ut.build();
+    mapper_ut.__register_tests();
     svunit_ts = new(name);
     svunit_ts.add_testcase(behavior_ut.svunit_ut);
     svunit_ts.add_testcase(concurrency_ut.svunit_ut);

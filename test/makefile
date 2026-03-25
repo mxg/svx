@@ -30,8 +30,11 @@
 TOP		= ..
 TOP_MODULE	= testrunner
 
-SVUNIT_SRC	:= ${SVUNIT_INSTALL}/svunit_base/svunit_pkg.sv
-SVUNIT_INC	:= +incdir+${SVUNIT_INSTALL}/svunit_base
+SVUNIT_SRC	:= ${SVUNIT_INSTALL}/svunit_base/svunit_pkg.sv \
+                   ${SVUNIT_INSTALL}/svunit_base/junit-xml/junit_xml.sv
+SVUNIT_INC	:= +incdir+${SVUNIT_INSTALL}/svunit_base \
+                   +incdir+${SVUNIT_INSTALL}/svunit_base/junit-xml
+
 UNIT_TESTS      := ${wildcard */*_unit_test.sv}
 TESTSUITES      := ${wildcard */*_testsuite.sv}
 
@@ -43,5 +46,7 @@ SV_SRC		:= test_utils.sv                             \
 
 SV_INC		:= +incdir+.                                 \
                    ${SVUNIT_INC}                             \
+
+#RUN_OPTS	:= +SVUNIT_LIST_TESTS
 
 include ${TOP}/make/makefile

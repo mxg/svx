@@ -19,8 +19,11 @@ module iterators_testsuite;
   //===================================
   function void build();
     list_iterators_ut.build();
+    list_iterators_ut.__register_tests();
     map_iterators_ut.build();
+    map_iterators_ut.__register_tests();
     permute_iterator_ut.build();
+    permute_iterator_ut.__register_tests();
     svunit_ts = new(name);
     svunit_ts.add_testcase(list_iterators_ut.svunit_ut);
     svunit_ts.add_testcase(map_iterators_ut.svunit_ut);

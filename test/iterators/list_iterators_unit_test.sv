@@ -45,7 +45,7 @@ module list_iterators_unit_test;
   // running the Unit Tests on
   //===================================
   int32_vector vec;
-  int unsigned vector_size;
+  uint32_t vector_size;
 
   //===================================
   // Build
@@ -56,7 +56,7 @@ module list_iterators_unit_test;
     vec = new();
 
     //randomize the size of the test vector;
-    vector_size = $urandom() % 1000;
+    vector_size = uint32_t'($urandom() % 1000);
   endfunction
 
 
@@ -100,7 +100,7 @@ module list_iterators_unit_test;
       int unsigned i;
       int last_item;
   
-      list_fwd_iterator#(int, int32_traits) iter = new();
+      list_fwd_iterator#(int32_t, int32_traits) iter = new();
 
       // We could bind the vector using the iterator constructor.  We do
       // it here using bind_list() to ensure that function works
@@ -110,7 +110,7 @@ module list_iterators_unit_test;
 
       // Fill the vector with random numbers
       for(i = 0; i < vector_size; i++) begin
-        vec.appendc($urandom());
+        vec.appendc(int32_t'($urandom()));
       end
 
       // Iterate through the vector
