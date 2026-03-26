@@ -29,8 +29,11 @@
 // Include the various macros from the SVX library and bring in the SVX
 // library package. The example code depends on the SVX library so we
 // have to do this first before the example code.
+/* verilator lint_off IMPORTSTAR */
 `include "svx_macros.svh"
 import svx::*;
+/* verilator lint_on IMPORTSTAR */
+
 
 // include our example code
 `include "list_example.svh"
@@ -38,7 +41,7 @@ import svx::*;
 
 
 //----------------------------------------------------------------------
-// use_model_examplse
+// use_model_examples
 //
 // You can run all the examples or comment out the ones that are not of
 // interest.

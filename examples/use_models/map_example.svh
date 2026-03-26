@@ -103,42 +103,42 @@ class map_example;
     pc = new();
     pc.val = 96485.33289;
     pc.units = "C mol";
-    tbl.insert("faraday_constant", pc);
+    void'(tbl.insert("faraday_constant", pc));
 	 
     pc = new();
     pc.val = 6.626070040e-34;
     pc.units = "J s";
-    tbl.insert("planck_constant", pc);
+    void'(tbl.insert("planck_constant", pc));
 
     pc = new();
     pc.val = 6.022140857e23;
     pc.units = "mol^-1";
-    tbl.insert("avogadro_constant", pc);
+    void'(tbl.insert("avogadro_constant", pc));
 
     pc = new();
     pc.val = 1.38064852e-23;
     pc.units = "J K^-1";
-    tbl.insert("boltzmann_constant", pc);
+    void'(tbl.insert("boltzmann_constant", pc));
 
     pc = new();
     pc.val = 9.10938356e-31;
     pc.units = "kg";
-    tbl.insert("electron_mass", pc);
+    void'(tbl.insert("electron_mass", pc));
 
     pc = new();
     pc.val = 1.672621898e-27;
     pc.units = "kg";
-    tbl.insert("proton_mass", pc);
+    void'(tbl.insert("proton_mass", pc));
 
     pc = new();
     pc.val = 2.067833831e-15;
     pc.units = "Wb";
-    tbl.insert("magnetic_flux_constant", pc); 
+    void'(tbl.insert("magnetic_flux_constant", pc)); 
 
     pc = new();
     pc.val = 1.6021766208e-19;
     pc.units = "C";
-    tbl.insert("elementary_charge", pc); 
+    void'(tbl.insert("elementary_charge", pc)); 
 
     // ----- END TABLE -----
 
@@ -147,13 +147,13 @@ class map_example;
     iter = new(tbl);
 
     $display("------<<< Table of Physical Constants >>>-------");
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       // Using the iterator, retrieve the item from the map container
       pc = iter.get();
       // get_index() returns the key from the current iterator item.
       $display("%25s = %15g %s", iter.get_index(), pc.val, pc.units);
-      iter.next();
+      void'(iter.next());
     end
 
     // Note: The traversal order of the map, and thus the order in which
@@ -204,15 +204,15 @@ class map_example;
 
     ic = new();
     ic.set(19);
-    poly_map.insert("A", ic);
+    void'(poly_map.insert("A", ic));
 
     rc = new();
     rc.set(472.8847);
-    poly_map.insert("B", rc);
+    void'(poly_map.insert("B", rc));
 
     sc = new();
     sc.set("hello!");
-    poly_map.insert("C", sc);
+    void'(poly_map.insert("C", sc));
 
     // Using an iterator, traverse through the map and print each item.
     // Note that the structure underlying the map#() class is an
@@ -223,14 +223,14 @@ class map_example;
     // iterator and bind it to the map.
     iter = new(poly_map);
     // Reset the iterator to point to the first object in the map.
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       // Using the iterator, retrieve the item from the map.
       tcb = iter.get();
       // The get_index() function returns the key for the current item.
       $display("%s = %s", iter.get_index(), tcb.convert2string());
       // Advance to the next item in the map.
-      iter.next();
+      void'(iter.next());
     end
 
     // For some weird reason, if you didn't want to or could not use
@@ -240,12 +240,13 @@ class map_example;
     // of the object.
     
     iter = new(poly_map);
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       tcb = iter.get();
 
       // A case statement that switches on the data type in the
       // container.
+      /* verilator lint_off SIDEEFFECT */      
       case(tcb.get_type_handle())
 	(type_handle#(int)::get_type())  :
 	  begin
@@ -253,7 +254,7 @@ class map_example;
 	    $cast(c, tcb);
 	    $display("%s = %0d", iter.get_index(), c.get());
 	  end
-
+	
 	(type_handle#(real)::get_type())  :
           begin
 	    type_container#(real) c;
@@ -267,10 +268,11 @@ class map_example;
 	    $cast(c, tcb);
 	    $display("%s = %s", iter.get_index(), c.get());
 	  end
+	
+      endcase			  
+      /* verilator lint_on SIDEEFFECT */      
 
-        endcase			  
-
-      iter.next();
+      void'(iter.next());
     end
     
   endfunction

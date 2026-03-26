@@ -29,10 +29,9 @@
 //----------------------------------------------------------------------
 // types
 //
-// Special types used in svx
+// Standardized types
 //----------------------------------------------------------------------
 
-// Common types
 typedef bit [127:0]          int128_t;
 typedef bit unsigned [127:0] uint128_t;
 typedef longint              int64_t;
@@ -50,7 +49,6 @@ typedef uint64_t size_t;
 // used for indexes
 typedef uint64_t index_t;
 typedef int64_t signed_index_t;
-
 
 // process identifiers
 typedef int unsigned pid_t;

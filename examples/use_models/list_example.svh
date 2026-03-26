@@ -41,14 +41,14 @@ class list_example;
   function void fwd();
 
     int unsigned i;
-    int n;
+    int32_t n;
     
     // A vector of integers
-    vector#(int, int_traits) v;
+    vector#(int32_t, int32_traits) v;
     
     // An iterator for our list of integers.  Note that the parameters
     // for the iterator are the same as for the vector.
-    list_fwd_iterator#(int, int_traits) iter;
+    list_fwd_iterator#(int32_t, int32_traits) iter;
 
     // create the vector container
     v = new();
@@ -56,7 +56,7 @@ class list_example;
     // Populate the vector with randomized integers between -999 and
     // 999;
     for(i = 0; i < 20; i++) begin
-      n = $random() % 1000;
+      n = int32_t'($random()) % 1000;
       // add the new randomized number to the end of the vector
       v.appendc(n);
     end
@@ -66,7 +66,7 @@ class list_example;
     iter = new(v);
 
     // Set the iterator to point to the first item in the vector
-    iter.first();
+    void'(iter.first());
 
     $display("-- unsorted vector --");
     // Visit all the items in the vector
@@ -77,7 +77,7 @@ class list_example;
       // print it.
       $display("item = %0d", n);
       // Move to the next item in the vector.
-      iter.next();
+      void'(iter.next());
     end
 
     // Let's sort the vector
@@ -85,11 +85,11 @@ class list_example;
 
     // Now, print the vector again, this time in sorted order
     $display("\n-- sorted vector --");
-    iter.first();  // reset to the beginning of the vector
+    void'(iter.first());  // reset to the beginning of the vector
     while(!iter.at_end()) begin
       n = iter.get();
       $display("item = %0d", n);
-      iter.next();
+      void'(iter.next());
     end
     
   endfunction
