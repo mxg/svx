@@ -29,17 +29,19 @@
 //----------------------------------------------------------------------
 // Sample Address Map
 //----------------------------------------------------------------------
+/* verilator lint_off IMPORTSTAR */
 import svx::*;
 `include "svx_macros.svh"
 
 import mem_map::*;
+/* verilator lint_on IMPORTSTAR */
 
 //----------------------------------------------------------------------
 // erroneous
 //----------------------------------------------------------------------
 class erroneous extends mem_field #(16);
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, size_t _size);
+  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
     super.new(name, parent, _offset, _size);
   endfunction
 
@@ -52,7 +54,7 @@ class start_stop extends mem_field #(16);
 
   erroneous e;
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, size_t _size);
+  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
     super.new(name, parent, _offset, _size);
 
 //    e = new("erroneous", this, 12, 100);
@@ -65,7 +67,7 @@ endclass
 //----------------------------------------------------------------------
 class status extends mem_field #(16);
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, size_t _size);
+  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
     super.new(name, parent, _offset, _size);
   endfunction
 
@@ -79,7 +81,7 @@ class csr extends mem_register #(16);
   start_stop s;
   status t;
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, size_t _size);
+  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
     super.new(name, parent, _offset, _size);
 
     s = new("start_stop", this, 0, 4);
@@ -96,7 +98,7 @@ class timer extends mem_region #(16);
 
   csr c;
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, size_t _size);
+  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
     super.new(name, parent, _offset, _size);
 
     c = new("csr", this, 8, 1);
@@ -111,7 +113,7 @@ endclass
 //----------------------------------------------------------------------
 class uart extends mem_region #(16);
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, size_t _size);
+  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
     super.new(name, parent, _offset, _size);
 
     add_register("read_buf", 0, 1);
@@ -128,7 +130,7 @@ class io_bus extends mem_region #(16);
 
   uart u;
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, size_t _size);
+  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
     super.new(name, parent, _offset, _size);
 
     u = new("uart1", this, 'h00, 8);
@@ -140,13 +142,14 @@ endclass
 
 //----------------------------------------------------------------------
 // sys_bus
+//
 //----------------------------------------------------------------------
 class sys_bus extends mem_view #(16);
 
   timer t;
   mem_memory#(16) m;
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, size_t _size);
+  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
     super.new(name, parent, _offset, _size);
 
     t = new("timer", this, 0, 8);
@@ -159,21 +162,25 @@ endclass
 
 //----------------------------------------------------------------------
 // An alternate view of the system bus
+//
+// This does not add any memory or register elements.  It provides a
+// different way of accessing them
 //----------------------------------------------------------------------
 class sys_bus_2 extends mem_view #(16);
 
   mem_memory#(16) m;
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, size_t _size);
-    super.new(name, parent, _offset, _size);
+  function new(string name, mem_space#(16) parent, addr_t _offset,
+    mem_size_t _size); super.new(name, parent, _offset, _size);
 
-      m = new("mem", this, 'h0000, 'h100);
-  endfunction
+      m = new("mem", this, 'h0000, 'h100); endfunction
 
 endclass
 
 //----------------------------------------------------------------------
 // system
+//
+// Top-level of the memory/register space
 //----------------------------------------------------------------------
 class system extends mem_region #(16);
 
@@ -181,10 +188,13 @@ class system extends mem_region #(16);
   sys_bus s;
   sys_bus_2 s2;
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, size_t _size);
+  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
     super.new(name, parent, _offset, _size);
 
     io = new("io_bus", this, 'hff00, 'h100);
+    // Note that s and s2 occupy the same memory space.  Each
+    // represents a different view of the same set of memories and
+    // registers.
     s =  new("sys_bus", this, 'h0000, 'h100);
     s2 = new("sys_bus_2", this, 'h0000, 'h100);
 
@@ -223,7 +233,7 @@ class test;
       if(t == null)
 	$display("%s not found", path);
       else
-	$display("%s", t.convert2string());
+	$display("path found: %s", path);
     end
 
   endfunction
@@ -243,11 +253,11 @@ class test;
       list = sys.find_addr_all(addrs[i]);
       if(list != null && list.size() > 0) begin
 	iter.bind_list(list);
-	iter.first();
+	void'(iter.first());
 	while(!iter.at_end()) begin
 	  space = iter.get();
-	  $display("%s", space.convert2string());
-	  iter.next();
+	  $display(space.to_str());
+	  void'(iter.next());
 	end
       end
       else

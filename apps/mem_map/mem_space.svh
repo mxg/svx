@@ -43,12 +43,12 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
   // - n, which requires one more bit than address.
   
   typedef bit [ADDR_SIZE-1:0] addr_t;
-  typedef bit [ADDR_SIZE:0] size_t;
+  typedef bit [ADDR_SIZE:0] mem_size_t;
   
   // An enum that represents all of the kinds of memory spaces
   typedef enum {MEMORY, REGISTER, REGION, FIELD, VIEW} mem_space_type_t;
 
-  // These next twp typedefs are conveniences for the user.  The first
+  // These next two typedefs are conveniences for the user.  The first
   // is the type of the list returned by searches, the second is an
   // iterator for the list.  The expectation is that users can use these
   // in their own code to save a bit of typing.  For example,
@@ -80,7 +80,7 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
 
   // The size of a memory space is expressed in bytes, except for
   // fields.  Field sizes are expressed in bits.
-  local size_t size;
+  local mem_size_t size;
 
   // Identify the type of the memory space.
   local mem_space_type_t mem_space_type;
@@ -105,7 +105,7 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
   // constructor
   //--------------------------------------------------------------------
   function new(string name, mem_space_t parent, mem_space_type_t _type,
-               addr_t _offset, size_t _size);
+               addr_t _offset, mem_size_t _size);
 
     super.new(name, parent);
     offset = _offset;
@@ -121,7 +121,8 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
     end
     
     if((parent != null) && (!parent.check_child(this))) begin
-      $display("*** error: A %s cannot contain a %s\n           parent = %s, child = %s", parent.get_type_name(), get_type_name(), parent.get_full_name(), get_name());
+      $display("*** error: A %s cannot contain a %s\n           parent = %s, child = %s", 
+	       parent.get_type_name(), get_type_name(), parent.get_full_name(), get_name());
       has_error = 1;
     end
 
@@ -153,7 +154,7 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
   static local function string compute_print_fmt();
     string fmt;
       $sformat(fmt, "%%8s  %%1s [%%%0dx:%%%0dx] %%%0dx+%%%0dx: %%s",
-             addr_print_len, addr_print_len, addr_print_len, size_print_len);
+               addr_print_len, addr_print_len, addr_print_len, size_print_len);
     return fmt;
   endfunction
 
@@ -183,7 +184,7 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
     return offset;
   endfunction
 
-  function size_t get_size();
+  function mem_size_t get_size();
     return size;
   endfunction
 
@@ -192,7 +193,7 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
   endfunction
 
   function addr_t get_end_addr();
-    return get_addr() + (get_size() - 1);
+    return get_addr() + (addr_t'(get_size()) - 1);
   endfunction
 
   function string get_type_name();
@@ -222,7 +223,8 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
     string fmt;
     mem_space_type_t _type = get_type();
 
-    $sformat(s, print_fmt,
+    //$sformat(s, print_fmt,
+    $sformat(s, "%8s  %1s [%x:%x] %x+%x: %s",
              _type.name(),
 	     (get_error()?"*":" "),
              get_addr(),
@@ -344,7 +346,7 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
     mem_space_t outer_space;
     mem_space_t inner_space;
     bit ok;
-    int unsigned count;
+    uint64_t count;
 
     if((num_children() == 0) || (get_type() == VIEW))
       return 1;
@@ -461,7 +463,8 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
   function list_t find_addr_all(addr_t search_addr);
     list_t list = new();
     find_addr_recurse(search_addr, list, 1);
-    return ((list.size() > 0) ? list : null);
+    //return ((list.size() > 0) ? list : null);
+    return list;
   endfunction
 
   //--------------------------------------------------------------------
@@ -480,7 +483,7 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
 
     // Is the search address within range of this memory space?
     is_in_space = (search_addr >= get_addr() &&
-		   search_addr < (get_addr() + get_size()));
+		   search_addr < (get_addr() + (addr_t'(get_size()) - addr_t'(1))));
 
     if(!is_in_space) begin
       // search address is not in the space, no further searching is

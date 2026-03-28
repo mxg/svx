@@ -49,7 +49,7 @@ typedef class mem_view;
 class mem_field #(int unsigned ADDR_SIZE = 32)
   extends mem_space #(ADDR_SIZE);
 
-  function new(string name, mem_space_t parent, addr_t _offset, size_t _size);
+  function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);
     super.new(name, parent, FIELD, _offset, _size);
   endfunction
 
@@ -70,7 +70,7 @@ endclass
 class mem_register #(int unsigned ADDR_SIZE = 32)
   extends mem_space #(ADDR_SIZE);
 
-  function new(string name, mem_space_t parent, addr_t _offset, size_t _size);
+  function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);
     super.new(name, parent, REGISTER, _offset, _size);
   endfunction
 
@@ -82,7 +82,7 @@ class mem_register #(int unsigned ADDR_SIZE = 32)
     return (child.get_type() == FIELD);
   endfunction
 
-  function void add_field(string name, addr_t _offset, size_t _size);
+  function void add_field(string name, addr_t _offset, mem_size_t _size);
     mem_field #(ADDR_SIZE) field = new(name, this, _offset, _size);
   endfunction
   
@@ -94,7 +94,7 @@ endclass
 class mem_memory #(int unsigned ADDR_SIZE = 32)
   extends mem_space #(ADDR_SIZE);
 
-  function new(string name, mem_space_t parent, addr_t _offset, size_t _size);
+  function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);
     super.new(name, parent, MEMORY, _offset, _size);
   endfunction
 
@@ -114,7 +114,7 @@ endclass
 class mem_region #(int unsigned ADDR_SIZE = 32)
   extends mem_space #(ADDR_SIZE);
   
-  function new(string name, mem_space_t parent, addr_t _offset, size_t _size);
+  function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);
     super.new(name, parent, REGION, _offset, _size);
   endfunction
 
@@ -127,19 +127,19 @@ class mem_region #(int unsigned ADDR_SIZE = 32)
     return (child.get_type() != FIELD);
   endfunction
 
-  function void add_register(string name, addr_t _offset, size_t _size);
-    mem_register #(ADDR_SIZE) register = new(name, this, _offset, _size);
+  function void add_register(string name, addr_t _offset, mem_size_t _size);
+    mem_register #(ADDR_SIZE) rgstr = new(name, this, _offset, _size);
   endfunction
 
-  function void add_memory(string name, addr_t _offset, size_t _size);
+  function void add_memory(string name, addr_t _offset, mem_size_t _size);
     mem_memory #(ADDR_SIZE) memory = new(name, this, _offset, _size);
   endfunction
 
-  function void add_region(string name, addr_t _offset, size_t _size);
+  function void add_region(string name, addr_t _offset, mem_size_t _size);
     mem_region #(ADDR_SIZE) region = new(name, this, _offset, _size);
   endfunction
 
-  function void add_view(string name, addr_t _offset, size_t _size);
+  function void add_view(string name, addr_t _offset, mem_size_t _size);
     mem_view #(ADDR_SIZE) view = new(name, this, _offset, _size);
   endfunction
   
@@ -156,7 +156,7 @@ endclass
 class mem_view #(int unsigned ADDR_SIZE = 32)
   extends mem_space #(ADDR_SIZE);
 
-  function new(string name, mem_space_t parent, addr_t _offset, size_t _size);
+  function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);
     super.new(name, parent, VIEW, _offset, _size);
   endfunction
 
@@ -169,19 +169,19 @@ class mem_view #(int unsigned ADDR_SIZE = 32)
     return (child.get_type() != FIELD);
   endfunction
 
-  function void add_register(string name, addr_t _offset, size_t _size);
-    mem_register #(ADDR_SIZE) register = new(name, this, _offset, _size);
+  function void add_register(string name, addr_t _offset, mem_size_t _size);
+    mem_register #(ADDR_SIZE) rgstr = new(name, this, _offset, _size);
   endfunction
 
-  function void add_memory(string name, addr_t _offset, size_t _size);
+  function void add_memory(string name, addr_t _offset, mem_size_t _size);
     mem_memory #(ADDR_SIZE) memory = new(name, this, _offset, _size);
   endfunction
 
-  function void add_region(string name, addr_t _offset, size_t _size);
+  function void add_region(string name, addr_t _offset, mem_size_t _size);
     mem_region #(ADDR_SIZE) region = new(name, this, _offset, _size);
   endfunction
 
-  function void add_view(string name, addr_t _offset, size_t _size);
+  function void add_view(string name, addr_t _offset, mem_size_t _size);
     mem_view #(ADDR_SIZE) view = new(name, this, _offset, _size);
   endfunction
 
