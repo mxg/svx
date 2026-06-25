@@ -37,6 +37,9 @@ class mem#(int unsigned ADDR_BITS = 32,
 	   int unsigned WORD_SIZE = 4)
   extends mem_base#(ADDR_BITS, PAGE_BITS, BLOCK_BITS, WORD_SIZE);
 
+  typedef bit [PAGE_BITS-1:0] page_key_t; 
+  typedef bit [ADDR_BITS-1:0] addr_t;
+ 
   typedef mem_page#(ADDR_BITS, PAGE_BITS, BLOCK_BITS, WORD_SIZE) page_t;
   typedef map#(page_key_t, page_t, class_traits#(page_t)) page_map_t;
 
@@ -173,15 +176,15 @@ class mem#(int unsigned ADDR_BITS = 32,
   // page-level security
   //--------------------------------------------------------------------
   function void set_page_restriction(addr_t addr, restrict_t r);
-    set_restriction(get_page_key(addr), r);
+    set_restriction(restrict_t'(get_page_key(addr)), r);
   endfunction
 
   function restrict_t get_page_restriction(addr_t addr);
-    return get_restriction(get_page_key(addr));
+    return get_restriction(restrict_t'(get_page_key(addr)));
   endfunction
 
   function void clear_page_restriction(addr_t addr);
-    clear_restriction(get_page_key(addr));
+    clear_restriction(restrict_t'(get_page_key(addr)));
   endfunction  
 
   //--------------------------------------------------------------------
@@ -197,7 +200,7 @@ class mem#(int unsigned ADDR_BITS = 32,
       void'(page_map.insert(page_key, page));
     end
 
-    page.set_restriction(get_block_addr(addr), r);
+    page.set_restriction(restrict_t'(get_block_addr(addr)), r);
     
   endfunction
 
@@ -206,7 +209,7 @@ class mem#(int unsigned ADDR_BITS = 32,
     page_t page  = page_map.get(get_page_key(addr));
 
     if(page != null)
-      page.clear_restriction(get_block_addr(addr));
+      page.clear_restriction(addr_t'(get_block_addr(addr)));
 
   endfunction
 
@@ -369,7 +372,7 @@ class mem#(int unsigned ADDR_BITS = 32,
     void'(iter.first());
     while(!iter.at_end()) begin
       restrict_t r = iter.get();
-      page_key = iter.get_index();
+      page_key = page_key_t'(iter.get_index());
       $display("page: %x  restriction = %s", page_key, r.name());
       void'(iter.next());
     end

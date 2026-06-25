@@ -37,6 +37,9 @@ class mem_block#(int unsigned ADDR_BITS = 32,
 		 int unsigned WORD_SIZE = 4)
   extends mem_base#(ADDR_BITS, PAGE_BITS, BLOCK_BITS, WORD_SIZE);
 
+  typedef byte unsigned byte_t;
+  typedef bit [ADDR_BITS-1:0] addr_t;
+  
   local vector#(byte_t, byte_unsigned_traits) byte_vector;
 
   function new(mem_t root);
@@ -61,7 +64,7 @@ class mem_block#(int unsigned ADDR_BITS = 32,
     end
 
     // check word-level security
-    word_restriction = get_restriction(get_aligned_byte_addr(addr));
+    word_restriction = get_restriction(restrict_t'(get_aligned_byte_addr(addr)));
     if(word_restriction == RESTRICT_WRITE || word_restriction == RESTRICT_READ_WRITE) begin
       set_error(ERROR_WORD_SECURITY_VIOLATION);
       return;
@@ -69,10 +72,10 @@ class mem_block#(int unsigned ADDR_BITS = 32,
 
     // big-endian write
     byte_addr = get_byte_addr(addr);
-    for(index = 0; index < WORD_SIZE; index++) begin
-      word_base = (WORD_SIZE - index) * 8 - 1;
+    for(index = 0; index < index_t'(WORD_SIZE); index++) begin
+      word_base = byte_addr_t'((index_t'(WORD_SIZE) - index) * 8 - 1);
       b = data[word_base -: 8];
-      byte_vector.write(byte_addr + index, b);
+      byte_vector.write(index_t'(byte_addr) + index, b);
     end
     
   endfunction
@@ -95,7 +98,7 @@ class mem_block#(int unsigned ADDR_BITS = 32,
     end
 
     // check word-level security
-    word_restriction = get_restriction(get_aligned_byte_addr(addr));
+    word_restriction = get_restriction(restrict_t'(get_aligned_byte_addr(addr)));
     if(word_restriction == RESTRICT_READ || word_restriction == RESTRICT_READ_WRITE) begin
       set_error(ERROR_WORD_SECURITY_VIOLATION);
       return 0;
@@ -103,9 +106,9 @@ class mem_block#(int unsigned ADDR_BITS = 32,
 
     // big-endian read
     byte_addr = get_byte_addr(addr);
-    for(index = 0; index < WORD_SIZE; index++) begin
-      word_base = (WORD_SIZE - index) * 8 - 1;
-      b = byte_vector.read(byte_addr + index);
+    for(index = 0; index < index_t'(WORD_SIZE); index++) begin
+      word_base = byte_addr_t'((index_t'(WORD_SIZE) - index) * 8 - 1);
+      b = byte_vector.read(index_t'(byte_addr) + index);
       data[word_base -: 8] = b;
     end
 
@@ -122,13 +125,13 @@ class mem_block#(int unsigned ADDR_BITS = 32,
     byte_addr_t byte_addr = get_byte_addr(addr);
 
     // check word-level security
-    word_restriction = get_restriction(byte_addr);
+    word_restriction = get_restriction(restrict_t'(byte_addr));
     if(word_restriction == RESTRICT_WRITE || word_restriction == RESTRICT_READ_WRITE) begin
       set_error(ERROR_WORD_SECURITY_VIOLATION);
       return 0;
     end
     
-    return byte_vector.read(byte_addr);
+    return byte_vector.read(index_t'(byte_addr));
   endfunction
   
   //--------------------------------------------------------------------
@@ -140,20 +143,20 @@ class mem_block#(int unsigned ADDR_BITS = 32,
     byte_addr_t byte_addr = get_byte_addr(addr);
     
     // check word-level security
-    word_restriction = get_restriction(byte_addr);
+    word_restriction = get_restriction(restrict_t'(byte_addr));
     if(word_restriction == RESTRICT_READ || word_restriction == RESTRICT_READ_WRITE) begin
       set_error(ERROR_WORD_SECURITY_VIOLATION);
       return;
     end
 
-    byte_vector.write(byte_addr, data);
+    byte_vector.write(index_t'(byte_addr), data);
   endfunction
 
   //--------------------------------------------------------------------
   // get_addr_restriction
   //--------------------------------------------------------------------
   function restrict_t get_addr_restriction(addr_t addr);
-    return get_restriction(get_aligned_byte_addr(addr));
+    return get_restriction(restrict_t'(get_aligned_byte_addr(addr)));
   endfunction
 
   //--------------------------------------------------------------------
@@ -169,7 +172,7 @@ class mem_block#(int unsigned ADDR_BITS = 32,
     void'(iter.first());
     while(!iter.at_end()) begin
       restrict_t r = iter.get();
-      word_addr = iter.get_index();
+      word_addr = byte_addr_t'(iter.get_index());
       $display("word: %x  restriction = %s", word_addr, r.name());
       void'(iter.next());
     end

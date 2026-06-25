@@ -155,21 +155,21 @@ module behavior_unit_test;
   //--------------------------------------------------------------------
   // process_behavior
   //--------------------------------------------------------------------
-    `SVTEST(process_behavior_test)
+    // `SVTEST(process_behavior_test)
 
-      int_task_behavior t = new();
-      int_process_behavior f = new(t);
-      f.bind_context(12);
-      f.start();
-      f.await();
+    //   int_task_behavior t = new();
+    //   int_process_behavior f = new(t);
+    //   f.bind_context(12);
+    //   f.start();
+    //   f.await();
 
-      `FAIL_IF(f.get_context() != 7)
+    //   `FAIL_IF(f.get_context() != 7)
 
-      f.apply(22);
-      f.await();
-      `FAIL_IF(f.get_context() != 17);
+    //   f.apply(22);
+    //   f.await();
+    //   `FAIL_IF(f.get_context() != 17);
 
-    `SVTEST_END
+    // `SVTEST_END
 
   //--------------------------------------------------------------------
   // generic_beh

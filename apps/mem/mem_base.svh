@@ -174,19 +174,19 @@ virtual class mem_base#(int unsigned ADDR_BITS = 32,
   // Address part calculation interface
   //--------------------------------------------------------------------
   function page_key_t get_page_key(addr_t addr);
-    return (addr >> (ADDR_BITS - PAGE_BITS)) & page_addr_mask;
+    return page_key_t'((addr >> (ADDR_BITS - PAGE_BITS)) & page_addr_mask);
   endfunction
 
   function block_addr_t get_block_addr(addr_t addr);
-    return (addr >> (ADDR_BITS - BLOCK_BITS - PAGE_BITS)) & block_addr_mask;
+    return block_addr_t'((addr >> (ADDR_BITS - BLOCK_BITS - PAGE_BITS)) & block_addr_mask);
   endfunction
 
   function byte_addr_t get_byte_addr(addr_t addr);
-    return (addr & byte_addr_mask);
+    return byte_addr_t'(addr & byte_addr_mask);
   endfunction
 
   function byte_addr_t get_aligned_byte_addr(addr_t addr);
-    return (addr & byte_addr_mask & ~word_addr_mask);
+    return byte_addr_t'(addr & byte_addr_mask & ~word_addr_mask);
   endfunction
 
   function bit is_word_aligned(addr_t addr);
@@ -196,9 +196,9 @@ virtual class mem_base#(int unsigned ADDR_BITS = 32,
   function addr_t construct_addr(page_key_t page_key,
                                            block_addr_t block_addr,
                                            byte_addr_t byte_addr);
-    return ((page_key << (ADDR_BITS - PAGE_BITS)) |
-            (block_addr << (ADDR_BITS - PAGE_BITS - BLOCK_BITS)) |
-            (byte_addr));
+    return addr_t'((addr_t'(page_key) << (ADDR_BITS - PAGE_BITS)) |
+		   (addr_t'(block_addr) << (ADDR_BITS - PAGE_BITS - BLOCK_BITS)) |
+		   (addr_t'(byte_addr)));
   endfunction
 
   //====================================================================

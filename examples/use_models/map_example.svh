@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,11 +44,17 @@ endclass
 // string as the types in this example, you can make a container with
 // any type whatsoever.
 //
+// A type_container#() is a base class for an object container of any
+// type. These are the basis for building polymorphic data structures.
+// It provides virtual functions convert2string(), which prints the
+// contents, and get_type_handle(), which returns a unique handle
+// based on the container's type.
+//
 // Notice that we use the get() function to retrieve the object in the
 // container.  The object is declared as local and is not visible in a
 // derived class.  The get() function lets us access the object and
-// ensures there's no funny business (i.e. the object is not modified in
-// this context).
+// ensures there's no funny business (i.e. the object is not modified,
+// intentionally or unintentionally, in this context).
 
 class int_container extends type_container#(int);
   function string convert2string();
@@ -79,6 +86,7 @@ endclass
 class map_example;
 
   function void run();
+    $display("** Map Example");
     basic_example();
     polymorphic_example();
   endfunction
@@ -245,7 +253,13 @@ class map_example;
       tcb = iter.get();
 
       // A case statement that switches on the data type in the
-      // container.
+      // container.  Type_handle#(T)::get_type() returns a unique
+      // handle for each unique type T. Get_handle_type(), a method of
+      // type_container#(), also returns a unique handle based on the
+      // container's (derived) type.  So, we can match handles
+      // returned from type_handle#(T)::get_type() and handles
+      // returned from type_container::get_type_handle().
+      
       /* verilator lint_off SIDEEFFECT */      
       case(tcb.get_type_handle())
 	(type_handle#(int)::get_type())  :

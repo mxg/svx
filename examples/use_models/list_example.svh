@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,11 +30,14 @@
 //----------------------------------------------------------------------
 // list_example
 //
-// Demonstrate use models for lists
+// Demonstrate use models for lists.  We are using the vector
+// container for our lists.
+
 //----------------------------------------------------------------------
 class list_example;
 
   function void run();
+    $display("** List Example");
     fwd();
   endfunction
 
@@ -41,22 +45,22 @@ class list_example;
   function void fwd();
 
     int unsigned i;
-    int32_t n;
+    uint32_t n;
     
     // A vector of integers
-    vector#(int32_t, int32_traits) v;
+    uint32_vector v;
     
     // An iterator for our list of integers.  Note that the parameters
     // for the iterator are the same as for the vector.
-    list_fwd_iterator#(int32_t, int32_traits) iter;
+    list_fwd_uint32_iterator iter;
 
     // create the vector container
     v = new();
 
-    // Populate the vector with randomized integers between -999 and
+    // Populate the vector with randomized integers between 0 and
     // 999;
     for(i = 0; i < 20; i++) begin
-      n = int32_t'($random()) % 1000;
+      n = uint32_t'($random()) % 1000;
       // add the new randomized number to the end of the vector
       v.appendc(n);
     end
@@ -69,9 +73,10 @@ class list_example;
     void'(iter.first());
 
     $display("-- unsorted vector --");
-    // Visit all the items in the vector
+    // Visit all the items in the vector.  This is an idiom for
+    // traversing a container.
     while(!iter.at_end()) begin
-      // Uing the iterator, retrieve the item from the vector container
+      // Using the iterator, retrieve the item from the vector container
       n = iter.get();
       // Here we can use the item as we wish.  In this case we'll just
       // print it.

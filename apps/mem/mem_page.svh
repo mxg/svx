@@ -37,6 +37,9 @@ class mem_page#(int unsigned ADDR_BITS = 32,
 		int unsigned WORD_SIZE = 4)
   extends mem_base#(ADDR_BITS, PAGE_BITS, BLOCK_BITS, WORD_SIZE);
 
+  typedef bit [ADDR_BITS-1:0] addr_t;
+  typedef bit [BLOCK_BITS-1:0] block_addr_t;  
+  
   typedef mem_block#(ADDR_BITS, PAGE_BITS, BLOCK_BITS, WORD_SIZE) block_t;
   typedef map#(block_addr_t, block_t, class_traits#(block_t)) block_map_t;
 
@@ -58,7 +61,7 @@ class mem_page#(int unsigned ADDR_BITS = 32,
 
     // check block-level security
     block_addr = get_block_addr(addr);
-    block_restriction = get_restriction(block_addr);
+    block_restriction = get_restriction(addr_t'(block_addr));
     if(block_restriction == RESTRICT_WRITE || block_restriction == RESTRICT_READ_WRITE) begin
       set_error(ERROR_BLOCK_SECURITY_VIOLATION);
       return;
@@ -85,7 +88,7 @@ class mem_page#(int unsigned ADDR_BITS = 32,
     block_addr_t block_addr;
 
     block_addr = get_block_addr(addr);
-    block_restriction = get_restriction(block_addr);
+    block_restriction = get_restriction(addr_t'(block_addr));
     if(block_restriction == RESTRICT_READ || block_restriction == RESTRICT_READ_WRITE) begin
       set_error(ERROR_BLOCK_SECURITY_VIOLATION);
       return 0;
@@ -110,7 +113,7 @@ class mem_page#(int unsigned ADDR_BITS = 32,
     block_addr_t block_addr;
 
     block_addr = get_block_addr(addr);
-    block_restriction = get_restriction(block_addr);
+    block_restriction = get_restriction(addr_t'(block_addr));
     if(block_restriction == RESTRICT_WRITE || block_restriction == RESTRICT_READ_WRITE) begin
       set_error(ERROR_BLOCK_SECURITY_VIOLATION);
       return;
@@ -136,7 +139,7 @@ class mem_page#(int unsigned ADDR_BITS = 32,
     block_addr_t block_addr;
 
     block_addr = get_block_addr(addr);
-    block_restriction = get_restriction(block_addr);
+    block_restriction = get_restriction(addr_t'(block_addr));
     if(block_restriction == RESTRICT_READ || block_restriction == RESTRICT_READ_WRITE) begin
       set_error(ERROR_BLOCK_SECURITY_VIOLATION);
       return 0;
@@ -174,7 +177,7 @@ class mem_page#(int unsigned ADDR_BITS = 32,
       void'(block_map.insert(block_addr, block));
     end
 
-    block.set_restriction(get_aligned_byte_addr(addr), r);
+    block.set_restriction(restrict_t'(get_aligned_byte_addr(addr)), r);
     
   endfunction
 
@@ -184,7 +187,7 @@ class mem_page#(int unsigned ADDR_BITS = 32,
     block_t block = block_map.get(get_block_addr(addr));
 
     if(block != null)
-      block.clear_restriction(get_aligned_byte_addr(addr));
+      block.clear_restriction(restrict_t'(get_aligned_byte_addr(addr)));
 
   endfunction
 
@@ -193,7 +196,7 @@ class mem_page#(int unsigned ADDR_BITS = 32,
     block_t block;
     restrict_t r;
 
-    r = get_restriction(get_block_addr(addr));
+    r = get_restriction(addr_t'(get_block_addr(addr)));
     if(r != RESTRICT_NONE)
       return r;
 
@@ -221,7 +224,7 @@ class mem_page#(int unsigned ADDR_BITS = 32,
     void'(iter.first());
     while(!iter.at_end()) begin
       restrict_t r = iter.get();
-      page_key = iter.get_index();
+      page_key = page_key_t'(iter.get_index());
       $display("block: %x  restriction = %s", page_key, r.name());
       void'(iter.next());
     end

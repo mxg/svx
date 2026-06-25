@@ -223,6 +223,12 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
     string fmt;
     mem_space_type_t _type = get_type();
 
+    // The Verilator implementation of SystemVeriloigis a bit smarter
+    // about knowing the bit widths of variables, so the computed
+    // format string is not really necessary.  Also, using a
+    // non-constant string as the format string for $display does not
+    // appear to be supported by Verilator at the moment.
+
     //$sformat(s, print_fmt,
     $sformat(s, "%8s  %1s [%x:%x] %x+%x: %s",
              _type.name(),

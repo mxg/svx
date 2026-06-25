@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,12 +37,16 @@ import svx::*;
 import mem_map::*;
 /* verilator lint_on IMPORTSTAR */
 
+`define ASIZE 32
+
+typedef mem_space#(`ASIZE) space_t;
+
 //----------------------------------------------------------------------
 // erroneous
 //----------------------------------------------------------------------
-class erroneous extends mem_field #(16);
+class erroneous extends mem_field #(`ASIZE);
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
+  function new(string name, space_t parent, space_t::addr_t _offset, space_t::mem_size_t _size);
     super.new(name, parent, _offset, _size);
   endfunction
 
@@ -50,11 +55,11 @@ endclass
 //----------------------------------------------------------------------
 // start_stop
 //----------------------------------------------------------------------
-class start_stop extends mem_field #(16);
+class start_stop extends mem_field #(`ASIZE);
 
   erroneous e;
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
+  function new(string name, space_t parent, space_t::addr_t _offset, space_t::mem_size_t _size);
     super.new(name, parent, _offset, _size);
 
 //    e = new("erroneous", this, 12, 100);
@@ -65,9 +70,9 @@ endclass
 //----------------------------------------------------------------------
 // status
 //----------------------------------------------------------------------
-class status extends mem_field #(16);
+class status extends mem_field #(`ASIZE);
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
+  function new(string name, space_t parent, space_t::addr_t _offset, space_t::mem_size_t _size);
     super.new(name, parent, _offset, _size);
   endfunction
 
@@ -76,12 +81,12 @@ endclass
 //----------------------------------------------------------------------
 // csr
 //----------------------------------------------------------------------
-class csr extends mem_register #(16);
+class csr extends mem_register #(`ASIZE);
 
   start_stop s;
   status t;
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
+  function new(string name, space_t parent, space_t::addr_t _offset, space_t::mem_size_t _size);
     super.new(name, parent, _offset, _size);
 
     s = new("start_stop", this, 0, 4);
@@ -94,16 +99,16 @@ endclass
 //----------------------------------------------------------------------
 // timer
 //----------------------------------------------------------------------
-class timer extends mem_region #(16);
+class timer extends mem_region #(`ASIZE);
 
   csr c;
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
+  function new(string name, space_t parent, space_t::addr_t _offset, space_t::mem_size_t _size);
     super.new(name, parent, _offset, _size);
 
     c = new("csr", this, 8, 1);
-    add_register("seconds", 0, 4);
-    add_register("milliseconds", 4, 4);
+    add_register("seconds", space_t::addr_t'(0), space_t::mem_size_t'(4));
+    add_register("milliseconds", space_t::addr_t'(4), space_t::mem_size_t'(4));
   endfunction
 
 endclass
@@ -111,14 +116,14 @@ endclass
 //----------------------------------------------------------------------
 // uart
 //----------------------------------------------------------------------
-class uart extends mem_region #(16);
+class uart extends mem_region #(`ASIZE);
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
+  function new(string name, space_t parent, space_t::addr_t _offset, space_t::mem_size_t _size);
     super.new(name, parent, _offset, _size);
 
-    add_register("read_buf", 0, 1);
-    add_register("write_buf", 1, 1);
-    add_register("ctrl", 2, 1);
+    add_register("read_buf", space_t::addr_t'(0), space_t::mem_size_t'(1));
+    add_register("write_buf", space_t::addr_t'(1), space_t::mem_size_t'(1));
+    add_register("ctrl", space_t::addr_t'(2), space_t::mem_size_t'(1));
   endfunction
 
 endclass
@@ -126,15 +131,15 @@ endclass
 //----------------------------------------------------------------------
 // io_bus
 //----------------------------------------------------------------------
-class io_bus extends mem_region #(16);
+class io_bus extends mem_region #(`ASIZE);
 
   uart u;
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
+  function new(string name, space_t parent, space_t::addr_t _offset, space_t::mem_size_t _size);
     super.new(name, parent, _offset, _size);
 
-    u = new("uart1", this, 'h00, 8);
-    u = new("uart2", this, 'h08, 8);
+    u = new("uart1", this, space_t::addr_t'('h00), space_t::mem_size_t'(8));
+    u = new("uart2", this, space_t::addr_t'('h08), space_t::mem_size_t'(8));
 
   endfunction
   
@@ -144,17 +149,17 @@ endclass
 // sys_bus
 //
 //----------------------------------------------------------------------
-class sys_bus extends mem_view #(16);
+class sys_bus extends mem_view #(`ASIZE);
 
   timer t;
-  mem_memory#(16) m;
+  mem_memory#(`ASIZE) m;
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
+  function new(string name, space_t parent, space_t::addr_t _offset, space_t::mem_size_t _size);
     super.new(name, parent, _offset, _size);
 
-    t = new("timer", this, 0, 8);
-    m = new("mem1", this, 'h0080, 'h400);
-    m = new("mem2", this, 'h00c0, 'h400);
+    t = new("timer", this, space_t::addr_t'(0), space_t::mem_size_t'(8));
+    m = new("mem1", this, space_t::addr_t'('h0080), space_t::mem_size_t'('h400));
+    m = new("mem2", this, space_t::addr_t'('h00c0), space_t::mem_size_t'('h400));
 
   endfunction
   
@@ -166,14 +171,15 @@ endclass
 // This does not add any memory or register elements.  It provides a
 // different way of accessing them
 //----------------------------------------------------------------------
-class sys_bus_2 extends mem_view #(16);
+class sys_bus_2 extends mem_view #(`ASIZE);
 
-  mem_memory#(16) m;
+  mem_memory#(`ASIZE) m;
 
-  function new(string name, mem_space#(16) parent, addr_t _offset,
-    mem_size_t _size); super.new(name, parent, _offset, _size);
+  function new(string name, space_t parent, space_t::addr_t _offset,
+    space_t::mem_size_t _size); super.new(name, parent, _offset, _size);
 
-      m = new("mem", this, 'h0000, 'h100); endfunction
+      m = new("mem", this, space_t::addr_t'('h0000), space_t::mem_size_t'('h100));
+  endfunction
 
 endclass
 
@@ -182,21 +188,21 @@ endclass
 //
 // Top-level of the memory/register space
 //----------------------------------------------------------------------
-class system extends mem_region #(16);
+class system extends mem_region #(`ASIZE);
 
   io_bus io;
   sys_bus s;
   sys_bus_2 s2;
 
-  function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
+  function new(string name, space_t parent, space_t::addr_t _offset, space_t::mem_size_t _size);
     super.new(name, parent, _offset, _size);
 
-    io = new("io_bus", this, 'hff00, 'h100);
+    io = new("io_bus", this, space_t::addr_t'('hff00), space_t::mem_size_t'('h100));
     // Note that s and s2 occupy the same memory space.  Each
     // represents a different view of the same set of memories and
     // registers.
-    s =  new("sys_bus", this, 'h0000, 'h100);
-    s2 = new("sys_bus_2", this, 'h0000, 'h100);
+    s =  new("sys_bus", this, space_t::addr_t'('h0000), space_t::mem_size_t'('h100));
+    s2 = new("sys_bus_2", this, space_t::addr_t'('h0000), space_t::mem_size_t'('h100));
 
   endfunction
 
@@ -239,10 +245,10 @@ class test;
   endfunction
 
   function void lookup_addrs();
-    mem_space#(16)::addr_t addrs[$] = {'h00000000, 'h8, 'hf0, 'hff00, 'hff01, 'hff04};
-    mem_space#(16)::list_t list;
-    mem_space#(16)::fwd_iterator_t iter;
-    mem_space#(16) space;
+    space_t::addr_t addrs[$] = {'h00000000, 'h8, 'hf0, 'hff00, 'hff01, 'hff04};
+    space_t::list_t list;
+    space_t::fwd_iterator_t iter;
+    space_t space;
 
     $display("\n--- lookup addrs ---");
 
@@ -273,8 +279,10 @@ endclass
 //----------------------------------------------------------------------
 module top;
 
+  test t;
+
   initial begin
-    test t = new();
+    t = new();
     t.dump();
     t.lookup_paths();
     t.lookup_addrs();
