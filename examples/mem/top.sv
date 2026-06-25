@@ -26,9 +26,11 @@
 // permissions and limitations under the License.
 //======================================================================
 
+/* verilator lint_off IMPORTSTAR */
 import svx::*;
 `include "svx_macros.svh"
-import mem::*;
+import mem_pkg::*;
+/* verilator lint_on IMPORTSTAR */
 
 //----------------------------------------------------------------------
 // class test
@@ -42,8 +44,11 @@ class test;
 
   typedef mem#(ADDR_BITS, PAGE_BITS, BLOCK_BITS, WORD_SIZE) mem_t;
   mem_t m;
-  typedef mem_t::addr_t addr_t;
-  typedef mem_t::word_t word_t;
+  //typedef mem_t::addr_t addr_t;
+  //typedef mem_t::word_t word_t;
+
+  typedef mem#(ADDR_BITS, PAGE_BITS, BLOCK_BITS, WORD_SIZE)::addr_t addr_t;
+  typedef mem#(ADDR_BITS, PAGE_BITS, BLOCK_BITS, WORD_SIZE)::word_t word_t;
 
   function new();
     m = new();
@@ -68,29 +73,32 @@ class test;
   
 
   function void run();
-    bit [(WORD_SIZE*8)-1:0] data;
+    typedef bit [(WORD_SIZE*8)-1:0] bytes_t;
+    typedef bit[6:0] short_ix_t;
+    bytes_t data;
     addr_t base_addr = 'h7460_0000;
-    signed_index_t i;
-    bit[(WORD_SIZE*8)-1:0] array[100];
+    index_t i;
+    bytes_t array[100];
 
     m.set_word_restriction(base_addr + 'h3f, RESTRICT_WRITE);
 //    m.set_block_restriction(base_addr + 'h0100, RESTRICT_WRITE);
 
     for(i = 0; i < 100; i++) begin
       data = ($urandom() << 32) | $urandom();
-      array[i] = data;
-      m.write(base_addr + i*WORD_SIZE, data);
+      array[short_ix_t'(i)] = data;
+      m.write(addr_t'(index_t'(base_addr) + i*WORD_SIZE), data);
       if(m.last_operation_failed())
 	$display("** error: %s", m.get_last_op_string());
     end
 
     for(i = 0; i < 100 ; i++) begin
-      data = m.read(base_addr + i*WORD_SIZE);
+      data = m.read(addr_t'(index_t'(base_addr) + i*WORD_SIZE));
       if(m.last_operation_failed())
 	$display("** error: %s", m.get_last_op_string());
       else
-	if(data != array[i])
-	  $display("error %x -- actual = %x expected = %x", base_addr + i*WORD_SIZE, data, array[i]);
+	if(data != array[short_ix_t'(i)])
+	  $display("error %x -- actual = %x expected = %x",
+		   addr_t'(index_t'(base_addr) + i*WORD_SIZE), data, array[short_ix_t'(i)]);
     end
     m.show();
     m.dump();
@@ -100,8 +108,10 @@ endclass
 
 module top;
 
+  test t;
+
   initial begin
-    test t = new();
+    t = new();
     t.run();
   end
   
