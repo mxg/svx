@@ -27,7 +27,7 @@
 //======================================================================
 
 module mem_bounded_unit_test;
-`include "svunit_defines.svh"
+  `include "svunit_defines.svh"
   import svunit_pkg::svunit_testcase;
 
    // the svx library
@@ -35,7 +35,7 @@ module mem_bounded_unit_test;
   `include "svx_macros.svh"
 
   // The facility under test
-  import mem::*;
+  import mem_pkg::*;
   
   import test_utils::*;
   

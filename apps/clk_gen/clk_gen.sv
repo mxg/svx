@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------
 // clock interface
 //----------------------------------------------------------------------
-interface clk_if #(int unsigned N=1)(wire clk[N]);
+interface clk_if #(int unsigned N=1)(output clk[N]);
 endinterface
 
 package clk_gen;

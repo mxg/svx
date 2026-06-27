@@ -48,13 +48,16 @@ CXXFLAGS        := -std=c++17 -O2
 TOP		?= .
 
 SVX_SRC		:= ${TOP}/src/svx.sv
-SVX_INC		:= +incdir+${TOP}/src
+SVX_INC		:= +incdir+${TOP}/src \
+		   +incdir+${TOP}/src/lexer
 APPS		:= ${TOP}/apps
 
 APPS_SRC	:= ${wildcard ${APPS}/mem/*.sv}             \
-                   ${wildcard ${APPS}/mem_map/*.sv}
+                   ${wildcard ${APPS}/mem_map/*.sv}         \
+                   ${wildcard ${APPS}/clk_gen/*.sv}
 APPS_INC	:= +incdir+${APPS}/mem                      \
-                   +incdir+${APPS}/mem_map
+                   +incdir+${APPS}/mem_map                  \
+		   +incdir+${APPS}/clk_gen
 
 SV_SRC		:= ${SVX_SRC} ${APPS_SRC} ${SV_SRC}
 
@@ -94,32 +97,49 @@ COMPILE_OPTS	+= --Wno-DECLFILENAME -Wno-VARHIDDEN -Wno-UNUSEDSIGNAL -Wno-UNDRIVE
 COMPILE_OPTS	+= --timing
 COMPILE_OPTS	+= --autoflush
 
-COMPILE_CMD    := ${VERILATOR} ${COMPILE_OPTS} ${INC} ${SRC}
+COMPILE_CMD    := ${VERILATOR} ${COMPILE_OPTS} ${EXTRA_COMPILE_OPTS} ${INC} ${SRC}
 
 RUN_OPTS       += +UVM_NO_RELNOTES +UVM_TESTNAME=${TEST} 
 
-RUN_CMD	       := ${SIM_BIN} ${RUN_OPTS}
+RUN_CMD	       := ${SIM_BIN} ${RUN_OPTS} ${EXTRA_RUN_OPTS}
 
 #------------------------------------------------------------
 # Rules
 
+.phony: do_build do_run
+
 all: clean build run
- 
+
 build: ${SRC}
-	@echo "[BUILD]" `pwd`
-	${V}mkdir -p $(BUILD_DIR)	
+	@if [ ! -e .disable ]; then \
+	  make -s do_build; \
+	else \
+	  dir=`pwd`; \
+	  echo "[BUILD] Example" `basename $$dir` "is disabled."; \
+	fi
+
+do_build:
+	echo "[BUILD]" `pwd`
+	${V}mkdir -p $(BUILD_DIR)
 	${V}echo ${COMPILE_CMD} > ${BUILDLOG} 2>&1
 	${V}${COMPILE_CMD} >> ${BUILDLOG} 2>&1
 
 run:
+	@if [ ! -e .disable ]; then \
+	  make -s do_run; \
+	else \
+	  dir=`pwd`; \
+	  echo "[RUN] Example" `basename $$dir` "is disabled."; \
+	fi
+do_run:
 	@echo "[RUN]" `pwd`
 	${V}echo ${RUN_CMD} > ${RUNLOG} 2>&1
 	${V}${RUN_CMD} >> ${RUNLOG} 2>&1
- 
+
 clean:
 	@echo "[CLEAN]" `pwd`
 	${V}rm -f ${BUILDLOG} ${RUNLOG}
 	${V}rm -f xx* *~ #*
 	${V}rm -rf $(BUILD_DIR) *.vcd *.fst
 	${V}rm -f *.xml
- 
+

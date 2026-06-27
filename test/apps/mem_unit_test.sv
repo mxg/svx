@@ -37,7 +37,7 @@ module mem_unit_test;
   `include "svx_macros.svh"
 
   // The facility under test
-  import mem::*;
+  import mem_pkg::*;
   
   import test_utils::*;
   

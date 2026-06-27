@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,20 +27,22 @@
 // permissions and limitations under the License.
 //======================================================================
 
+/* verilator lint_off IMPORTSTAR */
 import clk_gen::*;
 import svx::*;
+/* verilator lint_on IMPORTSTAR */
 
 `timescale 1ps / 1ps
 
 //----------------------------------------------------------------------
 // clock generator
 //----------------------------------------------------------------------
-module clock_generator#(int unsigned N=1)(wire clks[N]);
+module clock_generator#(uint32_t N=1)(output clks[N]);
 
   typedef deque#(clk_descriptor#(N), class_traits#(clk_descriptor#(N))) clk_vec_t;
 
   clk_if#(N) ckif(clks);
-
+  
   // Clock start event.  Shared amongst all the clock descriptors
   event start_clocks;
 
@@ -47,7 +50,7 @@ module clock_generator#(int unsigned N=1)(wire clks[N]);
   clk_processor#(N) ckgen;
 
   // Create the vector of clock descriptors
-  function clk_vec_t create_clock_descriptors();
+  function static clk_vec_t create_clock_descriptors();
     clk_descriptor#(N) cd;
 
     clk_vec_t vec = new();

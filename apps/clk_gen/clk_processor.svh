@@ -100,11 +100,11 @@ class clk_processor#(int unsigned N=1) implements process_if;
       return;
 
     // Validate each of the clock descriptors
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       cd = iter.get();
       ok &= cd.validate();
-      iter.next();
+      void'(iter.next());
     end
 
     if(!ok)
@@ -124,11 +124,11 @@ class clk_processor#(int unsigned N=1) implements process_if;
       return;
 
     // Validate each of the clock descriptors
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       cd = iter.get();
       $display("%s", cd.to_str());
-      iter.next();
+      void'(iter.next());
     end
 
     
@@ -146,13 +146,13 @@ class clk_processor#(int unsigned N=1) implements process_if;
     clk_procs = new();
 
     // Load up the process group with all the clock processes
-    iter.first();
+    void'(iter.first());
     while(!iter.at_end()) begin
       beh = new();
       proc = new(beh);
       proc.bind_context(iter.get());
       clk_procs.add_process(proc);
-      iter.next();
+      void'(iter.next());
     end
 
     clk_procs.exec();
@@ -179,7 +179,8 @@ class clk_processor#(int unsigned N=1) implements process_if;
   
   virtual function bit is_done();
     if(clk_procs != null)
-      clk_procs.is_done();
+      return clk_procs.is_done();
+    return 0;
   endfunction
 
   virtual task await();

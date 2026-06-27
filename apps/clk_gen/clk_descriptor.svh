@@ -82,6 +82,7 @@ class clk_descriptor #(int unsigned N=1) extends object;
     verbose = 0;
     time_lo = 0;
     time_hi = 0;
+    //start_event = null;
   endfunction
 
   // store the virtual clock interface and the index for this clock
@@ -168,10 +169,10 @@ class clk_descriptor #(int unsigned N=1) extends object;
     end
 
     // start even must be set...
-    if(start_event == null) begin
-      $display("start event is null");
-      ok = 0;
-    end
+    // if(start_event == null) begin
+    //   $display("start event is null");
+    //   ok = 0;
+    // end
 
     // Generate a synthetic name if one has not been provided
     if(name == "") begin
@@ -202,8 +203,8 @@ class clk_descriptor #(int unsigned N=1) extends object;
 
 	// convert frequency to time in femtoseconds.
 	time_interval = ((scale_factor * 1.0e6) / freq);
-	time_hi = $rtoi(time_interval * duty_cycle) / 1.0e6;
-	time_lo = $rtoi(time_interval * (1.0 - duty_cycle)) / 1.0e6;
+	time_hi = time'($rtoi((time_interval * duty_cycle) / 1.0e6));
+	time_lo = time'($rtoi((time_interval * (1.0 - duty_cycle)) / 1.0e6));
       end
       else begin
 	$display("frequency not specified");
