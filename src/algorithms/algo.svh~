@@ -1,8 +1,0 @@
-class algo#(type T=int, type P=void_traits);
-
-  static function uint32_t count(list_bidir_iterator#(T,P) iter, predicate#(T));
-    void'(iter.first());
-    while(!iter.at_end()) begin
-
-      void'(iter.next());
-    end
