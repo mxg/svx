@@ -26,21 +26,23 @@
 // permissions and limitations under the License.
 //======================================================================
 
-import svx::*;
-`include "svx_macros.svh"
-import rpn_calc::*;
-
 module top;
+
+  import svx::*;
+  `include "svx_macros.svh"
+  import rpn_calc::*;
+
+  calc c;
 
   initial
     begin
-      calc c = new();
-      c.calculate("5280 3 / 1.257722 *");
-      c.calculate("2750 88.0 / 16 * 122.456 *");
-      c.calculate("1 2 3 4 * * * ");
-      c.calculate("1 0 /");
-      c.calculate("0 1 /");
-      c.calculate("3.14159 4 4 * 1.141 /");
+      c = new();
+      void'(c.calculate("5280 3 / 1.257722 *"));
+      void'(c.calculate("2750 88.0 / 16 * 122.456 *"));
+      void'(c.calculate("1 2 3 4 * * * "));
+      void'(c.calculate("1 0 /"));
+      void'(c.calculate("0 1 /"));
+      void'(c.calculate("3.14159 4 4 * 1.141 /"));
     end
 
 endmodule

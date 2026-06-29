@@ -11,7 +11,7 @@
 #                  SystemVerilog Extension Library
 #
 #
-# Copyright 2026 Mark Glasser
+# Copyright 2026 Mark Glassser
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,31 +26,11 @@
 # permissions and limitations under the License.
 #=======================================================================
 
-EXAMPLES	:= mem mem_map use_models calc
+TOP		:= ../..
 
-MAKE		:= /usr/bin/make -s
+RPN_CALC         := ${TOP}/apps/rpn_calc
 
-phony: clean build run
+SV_INC		:= +incdir+. +incdir+${RPN_CALC}
+SV_SRC		:= ${RPN_CALC}/rpn_calc.sv ${wildcard *.sv}
 
-all: clean build run
-
-clean:
-	@for f in ${EXAMPLES}; do \
-	  cd $$f; \
-	  ${MAKE} clean; \
-	  cd ..; \
-	done
-
-build:
-	@for f in ${EXAMPLES}; do \
-	  cd $$f; \
-	  ${MAKE} build; \
-	  cd ..; \
-	done
-
-run:
-	@for f in ${EXAMPLES}; do \
-	  cd $$f; \
-	  ${MAKE} run; \
-	  cd ..; \
-	done
+include ${TOP}/make/makefile
