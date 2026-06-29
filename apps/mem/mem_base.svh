@@ -95,10 +95,10 @@
 
 typedef class mem;
 
-virtual class mem_base#(int unsigned ADDR_BITS = 32,
-                 int unsigned PAGE_BITS = 16,
-                 int unsigned BLOCK_BITS = 8,
-                 int unsigned WORD_SIZE = 4)
+virtual class mem_base#(uint32_t ADDR_BITS = 32,
+			uint32_t PAGE_BITS = 16,
+			uint32_t BLOCK_BITS = 8,
+			uint32_t WORD_SIZE = 4)
   extends object;
 
   typedef mem#(ADDR_BITS, PAGE_BITS, BLOCK_BITS, WORD_SIZE) mem_t;
@@ -113,8 +113,9 @@ virtual class mem_base#(int unsigned ADDR_BITS = 32,
   typedef bit [BLOCK_BITS-1:0] block_addr_t;
 
   // Address of a byte within a block
-  typedef bit [ADDR_BITS-PAGE_BITS-BLOCK_BITS-1:0] byte_addr_t;
-
+  localparam  uint32_t BYTE_ADDR_BITS = ADDR_BITS - PAGE_BITS - BLOCK_BITS;
+  typedef bit [BYTE_ADDR_BITS-1:0] byte_addr_t;
+ 
   // Masks for retrieving the various parts of the address
   static const addr_t page_addr_mask  = ((addr_t'('1)) >> (ADDR_BITS - PAGE_BITS));
   static const addr_t block_addr_mask = ((addr_t'('1)) >> (ADDR_BITS - BLOCK_BITS));
@@ -144,9 +145,9 @@ virtual class mem_base#(int unsigned ADDR_BITS = 32,
   // --------------------------------------------------------------------
   local function bit check_parameters();
 
-    int unsigned word_bits;
-    int unsigned one_bits;
-    int unsigned word_size;
+    uint32_t word_bits;
+    uint32_t one_bits;
+    uint32_t word_size;
     bit ok = 1;
 
     ok &= ((ADDR_BITS > 0) && (PAGE_BITS > 0) && (BLOCK_BITS > 0) &&(WORD_SIZE > 0));
@@ -174,11 +175,15 @@ virtual class mem_base#(int unsigned ADDR_BITS = 32,
   // Address part calculation interface
   //--------------------------------------------------------------------
   function page_key_t get_page_key(addr_t addr);
-    return page_key_t'((addr >> (ADDR_BITS - PAGE_BITS)) & page_addr_mask);
+    addr_t x = (addr >> (addr_t'(ADDR_BITS) - addr_t'(PAGE_BITS))) & addr_t'(page_addr_mask);
+    return page_key_t'(x);
+//    return page_key_t'((addr >> addr_t'(ADDR_BITS - PAGE_BITS)) & addr_t'(page_addr_mask));
   endfunction
 
   function block_addr_t get_block_addr(addr_t addr);
-    return block_addr_t'((addr >> (ADDR_BITS - BLOCK_BITS - PAGE_BITS)) & block_addr_mask);
+    addr_t x = (addr >> addr_t'(BYTE_ADDR_BITS)) & addr_t'(block_addr_mask);
+    return block_addr_t'(x);
+//    return block_addr_t'((addr >> addr_t(BYTE_ADDR_BITS)) & addr_t'(block_addr_mask));
   endfunction
 
   function byte_addr_t get_byte_addr(addr_t addr);

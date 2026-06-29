@@ -11,7 +11,7 @@
 //                  SystemVerilog Extension Library
 //
 //
-// Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,8 +29,3 @@
 //----------------------------------------------------------------------
 // iterators
 //----------------------------------------------------------------------
-`include "iterators/iterator.svh"
-`include "iterators/map_iterators.svh"
-`include "iterators/list_iterators.svh"
-`include "iterators/permute_iterators.svh"
-`include "iterators/range.svh"

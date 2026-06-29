@@ -15,8 +15,8 @@ module testrunner();
   // These are the test suites that we
   // want included in this testrunner
   //==================================
-//  apps_testsuite apps_ts();
-  behaviors_testsuite behaviors_ts();
+  algorithms_testsuite algorithms_ts();
+  apps_testsuite apps_ts();
   containers_testsuite containers_ts();
   iterators_testsuite iterators_ts();
   lexer_testsuite lexer_ts();
@@ -49,10 +49,10 @@ module testrunner();
   //===================================
   function void build();
     svunit_tr = new(name);
-//    apps_ts.build();
-//    svunit_tr.add_testsuite(apps_ts.svunit_ts);
-    behaviors_ts.build();
-    svunit_tr.add_testsuite(behaviors_ts.svunit_ts);
+    algorithms_ts.build();
+    svunit_tr.add_testsuite(algorithms_ts.svunit_ts);
+    apps_ts.build();
+    svunit_tr.add_testsuite(apps_ts.svunit_ts);
     containers_ts.build();
     svunit_tr.add_testsuite(containers_ts.svunit_ts);
     iterators_ts.build();
@@ -68,8 +68,8 @@ module testrunner();
   // Run
   //===================================
   task run();
-//    apps_ts.run();
-    behaviors_ts.run();
+    algorithms_ts.run();
+    apps_ts.run();
     containers_ts.run();
     iterators_ts.run();
     lexer_ts.run();

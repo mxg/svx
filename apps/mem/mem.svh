@@ -176,15 +176,15 @@ class mem#(int unsigned ADDR_BITS = 32,
   // page-level security
   //--------------------------------------------------------------------
   function void set_page_restriction(addr_t addr, restrict_t r);
-    set_restriction(restrict_t'(get_page_key(addr)), r);
+    set_restriction(addr_t'(get_page_key(addr)), r);
   endfunction
 
   function restrict_t get_page_restriction(addr_t addr);
-    return get_restriction(restrict_t'(get_page_key(addr)));
+    return get_restriction(addr_t'(get_page_key(addr)));
   endfunction
 
   function void clear_page_restriction(addr_t addr);
-    clear_restriction(restrict_t'(get_page_key(addr)));
+    clear_restriction(addr_t'(get_page_key(addr)));
   endfunction  
 
   //--------------------------------------------------------------------
@@ -200,7 +200,7 @@ class mem#(int unsigned ADDR_BITS = 32,
       void'(page_map.insert(page_key, page));
     end
 
-    page.set_restriction(restrict_t'(get_block_addr(addr)), r);
+    page.set_restriction(addr_t'(get_block_addr(addr)), r);
     
   endfunction
 

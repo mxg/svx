@@ -11,7 +11,7 @@
 //                  SystemVerilog Extension Library
 //
 //
-// Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,11 +26,48 @@
 // permissions and limitations under the License.
 //======================================================================
 
+virtual class predicate_base;
+endclass
+
 //----------------------------------------------------------------------
-// iterators
+// predicate
+//
+// interface class that defines predicate functionality.  Any class
+// that implements this interface can be used as a predicate.
 //----------------------------------------------------------------------
-`include "iterators/iterator.svh"
-`include "iterators/map_iterators.svh"
-`include "iterators/list_iterators.svh"
-`include "iterators/permute_iterators.svh"
-`include "iterators/range.svh"
+virtual class predicate #(type T=int) extends predicate_base;
+
+   pure virtual function bit is_true(T t); 
+
+   virtual function bit is_false(T t);
+     return !is_true(t);
+   endfunction
+   
+endclass
+
+//----------------------------------------------------------------------
+// always_true
+//
+// A "constant" predicate that is always true
+//----------------------------------------------------------------------
+class always_true#(type T=int) extends predicate #(T);
+  
+  function bit is_true(T t);
+    return 1;
+  endfunction
+  
+endclass
+
+//----------------------------------------------------------------------
+// always_false
+//
+// A "constant" predicate that is always false
+//----------------------------------------------------------------------
+class always_false#(type T=int) extends predicate #(T);
+  
+  function bit is_true(T t);
+    return 0;
+  endfunction
+  
+endclass
+

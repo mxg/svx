@@ -54,8 +54,16 @@ echo "*** Create iterators test suite"
 create_testsuite.pl -add iterators/list_iterators_unit_test.sv        \
                     -add iterators/map_iterators_unit_test.sv         \
                     -add iterators/permute_iterators_unit_test.sv     \
+		    -add iterators/range_unit_test.sv                 \
                     -out iterators/iterators_testsuite.sv             \
                     -overwrite
+
+# create algorithms test suite
+echo
+echo "*** create algorithms test suite"
+create_testsuite.pl -add algorithms/algo_unit_test.sv                 \
+		    -out algorithms/algorithms_testsuite.sv           \
+		    -overwrite
 
 #create linked test suite
 echo
@@ -84,22 +92,22 @@ create_testsuite.pl -add apps/mem_unit_test.sv                        \
                     -overwrite
 
 # create behaviors test suite
-echo
-echo "*** Create behaviors test suite"
-create_testsuite.pl -add behaviors/behavior_unit_test.sv              \
-                    -add behaviors/concurrency_unit_test.sv           \
-                    -add behaviors/mapper_unit_test.sv                \
-                    -out behaviors/behaviors_testsuite.sv             \
-                    -overwrite
+# echo
+# echo "*** Create behaviors test suite"
+# create_testsuite.pl -add behaviors/behavior_unit_test.sv              \
+#                     -add behaviors/concurrency_unit_test.sv           \
+#                     -add behaviors/mapper_unit_test.sv                \
+#                     -out behaviors/behaviors_testsuite.sv             \
+#                     -overwrite
 
 # create testrunner
 echo
 echo "*** Create top-level test runner"
 create_testrunner.pl -add containers/containers_testsuite.sv          \
                      -add iterators/iterators_testsuite.sv            \
+		     -add algorithms/algorithms_testsuite.sv          \
                      -add linked/linked_testsuite.sv                  \
                      -add lexer/lexer_testsuite.sv                    \
                      -add apps/apps_testsuite.sv                      \
-                     -add behaviors/behaviors_testsuite.sv            \
                      -out testrunner.sv                               \
                      -overwrite

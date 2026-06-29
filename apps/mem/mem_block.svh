@@ -64,7 +64,7 @@ class mem_block#(int unsigned ADDR_BITS = 32,
     end
 
     // check word-level security
-    word_restriction = get_restriction(restrict_t'(get_aligned_byte_addr(addr)));
+    word_restriction = get_restriction(addr_t'(get_aligned_byte_addr(addr)));
     if(word_restriction == RESTRICT_WRITE || word_restriction == RESTRICT_READ_WRITE) begin
       set_error(ERROR_WORD_SECURITY_VIOLATION);
       return;
@@ -98,7 +98,7 @@ class mem_block#(int unsigned ADDR_BITS = 32,
     end
 
     // check word-level security
-    word_restriction = get_restriction(restrict_t'(get_aligned_byte_addr(addr)));
+    word_restriction = get_restriction(addr_t'(get_aligned_byte_addr(addr)));
     if(word_restriction == RESTRICT_READ || word_restriction == RESTRICT_READ_WRITE) begin
       set_error(ERROR_WORD_SECURITY_VIOLATION);
       return 0;
@@ -125,7 +125,7 @@ class mem_block#(int unsigned ADDR_BITS = 32,
     byte_addr_t byte_addr = get_byte_addr(addr);
 
     // check word-level security
-    word_restriction = get_restriction(restrict_t'(byte_addr));
+    word_restriction = get_restriction(addr_t'(byte_addr));
     if(word_restriction == RESTRICT_WRITE || word_restriction == RESTRICT_READ_WRITE) begin
       set_error(ERROR_WORD_SECURITY_VIOLATION);
       return 0;
@@ -143,7 +143,7 @@ class mem_block#(int unsigned ADDR_BITS = 32,
     byte_addr_t byte_addr = get_byte_addr(addr);
     
     // check word-level security
-    word_restriction = get_restriction(restrict_t'(byte_addr));
+    word_restriction = get_restriction(addr_t'(byte_addr));
     if(word_restriction == RESTRICT_READ || word_restriction == RESTRICT_READ_WRITE) begin
       set_error(ERROR_WORD_SECURITY_VIOLATION);
       return;
@@ -156,7 +156,7 @@ class mem_block#(int unsigned ADDR_BITS = 32,
   // get_addr_restriction
   //--------------------------------------------------------------------
   function restrict_t get_addr_restriction(addr_t addr);
-    return get_restriction(restrict_t'(get_aligned_byte_addr(addr)));
+    return get_restriction(addr_t'(get_aligned_byte_addr(addr)));
   endfunction
 
   //--------------------------------------------------------------------

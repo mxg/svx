@@ -79,20 +79,20 @@ module mem_field_unit_test;
   // define some memory spaces we'll use in the tests
 
   class region extends mem_region#(16);
-    function new(string name, mem_space_t parent, addr_t _offset, size_t _size);
+    function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);
       super.new(name, parent, _offset, _size);
     endfunction
   endclass
 
   class register extends mem_register#(16);
-    function new(string name, mem_space_t parent, addr_t _offset, size_t _size);
+    function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);
       super.new(name, parent, _offset, _size);
     endfunction
   endclass
 
   class treg extends mem_register #(16);
 
-    function new(string name, mem_space_t parent, addr_t _offset, size_t _size);
+    function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);
       super.new(name, parent, _offset, _size);
     endfunction
 
@@ -105,7 +105,7 @@ module mem_field_unit_test;
     treg r3;
     treg r4;
 
-    function new(string name, mem_space#(16) parent, addr_t _offset, size_t _size);
+    function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
       super.new(name, parent, _offset, _size);
 
       r1 = new("r1", this, 'h08, 4);
@@ -123,7 +123,7 @@ module mem_field_unit_test;
     treg r3;
     treg r4;
 
-    function new(string name, mem_space#(16) parent, addr_t _offset, size_t _size);
+    function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
       super.new(name, parent, _offset, _size);
 
       r1 = new("r1", this, 'h08, 4);
@@ -141,7 +141,7 @@ module mem_field_unit_test;
     treg r3;
     treg r4;
 
-    function new(string name, mem_space#(16) parent, addr_t _offset, size_t _size);
+    function new(string name, mem_space#(16) parent, addr_t _offset, mem_size_t _size);
       super.new(name, parent, _offset, _size);
 
       r1 = new("r1", this, 'hf0, 4);
@@ -153,7 +153,7 @@ module mem_field_unit_test;
   endclass
 
   class reg32 extends mem_register#(32);
-    function new(string name, mem_space_t parent, addr_t _offset, size_t _size);
+    function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);
       super.new(name, parent, _offset, _size);
     endfunction
   endclass
@@ -164,7 +164,7 @@ module mem_field_unit_test;
     reg32 ctrl;
     reg32 status;
 
-    function new(string name, mem_space_t parent, addr_t _offset, size_t _size);
+    function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);
       super.new(name, parent, _offset, _size);
 
       data = new("data", this, 0, 4);
@@ -178,7 +178,7 @@ module mem_field_unit_test;
     peripheral p1;
     peripheral p2;
 
-    function new(string name, mem_space_t parent, addr_t _offset, size_t _size);
+    function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);
       super.new(name, parent, _offset, _size);
 
       p1 = new("p1", this, 'h0000_ff00, 'h0000_00ff);
@@ -187,17 +187,17 @@ module mem_field_unit_test;
   endclass
 
   class b_bus extends mem_view#(32);
-    function new(string name, mem_space_t parent, addr_t _offset, size_t _size);
+    function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);
       super.new(name, parent, _offset, _size);
     endfunction
   endclass
 
-  class sys_region extends mem_region #(32)	;
+  class sys_region extends mem_region #(32);
 
     a_bus a;
     b_bus b;
 
-  function new(string name, mem_space_t parent, addr_t _offset, size_t _size);
+  function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);
     super.new(name, parent, _offset, _size);
 
     a = new("bus_a", this, 'h0000_0000, 'h1_0000_0000);

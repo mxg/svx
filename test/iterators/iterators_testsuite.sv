@@ -12,6 +12,7 @@ module iterators_testsuite;
   list_iterators_unit_test list_iterators_ut();
   map_iterators_unit_test map_iterators_ut();
   permute_iterator_unit_test permute_iterator_ut();
+  range_unit_test range_ut();
 
 
   //===================================
@@ -24,10 +25,13 @@ module iterators_testsuite;
     map_iterators_ut.__register_tests();
     permute_iterator_ut.build();
     permute_iterator_ut.__register_tests();
+    range_ut.build();
+    range_ut.__register_tests();
     svunit_ts = new(name);
     svunit_ts.add_testcase(list_iterators_ut.svunit_ut);
     svunit_ts.add_testcase(map_iterators_ut.svunit_ut);
     svunit_ts.add_testcase(permute_iterator_ut.svunit_ut);
+    svunit_ts.add_testcase(range_ut.svunit_ut);
   endfunction
 
 
@@ -39,6 +43,7 @@ module iterators_testsuite;
     list_iterators_ut.run();
     map_iterators_ut.run();
     permute_iterator_ut.run();
+    range_ut.run();
     svunit_ts.report();
   endtask
 

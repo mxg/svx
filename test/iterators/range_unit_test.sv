@@ -11,7 +11,7 @@
 //                  SystemVerilog Extension Library
 //
 //
-// Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,20 +26,19 @@
 // permissions and limitations under the License.
 //======================================================================
 
-module mem_bounded_unit_test;
-  `include "svunit_defines.svh"
+//----------------------------------------------------------------------
+// range unit test
+//----------------------------------------------------------------------
+
+module range_unit_test;
+`include "svunit_defines.svh"
   import svunit_pkg::svunit_testcase;
 
-   // the svx library
+  // the library we are testing
   import svx::*;
-  `include "svx_macros.svh"
+ `include "svx_macros.svh"
 
-  // The facility under test
-  import mem_pkg::*;
-  
-  import test_utils::*;
-  
-  string name = "mem_bounded_ut";
+  string name = "range_ut";
   svunit_testcase svunit_ut;
 
 
@@ -47,25 +46,34 @@ module mem_bounded_unit_test;
   // This is the UUT that we're 
   // running the Unit Tests on
   //===================================
-
+  uint32_vector vec;
+  index_t vector_size;
 
   //===================================
   // Build
   //===================================
   function void build();
     svunit_ut = new(name);
-
+    vec = new();
   endfunction
-
 
   //===================================
   // Setup for running the Unit Tests
-  //===================================
+  //==ector_siz
+  // ==================v===============
   task setup();
+    index_t i;
     svunit_ut.setup();
     /* Place Setup Code Here */
-  endtask
 
+    //randomize the size of the test vector;
+    vector_size = index_t'($urandom()) % index_t'(100);
+    // Fill the vector with random numbers
+    for(i = 0; i < vector_size; i++) begin
+      vec.appendc(int32_t'($urandom() % 1000));
+    end
+
+  endtask
 
   //===================================
   // Here we deconstruct anything we 
@@ -74,8 +82,8 @@ module mem_bounded_unit_test;
   task teardown();
     svunit_ut.teardown();
     /* Place Teardown Code Here */
-  endtask
 
+  endtask
 
   //===================================
   // All tests are defined between the
@@ -92,55 +100,71 @@ module mem_bounded_unit_test;
   //===================================
   `SVUNIT_TESTS_BEGIN
 
-  //--------------------------------------------------------------------
-  // set_bounds
-  //--------------------------------------------------------------------
-    `SVTEST(set_bounds)
+    `SVTEST(basic_range)
+      index_t ub;
+      index_t lb;
+      range#(uint32_t, uint32_traits) rg;
+      list_fwd_uint32_iterator iter;
+  
+      ub = index_t'($urandom()) % vector_size;
+      lb = index_t'($urandom()) % ub;
+      $display("vector size = %0d, lower bound = %0d, upper bound = %0d",
+	       vector_size, lb, ub);
+      rg = new(vec, lb, ub);
+  
+      // print range
+      $write("range:");
+      void'(rg.first());
+      while(!rg.at_end()) begin
+	$write(" %4d", rg.get());
+        void'(rg.next());
+      end
+      $display();
 
-      mem_bounded#(16,4,4,2) m = new('h3000, 'h3fff);
-      `FAIL_IF(m.get_lower_bound() != 'h3000)
-      `FAIL_IF(m.get_upper_bound() != 'h3fff)
-      `FAIL_IF(m.get_bounds_lock() == 1)
-      m.set_bounds('h2000, 'h2f00);
-      `FAIL_IF(m.get_lower_bound() != 'h2000)
-      `FAIL_IF(m.get_upper_bound() != 'h2f00)
-      `FAIL_IF(m.get_bounds_lock() == 1)
-
-      // lock bounds
-      m.set_bounds_lock();
-      `FAIL_IF(m.get_bounds_lock() == 0)
-      // try to change the bounds even though they are locked
-      m.set_bounds('h4211, 'hff00);
-      // The bounds should not have changed
-      `FAIL_IF(m.get_lower_bound() != 'h2000)
-      `FAIL_IF(m.get_upper_bound() != 'h2f00)
-
-    `SVTEST_END
-
-  //--------------------------------------------------------------------
-  // read_write
-  //--------------------------------------------------------------------
-    `SVTEST(read_write)
-
-      //typedef mem_bounded#(16,4,4,2) mem_t;
-      typedef mem_bounded#(16,4,4,2)::word_t word_t;
-      word_t data;
-      mem_bounded#(16,4,4,2) m = new('h3000, 'h3fff);
-
-      `FAIL_IF(m.get_bounds_lock() == 1)
-      data = word_t'($urandom());
-      m.write('h30c0, data);
-      `FAIL_IF(m.get_bounds_lock() == 0)
-
-      // write below the boundary
-      m.write('h1fff, data);
-      `FAIL_UNLESS(m.last_operation_failed())
-
-      // write above the boundary
-      m.write('hffff, data);
-      `FAIL_UNLESS(m.last_operation_failed())
+      // print vector
+      iter = new(vec);
+      $write("vector:");
+      void'(iter.first());
+      while(!iter.at_end()) begin
+	$write(" %4d", iter.get());
+        void'(iter.next());
+      end
+      $display();
 
     `SVTEST_END
+
+   `SVTEST(bkwd_range)
+      index_t ub;
+      index_t lb;
+      range#(uint32_t, uint32_traits) rg;
+      list_fwd_uint32_iterator iter;
+  
+      ub = index_t'($urandom()) % vector_size;
+      lb = index_t'($urandom()) % ub;
+      $display("vector size = %0d, lower bound = %0d, upper bound = %0d",
+	       vector_size, lb, ub);
+      rg = new(vec, lb, ub);
+  
+      // print vector
+      iter = new(vec);
+      $write("vector:");
+      void'(iter.first());
+      while(!iter.at_end()) begin
+	$write(" %4d", iter.get());
+        void'(iter.next());
+      end
+      $display();
+
+      // print range in reverse order
+      $write("range:");
+      void'(rg.last());
+      while(!rg.at_beginning()) begin
+	$write(" %4d", rg.get());
+        void'(rg.prev());
+      end
+      $display();
+
+    `SVTEST_END      
 
   `SVUNIT_TESTS_END
 

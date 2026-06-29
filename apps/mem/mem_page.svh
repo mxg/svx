@@ -177,7 +177,7 @@ class mem_page#(int unsigned ADDR_BITS = 32,
       void'(block_map.insert(block_addr, block));
     end
 
-    block.set_restriction(restrict_t'(get_aligned_byte_addr(addr)), r);
+    block.set_restriction(addr_t'(get_aligned_byte_addr(addr)), r);
     
   endfunction
 
@@ -187,7 +187,7 @@ class mem_page#(int unsigned ADDR_BITS = 32,
     block_t block = block_map.get(get_block_addr(addr));
 
     if(block != null)
-      block.clear_restriction(restrict_t'(get_aligned_byte_addr(addr)));
+      block.clear_restriction(addr_t'(get_aligned_byte_addr(addr)));
 
   endfunction
 
