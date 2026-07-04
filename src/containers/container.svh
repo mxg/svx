@@ -62,7 +62,11 @@ virtual class typed_container #(type T=int, type P=void_traits)
     return 0;
   endfunction
 
-  function void clear();
+  virtual function bit is_empty();
+    return 0;
+  endfunction
+
+  virtual function void clear();
   endfunction    
 
 endclass

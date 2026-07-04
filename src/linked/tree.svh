@@ -145,6 +145,15 @@ class tree extends node;
     return size_t'(m_children.size());
   endfunction
 
+  function size_t size();
+    deque#(tree, class_traits#(tree)) deq;
+    deq = get_children();
+    if(deq == null)
+      return 0;
+    else
+      return deq.size();
+  endfunction
+
   //--------------------------------------------------------------------
   // function: get_children
   //

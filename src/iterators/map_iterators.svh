@@ -96,6 +96,18 @@ virtual class map_iterator_base#(type KEY=int,
   virtual function KEY get_index();
     return index;
   endfunction
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  virtual function size_t size();
+    return m_map.size();
+  endfunction
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  virtual function bit is_empty();
+    return (m_map == null) || (size() == 0);
+  endfunction
   
 endclass
 
@@ -106,7 +118,7 @@ endclass
 //----------------------------------------------------------------------
 class map_fwd_iterator#(type KEY=int, type T=int, type P=void_traits)
   extends map_iterator_base#(KEY,T,P)
-  implements fwd_iterator;
+  implements fwd_intf;
 
   // constructor
   //
@@ -211,6 +223,16 @@ class map_fwd_iterator#(type KEY=int, type T=int, type P=void_traits)
     return 1;
     
   endfunction
+
+  // The Verilator compiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return super.size();
+  endfunction
+    
+  virtual function bit is_empty();
+    return super.is_empty();
+  endfunction
     
 endclass
 
@@ -221,7 +243,7 @@ endclass
 //----------------------------------------------------------------------
 class map_bkwd_iterator#(type KEY=int, type T=int, type P=void_traits)
   extends map_iterator_base#(KEY,T,P)
-  implements bkwd_iterator;
+  implements bkwd_intf;
 
   // constructor
   //
@@ -329,6 +351,16 @@ class map_bkwd_iterator#(type KEY=int, type T=int, type P=void_traits)
     
   endfunction
     
+  // The Verilator compiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return super.size();
+  endfunction
+    
+  virtual function bit is_empty();
+    return super.is_empty();
+  endfunction
+    
 endclass
 
 //----------------------------------------------------------------------
@@ -345,7 +377,7 @@ endclass
 //----------------------------------------------------------------------
 class map_random_iterator#(type KEY=int, type T=int, type P=void_traits)
   extends map_fwd_iterator#(KEY,T,P)
-  implements random_iterator;
+  implements random_intf;
 
   local const int default_seed = 1;
 
@@ -407,7 +439,16 @@ class map_random_iterator#(type KEY=int, type T=int, type P=void_traits)
     return super.skip(distance);
   endfunction
 
-
+  // The Verilator compiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return super.size();
+  endfunction
+    
+  virtual function bit is_empty();
+    return super.is_empty();
+  endfunction
+    
 endclass
 
 
@@ -422,7 +463,7 @@ endclass
 // ----------------------------------------------------------------------
 class map_bidir_iterator#(type KEY=int, type T=int, type P=void_traits)
   extends map_iterator_base#(KEY,T,P)
-  implements fwd_iterator, bkwd_iterator;
+  implements bidir_intf;
 
   function new(map_t map_inst = null);
     super.new(map_inst);
@@ -553,4 +594,14 @@ class map_bidir_iterator#(type KEY=int, type T=int, type P=void_traits)
     
   endfunction
 
+  // The Verilator compiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return super.size();
+  endfunction
+    
+  virtual function bit is_empty();
+    return super.is_empty();
+  endfunction
+    
 endclass

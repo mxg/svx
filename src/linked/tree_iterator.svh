@@ -58,6 +58,14 @@ virtual class tree_iterator_base
     // satisfy the iterator interface.
   endfunction
 
+  virtual function size_t size();
+    return m_tree.size();
+  endfunction
+
+  virtual function bit is_empty();
+    return (m_tree == null) || (size() == 0);
+  endfunction
+
   virtual function bit skip(signed_index_t distance);
     return 0;
   endfunction
@@ -120,13 +128,23 @@ endclass
 // tree_fwd_iterator
 //----------------------------------------------------------------------
 class tree_fwd_iterator extends tree_iterator_base
-  implements fwd_iterator;
+  implements fwd_intf;
 
   list_fwd_iterator#(tree, class_traits#(tree)) iter;
 
   function new(tree t=null);
     super.new(t);
     iter = new(m_list);
+  endfunction
+
+  // The Verilator compiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return super.size();
+  endfunction
+    
+  virtual function bit is_empty();
+    return super.is_empty();
   endfunction
 
   virtual function void bind_tree(tree t=null, order_t order=PREORDER);
@@ -166,13 +184,23 @@ endclass
 // class: tree_bkwd_iterator
 //----------------------------------------------------------------------
 class tree_bkwd_iterator extends tree_iterator_base
-  implements bkwd_iterator;
+  implements bkwd_intf;
 
   list_bkwd_iterator#(tree, class_traits#(tree)) iter;
 
   function new(tree t=null);
     super.new(t);
     iter = new(m_list);
+  endfunction
+
+  // The Verilator compiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return super.size();
+  endfunction
+    
+  virtual function bit is_empty();
+    return super.is_empty();
   endfunction
 
   virtual function void bind_tree(tree t=null, order_t order=PREORDER);
@@ -214,7 +242,7 @@ endclass
 // tree_random_iterator
 //----------------------------------------------------------------------
 class tree_random_iterator extends tree_iterator_base
-  implements random_iterator;
+  implements random_intf;
 
   list_random_iterator#(tree, class_traits#(tree)) iter;
 
@@ -223,6 +251,16 @@ class tree_random_iterator extends tree_iterator_base
     iter = new(m_list);
   endfunction
 
+  // The Verilator compiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return super.size();
+  endfunction
+    
+  virtual function bit is_empty();
+    return super.is_empty();
+  endfunction
+  
   virtual function void bind_tree(tree t=null, order_t order=PREORDER);
     super.bind_tree(t, order);
     iter = new(m_list);
@@ -262,7 +300,7 @@ endclass
 // tree_bidir_iterator
 //----------------------------------------------------------------------
 class tree_bidir_iterator extends tree_iterator_base
-  implements fwd_iterator, bkwd_iterator;
+  implements bidir_intf;
 
   list_bidir_iterator#(tree, class_traits#(tree)) iter;
 
@@ -271,6 +309,16 @@ class tree_bidir_iterator extends tree_iterator_base
     iter = new(m_list);
   endfunction
 
+  // The Verilator compiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return super.size();
+  endfunction
+    
+  virtual function bit is_empty();
+    return super.is_empty();
+  endfunction
+  
   virtual function void bind_tree(tree t=null, order_t order=PREORDER);
     super.bind_tree(t, order);
     iter = new(m_list);

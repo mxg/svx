@@ -29,30 +29,48 @@
 //----------------------------------------------------------------------
 // range
 //----------------------------------------------------------------------
+class range_base#(type T=int, type P=void_traits)
+  extends typed_iterator#(T,P);
+
+  typedef bidir_intf iter_t;
+
+  protected iter_t iter;
+  protected index_t ub; // upper bound
+  protected index_t lb; // lower cound
+  protected index_t idx;
+
+  // The Verilator compiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return iter.size();
+  endfunction
+    
+  virtual function bit is_empty();
+    return iter.is_empty();
+  endfunction
+  
+endclass
+
+//----------------------------------------------------------------------
+// range
+//----------------------------------------------------------------------
 
 class range#(type T=int, type P=void_traits)
-  extends list_bidir_iterator#(T,P);
+  extends range_base#(T,P)
+  implements bidir_intf;
 
-  // x Verilator seems to have trouble findibng typedefs in a base
-  // class, so we replicate ones we need here.
-  typedef vector#(T,P) list_t;  
+  function new(iter_t it, index_t lower_bound, index_t upper_bound);
 
-  local index_t ub; // upper bound
-  local index_t lb; // lower cound
-
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  function new(list_t list_inst = null, index_t lower_bound, index_t upper_bound);
-    super.new(list_inst);
+    iter = it;
     lb = lower_bound;
     ub = upper_bound;
 
     // Make sure upper and lower bounds are within range of the
     // vector.
-    if(lb >= m_list.size())
-      lb = m_list.size() - 1;
-    if(ub >= m_list.size())
-      ub = m_list.size();
+    if(lb >= iter.size())
+      lb = iter.size() - 1;
+    if(ub >= iter.size())
+      ub = iter.size();
     if(lb > ub) begin
       index_t tmp;
       tmp = lb;
@@ -61,54 +79,90 @@ class range#(type T=int, type P=void_traits)
     end
   endfunction
 
+  // The Verilator compiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return super.size();
+  endfunction
+    
+  virtual function bit is_empty();
+    return super.is_empty();
+  endfunction
+
   virtual function bit first();
     idx = lb;
-    return (m_list != null && m_list.size() > 0);
+    if(is_empty())
+      return 0;
+    void'(iter.first());
+    void'(iter.skip(lb));
+    return 1;
   endfunction
 
   virtual function bit next();
-    if((m_list == null) || (m_list.size() == 0) ||
-       ((idx > lb) && (idx > ub)))
+    if(is_empty() || ((idx > lb) && (idx > ub)))
       return 0;
-    if(idx <= ub)
+    if(idx <= ub) begin
       idx++;
+      void'(iter.next());
+    end
     return 1;
   endfunction    
 
   virtual function bit is_last();
-    return ((m_list != null) && (m_list.size() > 0) && (idx >= ub));
+    return (!is_empty() && (idx >= ub));
   endfunction
 
   virtual function bit at_end();
-    if(m_list == null || m_list.size() == 0)
+    if(is_empty())
       return 1;
     return (idx > ub);    
   endfunction
 
   virtual function bit last();
-    if(m_list == null)
+    if(is_empty())
       return 0;
     idx = ub;
-    return (m_list.size() > 0);
+    return (iter.size() > 0);
   endfunction
 
   virtual function bit prev();
-    if(m_list == null || m_list.size() == 0 || idx < 0)
+    if(is_empty())
       return 0;
-    if(idx >= lb)
+    if(idx >= lb && idx > 0) begin
       idx--;
+      void'(iter.prev());
+    end
     return 1;
   endfunction
 
   virtual function bit is_first();
-    return ((m_list != null) && ((m_list.size() > 0) && (idx == lb)));
+    return (!is_empty() && (idx == lb));
   endfunction
 
   virtual function bit at_beginning();
-    if(m_list == null || m_list.size() == 0)
+    if(is_empty())
       return 1;
     return (idx < lb);
-  endfunction  
+  endfunction 
+
+  virtual function bit skip(signed_index_t distance);
+    signed_index_t tmp_idx;
+
+    // Increment or decrement the index using the distance.  Distance
+    // may be less than zero.
+    tmp_idx = idx + distance;
+
+    // Is the new (computed) index within range of the current list?
+    if (is_empty() || (tmp_idx < 0) || (tmp_idx >= iter.size()))
+      return 0;
+
+    void'(iter.skip(distance));
+    // New index is in the valid range, 
+    idx = tmp_idx;
+    return 1;
+  endfunction
+
+ 
 
 endclass
 

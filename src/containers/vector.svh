@@ -187,6 +187,16 @@ class vector #(type T=int, type P=void_traits)
   endfunction
 
   //--------------------------------------------------------------------
+  // function: is_empty
+  //
+  // Does the vector have any elements?
+  //--------------------------------------------------------------------
+  virtual function bit is_empty();
+    return(size() == size_t'(0));
+  endfunction
+
+
+  //--------------------------------------------------------------------
   // function: sort
   //
   // Sort the vector. Use the sort function defined in the traits class

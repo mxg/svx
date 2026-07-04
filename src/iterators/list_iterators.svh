@@ -113,6 +113,18 @@ virtual class list_iterator_base#(type T=int, type P=void_traits)
     return 1;
   endfunction
 
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  virtual function size_t size();
+    return m_list.size();
+  endfunction
+
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  virtual function bit is_empty();
+    return (m_list == null) || (size() == 0);
+  endfunction
+
 endclass
 
 //----------------------------------------------------------------------
@@ -122,7 +134,7 @@ endclass
 //----------------------------------------------------------------------
 class list_fwd_iterator#(type T=int, type P=void_traits)
   extends list_iterator_base#(T,P)
-  implements fwd_iterator;
+  implements fwd_intf;
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -133,6 +145,16 @@ class list_fwd_iterator#(type T=int, type P=void_traits)
     super.new(list_inst);
   endfunction
 
+  // The Verilator compiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return super.size();
+  endfunction
+    
+  virtual function bit is_empty();
+    return super.is_empty();
+  endfunction
+    
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   // first
@@ -204,7 +226,7 @@ endclass
 //----------------------------------------------------------------------
 class list_bkwd_iterator#(type T=int, type P=void_traits)
   extends list_iterator_base#(T,P)
-  implements bkwd_iterator;
+  implements bkwd_intf;
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -215,6 +237,16 @@ class list_bkwd_iterator#(type T=int, type P=void_traits)
     super.new(list_inst);
   endfunction
 
+  // The Verilator compiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return super.size();
+  endfunction
+    
+  virtual function bit is_empty();
+    return super.is_empty();
+  endfunction
+    
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   // last
@@ -284,7 +316,7 @@ endclass
 //----------------------------------------------------------------------
 class list_random_iterator#(type T=int, type P=void_traits)
   extends list_iterator_base#(T,P)
-  implements random_iterator;
+  implements random_intf;
 
   local const int default_seed = 1;
 
@@ -298,13 +330,23 @@ class list_random_iterator#(type T=int, type P=void_traits)
     set_default_seed();
   endfunction
 
+  // The Verilator compiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return super.size();
+  endfunction
+  
+  virtual function bit is_empty();
+    return super.is_empty();
+  endfunction
+
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   // set_seed
   //
   // Set a new random seed for the RNG
   virtual function void set_seed(int seed);
-    int n = $urandom(seed);
+    int	  n = $urandom(seed);
   endfunction
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -336,7 +378,7 @@ class list_random_iterator#(type T=int, type P=void_traits)
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  // skip  //
+  // skip
   // The Verilator compiler could not find the skip() implementation
   // in the base class, so we gave it a hint.
   virtual function bit skip(signed_index_t distance);
@@ -352,14 +394,24 @@ endclass
 //----------------------------------------------------------------------
 class list_bidir_iterator#(type T=int, type P=void_traits)
   extends list_iterator_base#(T,P)
-  implements fwd_iterator, bkwd_iterator;
+  implements bidir_intf;
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   function new(list_t list_inst = null);
     super.new(list_inst);
   endfunction
-  
+
+  // The Verilator compiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return super.size();
+  endfunction
+    
+  virtual function bit is_empty();
+    return super.is_empty();
+  endfunction
+    
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   virtual function bit first();

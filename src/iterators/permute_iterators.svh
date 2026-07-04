@@ -137,6 +137,20 @@ class permute_iterator_base#(type T=int, type P=void_traits)
   endfunction
 
   //--------------------------------------------------------------------
+  // size
+  //--------------------------------------------------------------------
+  virtual function size_t size();
+    return m_vec.size();
+  endfunction
+
+  //--------------------------------------------------------------------
+  // is_empty
+  //--------------------------------------------------------------------
+  virtual function bit is_empty();
+    return (m_vec == null) || (size() == 0);
+  endfunction
+  
+  //--------------------------------------------------------------------
   // factorial
   //
   // A little utility to compute n!
@@ -391,13 +405,23 @@ endclass
 //----------------------------------------------------------------------
 class permute_fwd_iterator#(type T=int, type P=void_traits)
   extends permute_iterator_base#(T,P)
-  implements fwd_iterator;
+  implements fwd_intf;
 
   // constructor
   //
   // Optionally, bind a vector to the iterator
   function new(vec_t v=null);
     super.new(v);
+  endfunction
+
+  // The Verilator compiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return super.size();
+  endfunction
+  
+  virtual function bit is_empty();
+    return super.is_empty();
   endfunction
 
   // first
@@ -458,7 +482,7 @@ endclass
 // ----------------------------------------------------------------------
 class permute_bkwd_iterator#(type T=int, type P=void_traits)
   extends permute_iterator_base#(T,P)
-  implements bkwd_iterator;
+  implements bkwd_intf;
 
   // constructor
   //
@@ -467,6 +491,16 @@ class permute_bkwd_iterator#(type T=int, type P=void_traits)
     super.new(vec);
   endfunction
 
+  // The Verilator compiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return super.size();
+  endfunction
+    
+  virtual function bit is_empty();
+    return super.is_empty();
+  endfunction
+  
   // last
   //
   // Set the current permutation to the last permutation, N-1.
@@ -528,7 +562,7 @@ endclass
 //----------------------------------------------------------------------
 class permute_random_iterator#(type T=int, type P=void_traits)
   extends permute_iterator_base#(T,P)
-  implements random_iterator;
+  implements random_intf;
 
   local const int default_seed = 1;
 
@@ -538,6 +572,16 @@ class permute_random_iterator#(type T=int, type P=void_traits)
   function new(vec_t vec = null);
     super.new(vec);
     set_default_seed();
+  endfunction
+
+  // The Verilatorcompiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return super.size();
+  endfunction
+    
+  virtual function bit is_empty();
+    return super.is_empty();
   endfunction
 
   // set_seed
@@ -588,12 +632,22 @@ endclass
 // ----------------------------------------------------------------------
 class permute_bidir_iterator#(type T=int, type P=void_traits)
   extends permute_iterator_base#(T,P)
-  implements fwd_iterator, bkwd_iterator;
+  implements bidir_intf;
 
   function new(vec_t vec = null);
     super.new(vec);
   endfunction
   
+  // The Verilator compiler doesn't seem to be able to find the
+  // implementations in the base class, so we give it a hint.
+  virtual function size_t size();
+    return super.size();
+  endfunction
+    
+  virtual function bit is_empty();
+    return super.is_empty();
+  endfunction
+
   virtual function bit first();
     if((m_vec == null) || (m_vec.size() == 0))
       return 0;

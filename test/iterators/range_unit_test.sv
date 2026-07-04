@@ -48,6 +48,7 @@ module range_unit_test;
   //===================================
   uint32_vector vec;
   index_t vector_size;
+  list_bidir_uint32_iterator iter;
 
   //===================================
   // Build
@@ -55,6 +56,7 @@ module range_unit_test;
   function void build();
     svunit_ut = new(name);
     vec = new();
+    iter = new(vec);
   endfunction
 
   //===================================
@@ -104,13 +106,14 @@ module range_unit_test;
       index_t ub;
       index_t lb;
       range#(uint32_t, uint32_traits) rg;
-      list_fwd_uint32_iterator iter;
+      list_bidir_uint32_iterator iter;
   
       ub = index_t'($urandom()) % vector_size;
       lb = index_t'($urandom()) % ub;
       $display("vector size = %0d, lower bound = %0d, upper bound = %0d",
 	       vector_size, lb, ub);
-      rg = new(vec, lb, ub);
+      iter = new(vec);
+      rg = new(iter, lb, ub);
   
       // print range
       $write("range:");
@@ -122,7 +125,6 @@ module range_unit_test;
       $display();
 
       // print vector
-      iter = new(vec);
       $write("vector:");
       void'(iter.first());
       while(!iter.at_end()) begin
@@ -137,16 +139,16 @@ module range_unit_test;
       index_t ub;
       index_t lb;
       range#(uint32_t, uint32_traits) rg;
-      list_fwd_uint32_iterator iter;
+      list_bidir_uint32_iterator iter;
   
       ub = index_t'($urandom()) % vector_size;
       lb = index_t'($urandom()) % ub;
       $display("vector size = %0d, lower bound = %0d, upper bound = %0d",
 	       vector_size, lb, ub);
-      rg = new(vec, lb, ub);
+      iter = new(vec);
+      rg = new(iter, lb, ub);
   
       // print vector
-      iter = new(vec);
       $write("vector:");
       void'(iter.first());
       while(!iter.at_end()) begin
