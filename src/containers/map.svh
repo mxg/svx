@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +28,6 @@
 //======================================================================
 
 //----------------------------------------------------------------------
-//
 // class: map
 //
 // Implements a class-based dynamic associative array. Allows sparse
@@ -66,13 +66,9 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   // in the database.  The value is overwritten for duplicates.
   //--------------------------------------------------------------------
   virtual function bit insert (KEY key, T item);
-
     bit rtn = !(m_map.exists(key));
-
     m_map[key] = item;
-
     return rtn;
-
   endfunction
 
   //--------------------------------------------------------------------
@@ -160,8 +156,8 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   // function will return 1 if the two are not equal, or zero if they
   // are.  It will never return a value less than zero.
   // --------------------------------------------------------------------
-  virtual function int compare(this_t m);
-    return int'(!equal(m));
+  virtual function int32_t compare(this_t m);
+    return int32_t'(!equal(m));
   endfunction
 
 
@@ -242,6 +238,8 @@ endclass
 
 //----------------------------------------------------------------------
 // class: singleton_map
+//
+// A singleton map is a map for which there is only one instance.
 //----------------------------------------------------------------------
 class singleton_map  #(type KEY=int, type T=void_t, type P=void_traits)
   extends map #(KEY,T,P);
@@ -250,8 +248,9 @@ class singleton_map  #(type KEY=int, type T=void_t, type P=void_traits)
   static local this_t t;
 
   protected function new();
-    // You can't call new() for this class!  You can only obtain handles
-    // to the class object thrpugh the get_inst() function
+    // You can't call new() directly for this class!  You can only
+    // obtain handles to the class object thrpugh the get_inst()
+    // function
   endfunction
   
   static function this_t get_inst();

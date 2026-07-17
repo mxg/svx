@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -61,6 +62,35 @@ class vector #(type T=int, type P=void_traits)
     v.m_vector = list;
     return v;
   endfunction
+
+  //--------------------------------------------------------------------
+  // size
+  //
+  // How many items are in the container?
+  //--------------------------------------------------------------------
+  function size_t size();
+    return size_t'(m_vector.size());
+  endfunction
+
+  //--------------------------------------------------------------------
+  // function: is_empty
+  //
+  // Does the vector contain any elements?
+  //--------------------------------------------------------------------
+  virtual function bit is_empty();
+    return(size() == size_t'(0));
+  endfunction
+
+  //--------------------------------------------------------------------
+  // function: clear
+  //
+  // remove all the elements in the vector; return it to an empty
+  // state.
+  //--------------------------------------------------------------------
+  function void clear();
+    m_vector.delete();
+  endfunction
+
   //--------------------------------------------------------------------
   // function: extend
   //
@@ -109,23 +139,6 @@ class vector #(type T=int, type P=void_traits)
   endfunction
 
   //--------------------------------------------------------------------
-  // function:  size
-  //--------------------------------------------------------------------
-  function size_t size();
-    return size_t'(m_vector.size());
-  endfunction
-
-  //--------------------------------------------------------------------
-  // function: clear
-  //
-  // remove all the elements in the vector; return it to an empty
-  // state.
-  //--------------------------------------------------------------------
-  function void clear();
-    m_vector.delete();
-  endfunction
-
-  //--------------------------------------------------------------------
   // function: copy
   //
   // Perform a shallow copy of a vector.
@@ -138,7 +151,7 @@ class vector #(type T=int, type P=void_traits)
     if(vec == null)
       return;
 
-    clear(); // empty the vector
+    clear(); // make sure the target vector is empty
 
     for(idx = 0; idx < vec.size(); idx++) begin
       t = vec.read(idx);
@@ -185,16 +198,6 @@ class vector #(type T=int, type P=void_traits)
     return (i >= size());
 
   endfunction
-
-  //--------------------------------------------------------------------
-  // function: is_empty
-  //
-  // Does the vector have any elements?
-  //--------------------------------------------------------------------
-  virtual function bit is_empty();
-    return(size() == size_t'(0));
-  endfunction
-
 
   //--------------------------------------------------------------------
   // function: sort
@@ -249,6 +252,10 @@ endclass
 
 //----------------------------------------------------------------------
 // Common vector types
+typedef vector#(int8_t,    int8_traits   ) int8_vector;
+typedef vector#(uint8_t,   uint8_traits  ) uint8_vector;
+typedef vector#(int16_t,   int16_traits  ) int16_vector;
+typedef vector#(uint16_t,  uint16_traits ) uint16_vector;
 typedef vector#(int32_t,   int32_traits  ) int32_vector;
 typedef vector#(uint32_t,  uint32_traits ) uint32_vector;
 typedef vector#(int64_t,   int64_traits  ) int64_vector;

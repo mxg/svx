@@ -32,7 +32,9 @@
 class restrict_traits extends void_t;
 
   typedef restrict_t empty_t;
-  const static empty_t empty = RESTRICT_NONE;
+  /* verilator lint_off UNUSEDPARAM */
+  localparam empty_t empty = RESTRICT_NONE;
+  /* verilator lint_on UNUSEDPARAM */
 
   static function bit equal(restrict_t a, restrict_t b);
     return (a == b);

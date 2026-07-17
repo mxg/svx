@@ -220,7 +220,9 @@ endclass
 class process_traits extends void_t;
 
   typedef process_base empty_t;
-  const static empty_t empty = null;
+  /* verilator lint_off UNUSEDPARAM */
+  localparam empty_t empty = null;
+  /* verilator lint_on UNUSEDPARAM */
 
   static function bit equal(input process_base a,
 			    input process_base b);

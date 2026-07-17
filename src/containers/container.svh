@@ -35,6 +35,7 @@ virtual class container extends void_t;
 
   pure virtual function size_t size();
   pure virtual function void clear();
+  pure virtual function bit is_empty();
 
 endclass
 

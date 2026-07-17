@@ -55,7 +55,9 @@ module sorter_unit_test;
   class coordinate_traits;
 
     typedef coordinate empty_t;
-    const static empty_t empty = null;
+    /* verilator lint_off UNUSEDPARAM */
+    localparam empty_t empty = null;
+    /* verilator lint_on UNUSEDPARAM */
 
     static function bit equal(coordinate a, coordinate b);
       return ((a.x == b.x) && (a.y == b.y));

@@ -86,7 +86,9 @@ typedef enum {
 class token_traits extends void_t;
 
   typedef token_t empty_t;
-  const static empty_t empty = TOKEN_EOL;
+  /* verilator lint_off UNUSEDPARAM */
+  localparam empty_t empty = TOKEN_EOL;
+  /* verilator lint_on UNUSEDPARAM */
 
   static function bit equal(token_t a, token_t b);
     return (a == b);

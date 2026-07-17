@@ -34,7 +34,7 @@
 // queue, and deque.
 // ----------------------------------------------------------------------
 virtual class list_iterator_base#(type T=int, type P=void_traits)
-  extends typed_iterator#(T,P);
+  implements typed_iterator#(T,P);
   
   typedef vector#(T,P) list_t;
   // Vector over which we will be iterating
@@ -115,12 +115,20 @@ virtual class list_iterator_base#(type T=int, type P=void_traits)
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+  // size
+  //
+  // Return the number of elements in the container underlying the
+  // iterator..
   virtual function size_t size();
     return m_list.size();
   endfunction
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+  // is_empty
+  //
+  // Answer the question: is the container underlying the iterator
+  // empty.
   virtual function bit is_empty();
     return (m_list == null) || (size() == 0);
   endfunction
@@ -150,7 +158,17 @@ class list_fwd_iterator#(type T=int, type P=void_traits)
   virtual function size_t size();
     return super.size();
   endfunction
-    
+
+  // The compiler should automatically find this in the base class.
+  virtual function void set(T t);
+   super.set(t);
+  endfunction  
+
+  // The compiler should automatically find this in the base class.
+  virtual function T get();
+    return super.get();
+  endfunction
+  
   virtual function bit is_empty();
     return super.is_empty();
   endfunction
@@ -394,7 +412,7 @@ endclass
 //----------------------------------------------------------------------
 class list_bidir_iterator#(type T=int, type P=void_traits)
   extends list_iterator_base#(T,P)
-  implements bidir_intf;
+  implements bidir_iterator_base#(T,P);
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -402,7 +420,17 @@ class list_bidir_iterator#(type T=int, type P=void_traits)
     super.new(list_inst);
   endfunction
 
-  // The Verilator compiler doesn't seem to be able to find the
+  // The compiler should automatically find this in the base class.
+  virtual function void set(T t);
+   super.set(t);
+  endfunction  
+
+  // The compiler should automatically find this in the base class.
+  virtual function T get();
+    return super.get();
+  endfunction
+
+ // The Verilator compiler doesn't seem to be able to find the
   // implementations in the base class, so we give it a hint.
   virtual function size_t size();
     return super.size();

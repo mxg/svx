@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2016 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -88,7 +89,9 @@
 // Base class for permutation iterators.
 //----------------------------------------------------------------------
 class permute_iterator_base#(type T=int, type P=void_traits)
-  extends typed_iterator#(T,P);
+  implements typed_iterator#(T,P);
+
+  localparam T m_empty = P::empty;
 
   typedef vector#(T,P) vec_t;
   protected vec_t m_vec;
@@ -192,7 +195,7 @@ class permute_iterator_base#(type T=int, type P=void_traits)
   // set() is not implemented for the permute iterators
   //--------------------------------------------------------------------
   virtual function void set(T t);
-    // intentiaionlly not implemented
+    // intentionally not implemented
   endfunction
   
   //--------------------------------------------------------------------

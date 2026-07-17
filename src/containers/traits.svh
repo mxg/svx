@@ -18,13 +18,15 @@
 // method.
 //----------------------------------------------------------------------
 
+/* verilator lint_off UNUSEDPARAM */
+
 //----------------------------------------------------------------------
 // void_traits
 //----------------------------------------------------------------------
 class void_traits extends void_t;
 
   typedef void_t empty_t;
-  const static empty_t empty = null;
+  localparam empty_t empty = null;
 
   static function bit equal(input void_t a, input void_t b);
     return 1; // void objects are always equivalent
@@ -45,7 +47,7 @@ endclass
 class object_traits extends void_t;
 
   typedef object empty_t;
-  const static empty_t empty = null;
+  localparam empty_t empty = null;
 
   static function bit equal(input object a, input object b);
     return (a.compare(b) == 0);
@@ -66,7 +68,7 @@ endclass
 class class_traits#(type T=int) extends void_t;
 
   typedef T empty_t;
-  const static empty_t empty = null;
+  localparam empty_t empty = null;
 
   static function bit equal(input T a, input T b);
     return (a == b);
@@ -87,7 +89,7 @@ endclass
 class base_int_traits #(type T=int) extends void_t;
 
   typedef T empty_t;
-  static empty_t empty = 0;
+  localparam empty_t empty = 0;
 
   static function bit equal(T a, T b);
     return (a == b);
@@ -122,11 +124,115 @@ class byte_unsigned_traits extends base_int_traits#(byte unsigned);
 endclass
 
 //----------------------------------------------------------------------
+// int8_traits
+//----------------------------------------------------------------------
+class int8_traits extends base_int_traits#(int8_t);
+  typedef int8_t empty_t;
+  localparam empty_t empty = 0;
+
+  static function bit equal(int8_t a, int8_t b);
+    return (a == b);
+  endfunction
+
+  static function int compare(int8_t a, int8_t b);
+    if(a > b)
+      return 1;
+    else
+      if(a < b)
+        return -1;
+      else
+        return 0;
+  endfunction
+
+  static function void sort(ref int8_t vec[$]);
+    vec.sort();
+  endfunction
+endclass
+
+//----------------------------------------------------------------------
+// uint8_traits
+//----------------------------------------------------------------------
+class uint8_traits;
+  typedef uint8_t empty_t;
+  localparam empty_t empty = 0;
+
+  static function bit equal(uint8_t a, uint8_t b);
+    return (a == b);
+  endfunction
+
+  static function int compare(uint8_t a, uint8_t b);
+    if(a > b)
+      return 1;
+    else
+      if(a < b)
+        return -1;
+      else
+        return 0;
+  endfunction
+
+  static function void sort(ref uint8_t vec[$]);
+    vec.sort();
+  endfunction
+endclass
+
+//----------------------------------------------------------------------
+// int16_traits
+//----------------------------------------------------------------------
+class int16_traits extends base_int_traits#(int16_t);
+  typedef int16_t empty_t;
+  localparam empty_t empty = 0;
+
+  static function bit equal(int16_t a, int16_t b);
+    return (a == b);
+  endfunction
+
+  static function int compare(int16_t a, int16_t b);
+    if(a > b)
+      return 1;
+    else
+      if(a < b)
+        return -1;
+      else
+        return 0;
+  endfunction
+
+  static function void sort(ref int16_t vec[$]);
+    vec.sort();
+  endfunction
+endclass
+
+//----------------------------------------------------------------------
+// uint16_traits
+//----------------------------------------------------------------------
+class uint16_traits;
+  typedef uint16_t empty_t;
+  localparam empty_t empty = 0;
+
+  static function bit equal(uint16_t a, uint16_t b);
+    return (a == b);
+  endfunction
+
+  static function int compare(uint16_t a, uint16_t b);
+    if(a > b)
+      return 1;
+    else
+      if(a < b)
+        return -1;
+      else
+        return 0;
+  endfunction
+
+  static function void sort(ref uint16_t vec[$]);
+    vec.sort();
+  endfunction
+endclass
+
+//----------------------------------------------------------------------
 // int32_traits
 //----------------------------------------------------------------------
 class int32_traits extends base_int_traits#(int32_t);
   typedef int32_t empty_t;
-  static empty_t empty = 0;
+  localparam empty_t empty = 0;
 
   static function bit equal(int32_t a, int32_t b);
     return (a == b);
@@ -152,7 +258,7 @@ endclass
 //----------------------------------------------------------------------
 class uint32_traits;
   typedef uint32_t empty_t;
-  static empty_t empty = 0;
+  localparam empty_t empty = 0;
 
   static function bit equal(uint32_t a, uint32_t b);
     return (a == b);
@@ -184,7 +290,7 @@ endclass
 //----------------------------------------------------------------------
 class uint64_traits extends base_int_traits#(uint64_t);
   typedef uint64_t empty_t;
-  static empty_t empty = 0;
+  localparam empty_t empty = 0;
 
   static function bit equal(uint64_t a, uint64_t b);
     return (a == b);
@@ -231,8 +337,8 @@ endclass
 class real_traits extends void_t;
 
   typedef real empty_t;
-  const static empty_t empty = 0.0;
-  const static real epsilon = 1.0e-28;
+  localparam empty_t empty = 0.0;
+  localparam real epsilon = 1.0e-28;
 
   static function bit equal(real a, real b);
     real diff = (a - b);
@@ -261,7 +367,7 @@ endclass
 class string_traits extends void_t;
 
   typedef string empty_t;
-  const static empty_t empty = "";
+  localparam empty_t empty = "";
 
   static function bit equal(string a, string b);
     return (a == b);
@@ -278,3 +384,4 @@ class string_traits extends void_t;
 
 endclass
 
+/* verilator lint_on UNUSEDPARAM */

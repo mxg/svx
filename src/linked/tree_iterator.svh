@@ -30,7 +30,7 @@
 // tree_iterator
 //----------------------------------------------------------------------
 virtual class tree_iterator_base
-  extends typed_iterator#(tree, void_traits);
+  implements typed_iterator#(tree, void_traits);
 
   typedef enum {PREORDER, POSTORDER} order_t;
 

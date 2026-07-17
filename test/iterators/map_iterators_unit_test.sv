@@ -66,8 +66,15 @@ module map_iterators_unit_test;
 
   endclass
 
-  map#(string, symbol, void_traits) symbol_table;
-  map#(string, symbol, void_traits) one_map;
+  class symbol_traits extends class_traits#(symbol);
+    // Sometims Verilator has trouble finding things in the base
+    // class.
+    localparam symbol empty = class_traits#(symbol)::empty;
+  endclass
+
+  map#(string, symbol, symbol_traits) symbol_table;
+  map#(string, symbol, symbol_traits
+) one_map;
   size_t map_size;
 
   //===================================
@@ -153,7 +160,7 @@ module map_iterators_unit_test;
       index_t iter_count;
       index_t i;
   
-      map_fwd_iterator#(string, symbol, void_traits) iter = new();
+      map_fwd_iterator#(string, symbol, symbol_traits) iter = new();
 
       // We could bind the map using the iterator constructor.  We do
       // it here using bind_map() to ensure that function works
@@ -203,7 +210,7 @@ module map_iterators_unit_test;
 
       index_t iter_count;
       index_t i;
-      map_bkwd_iterator#(string, symbol, void_traits) iter;
+      map_bkwd_iterator#(string, symbol, symbol_traits) iter;
 
       iter = new();
       iter.bind_map(symbol_table);
@@ -251,8 +258,8 @@ module map_iterators_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(begin_and_end)
 
-      map_fwd_iterator#(string, symbol, void_traits) fwd_iter = new(symbol_table);
-      map_bkwd_iterator#(string, symbol, void_traits) bkwd_iter = new(symbol_table);
+      map_fwd_iterator#(string, symbol, symbol_traits) fwd_iter = new(symbol_table);
+      map_bkwd_iterator#(string, symbol, symbol_traits) bkwd_iter = new(symbol_table);
 
       // beginning...
       `FAIL_IF(!fwd_iter.first())
@@ -273,9 +280,9 @@ module map_iterators_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(invalid)
 
-      map_fwd_iterator#(string, symbol, void_traits) fwd_iter;
-      map_bkwd_iterator#(string, symbol, void_traits) bkwd_iter;
-      map_bidir_iterator#(string, symbol, void_traits) bidir_iter;
+      map_fwd_iterator#(string, symbol, symbol_traits) fwd_iter;
+      map_bkwd_iterator#(string, symbol, symbol_traits) bkwd_iter;
+      map_bidir_iterator#(string, symbol, symbol_traits) bidir_iter;
 
       fwd_iter = new(symbol_table);
       bkwd_iter = new(symbol_table);
@@ -318,10 +325,10 @@ module map_iterators_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(zero_length)
   
-      map_fwd_iterator#(string, symbol, void_traits) fwd_iter;
-      map_bkwd_iterator#(string, symbol, void_traits) bkwd_iter;
-      map_bidir_iterator#(string, symbol, void_traits) bidir_iter;
-      map#(string, symbol, void_traits) empty_map;
+      map_fwd_iterator#(string, symbol, symbol_traits) fwd_iter;
+      map_bkwd_iterator#(string, symbol, symbol_traits) bkwd_iter;
+      map_bidir_iterator#(string, symbol, symbol_traits) bidir_iter;
+      map#(string, symbol, symbol_traits) empty_map;
 
       empty_map = new();
       fwd_iter = new(empty_map);
@@ -336,7 +343,7 @@ module map_iterators_unit_test;
       `FAIL_IF(fwd_iter.is_last()) 
       `FAIL_IF(!fwd_iter.at_end())
 
-      `FAIL_IF(bkwd_iter.get() != void_traits::empty)
+      `FAIL_IF(bkwd_iter.get() != symbol_traits::empty)
   
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       `FAIL_IF(bkwd_iter.last())
@@ -345,7 +352,7 @@ module map_iterators_unit_test;
       `FAIL_IF(!bkwd_iter.at_beginning())
 
       // There is no current item
-      `FAIL_IF(bkwd_iter.get() != void_traits::empty)
+      `FAIL_IF(bkwd_iter.get() != symbol_traits::empty)
       
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       `FAIL_IF(bidir_iter.first())
@@ -357,7 +364,7 @@ module map_iterators_unit_test;
       `FAIL_IF(bidir_iter.is_first())
       `FAIL_IF(!bidir_iter.at_beginning())
 
-      `FAIL_IF(bidir_iter.get() != void_traits::empty)
+      `FAIL_IF(bidir_iter.get() != symbol_traits::empty)
 
     `SVTEST_END
 
@@ -373,9 +380,9 @@ module map_iterators_unit_test;
     `SVTEST(unbound)
 
       // create an iterator that is not bound to a map
-      map_fwd_iterator#(string, symbol, void_traits) fwd_iter = new(null);
-      map_bkwd_iterator#(string, symbol, void_traits) bkwd_iter = new(null);
-      map_bidir_iterator#(string, symbol, void_traits) bidir_iter = new(null);
+      map_fwd_iterator#(string, symbol, symbol_traits) fwd_iter = new(null);
+      map_bkwd_iterator#(string, symbol, symbol_traits) bkwd_iter = new(null);
+      map_bidir_iterator#(string, symbol, symbol_traits) bidir_iter = new(null);
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // Forward iterator
@@ -385,7 +392,7 @@ module map_iterators_unit_test;
       `FAIL_IF(fwd_iter.at_end()) 
 
       // There is no current item
-      `FAIL_IF(fwd_iter.get() != void_traits::empty)
+      `FAIL_IF(fwd_iter.get() != symbol_traits::empty)
   
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // Backward iterator
@@ -395,7 +402,7 @@ module map_iterators_unit_test;
       `FAIL_IF(bkwd_iter.at_beginning())
 
       // There is no current item
-      `FAIL_IF(bkwd_iter.get() != void_traits::empty)
+      `FAIL_IF(bkwd_iter.get() != symbol_traits::empty)
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // Bidirectional iterator
@@ -409,7 +416,7 @@ module map_iterators_unit_test;
       `FAIL_IF(bidir_iter.at_beginning())
       
       // There is no current item
-      `FAIL_IF(bidir_iter.get() != void_traits::empty)
+      `FAIL_IF(bidir_iter.get() != symbol_traits::empty)
       
     `SVTEST_END
 
@@ -418,7 +425,7 @@ module map_iterators_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(bidir_fwd_bkwd)
 
-      map_bidir_iterator#(string, symbol, void_traits) iter;
+      map_bidir_iterator#(string, symbol, symbol_traits) iter;
       index_t iter_count;
 
       iter = new(symbol_table);
@@ -503,7 +510,7 @@ module map_iterators_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(random)
 
-      map_random_iterator#(string, symbol, void_traits) iter;
+      map_random_iterator#(string, symbol, symbol_traits) iter;
       symbol t;
       uint32_t i;
       uint32_t iterations;
@@ -569,9 +576,9 @@ module map_iterators_unit_test;
       uint32_t iter_count;
       symbol t;
 
-      map_fwd_iterator#(string, symbol, void_traits) fwd_iter;
-      map_bkwd_iterator#(string, symbol, void_traits) bkwd_iter;
-      map_bidir_iterator#(string, symbol, void_traits) bidir_iter;
+      map_fwd_iterator#(string, symbol, symbol_traits) fwd_iter;
+      map_bkwd_iterator#(string, symbol, symbol_traits) bkwd_iter;
+      map_bidir_iterator#(string, symbol, symbol_traits) bidir_iter;
 
       // create the iterators and bind them to the symbol table
       fwd_iter = new(one_map);

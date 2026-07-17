@@ -36,7 +36,11 @@
 virtual class map_iterator_base#(type KEY=int,
                                  type T=int,
                                  type P=void_traits)
-  extends typed_iterator#(T,P);
+  implements typed_iterator#(T,P);
+
+  // The Verilator compiler does not find this in the base class, so
+  // we provide a hint.
+  localparam P::empty_t m_empty = typed_iterator#(T,P)::m_empty;
 
   typedef map#(KEY,T,P) map_t;
   protected map_t m_map;

@@ -50,6 +50,10 @@ module container_unit_test;
       return 15;
     endfunction
 
+    function bit is_empty();
+      return 0;
+    endfunction
+
     function bit equal();
       return 0;
     endfunction

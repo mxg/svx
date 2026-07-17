@@ -30,14 +30,29 @@
 // range
 //----------------------------------------------------------------------
 class range_base#(type T=int, type P=void_traits)
-  extends typed_iterator#(T,P);
+  implements typed_iterator#(T,P);
 
-  typedef bidir_intf iter_t;
-
+  typedef bidir_iterator_base #(T,P) iter_t;
+  
   protected iter_t iter;
   protected index_t ub; // upper bound
   protected index_t lb; // lower cound
   protected index_t idx;
+
+  // Set the value of the item at the current index
+  virtual function void set(T t);
+    if(!is_empty()) begin
+      iter.set(t);
+    end
+  endfunction
+
+  // Retrieve the iterm at the current index
+  virtual function T get();
+    if(is_empty())
+      return P::empty;
+    else
+      return iter.get();
+  endfunction
 
   // The Verilator compiler doesn't seem to be able to find the
   // implementations in the base class, so we give it a hint.
@@ -77,6 +92,15 @@ class range#(type T=int, type P=void_traits)
       ub = lb;
       lb = tmp;
     end
+  endfunction
+
+  // The compiler should find this in the bse class.
+  virtual function void set(T t);
+    super.set(t);
+  endfunction
+  
+  virtual function T get();
+    return super.get();
   endfunction
 
   // The Verilator compiler doesn't seem to be able to find the
@@ -152,7 +176,7 @@ class range#(type T=int, type P=void_traits)
     // may be less than zero.
     tmp_idx = idx + distance;
 
-    // Is the new (computed) index within range of the current list?
+    // Is the new (computed) index within rangef the current list?
     if (is_empty() || (tmp_idx < 0) || (tmp_idx >= iter.size()))
       return 0;
 
@@ -166,3 +190,16 @@ class range#(type T=int, type P=void_traits)
 
 endclass
 
+typedef range#(int8_t,    int8_traits   ) int8_range;
+typedef range#(uint8_t,   uint8_traits  ) uint8_range;
+typedef range#(int16_t,   int16_traits  ) int16_range;
+typedef range#(uint16_t,  uint16_traits ) uint16_range;
+typedef range#(int32_t,   int32_traits  ) int32_range;
+typedef range#(uint32_t,  uint32_traits ) uint32_range;
+typedef range#(int64_t,   int64_traits  ) int64_range;
+typedef range#(uint64_t,  uint64_traits ) uint64_range;
+typedef range#(int128_t,  int128_traits ) int128_range;
+typedef range#(uint128_t, uint128_traits) uint128_range;
+typedef range#(real,      real_traits   ) real_range;
+typedef range#(string,    string_traits ) string_range;
+	       

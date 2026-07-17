@@ -44,6 +44,14 @@ module type_handle_unit_test;
     int i;
   endclass
 
+  class base_traits extends class_traits#(base);
+    // Sometimes Verilator has trouble finding things in the base
+    // class.
+    /* verilator lint_off UNUSEDPARAM */
+    localparam base empty = class_traits#(base)::empty;
+    /* verilator lint_on UNUSEDPARAM */
+  endclass
+
   class c1 extends base;
     function new();
       i = 1;
@@ -71,7 +79,7 @@ module type_handle_unit_test;
   class c3_container extends type_container#(c3);
   endclass
 
-  map#(type_handle_base, base, void_traits) type_map;
+  map#(type_handle_base, base, base_traits) type_map;
 
   c1 c1_obj;
   c2 c2_obj;
@@ -173,7 +181,7 @@ module type_handle_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(get)
 
-      map_fwd_iterator#(type_handle_base, base, void_traits) iter = new(type_map);
+      map_fwd_iterator#(type_handle_base, base, base_traits) iter = new(type_map);
       base b;
       int unsigned iter_count = 0;
 
