@@ -105,7 +105,7 @@ virtual class list_iterator_base#(type T=int, type P=void_traits)
     tmp_idx = idx + distance;
 
     // Is the new (computed) index within range of the current list?
-    if ((m_list == null) || (tmp_idx < 0) || (tmp_idx >= m_list.size()))
+    if (is_empty() || (tmp_idx >= m_list.size()))
       return 0;
 
     // New index is in the valid range, 
@@ -142,7 +142,7 @@ endclass
 //----------------------------------------------------------------------
 class list_fwd_iterator#(type T=int, type P=void_traits)
   extends list_iterator_base#(T,P)
-  implements fwd_intf;
+  implements fwd_iterator_base#(T,P);
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -244,7 +244,7 @@ endclass
 //----------------------------------------------------------------------
 class list_bkwd_iterator#(type T=int, type P=void_traits)
   extends list_iterator_base#(T,P)
-  implements bkwd_intf;
+  implements bkwd_iterator_base#(T,P);
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -255,6 +255,16 @@ class list_bkwd_iterator#(type T=int, type P=void_traits)
     super.new(list_inst);
   endfunction
 
+  // The compiler should automatically find this in the base class.
+  virtual function void set(T t);
+   super.set(t);
+  endfunction  
+
+  // The compiler should automatically find this in the base class.
+  virtual function T get();
+    return super.get();
+  endfunction
+  
   // The Verilator compiler doesn't seem to be able to find the
   // implementations in the base class, so we give it a hint.
   virtual function size_t size();
@@ -334,7 +344,7 @@ endclass
 //----------------------------------------------------------------------
 class list_random_iterator#(type T=int, type P=void_traits)
   extends list_iterator_base#(T,P)
-  implements random_intf;
+  implements random_iterator_base#(T,P);
 
   local const int default_seed = 1;
 
@@ -346,6 +356,16 @@ class list_random_iterator#(type T=int, type P=void_traits)
   function new(list_t list_inst = null);
     super.new(list_inst);
     set_default_seed();
+  endfunction
+
+  // The compiler should automatically find this in the base class.
+  virtual function void set(T t);
+   super.set(t);
+  endfunction  
+
+  // The compiler should automatically find this in the base class.
+  virtual function T get();
+    return super.get();
   endfunction
 
   // The Verilator compiler doesn't seem to be able to find the

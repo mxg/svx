@@ -48,6 +48,9 @@ interface class typed_iterator #(type T=int, type P=void_traits);
 
 endclass
 
+//----------------------------------------------------------------------
+// bidir_iterator_base
+//----------------------------------------------------------------------
 interface class bidir_iterator_base #(type T=int, type P=void_traits)
   extends bidir_intf
   implements typed_iterator#(T,P);
@@ -57,3 +60,39 @@ interface class bidir_iterator_base #(type T=int, type P=void_traits)
   
 endclass
   
+//----------------------------------------------------------------------
+// fwd_iterator_base
+//----------------------------------------------------------------------
+interface class fwd_iterator_base #(type T=int, type P=void_traits)
+  extends fwd_intf
+  implements typed_iterator#(T,P);
+
+  pure virtual function void set(T t);
+  pure virtual function T get();
+  
+endclass
+
+//----------------------------------------------------------------------
+// bkwd_iterator_base
+//----------------------------------------------------------------------
+interface class bkwd_iterator_base #(type T=int, type P=void_traits)
+  extends bkwd_intf
+  implements typed_iterator#(T,P);
+
+  pure virtual function void set(T t);
+  pure virtual function T get();
+  
+endclass
+
+//----------------------------------------------------------------------
+// random_iterator_base
+//----------------------------------------------------------------------
+interface class random_iterator_base #(type T=int, type P=void_traits)
+  extends random_intf
+  implements typed_iterator#(T,P);
+
+  pure virtual function void set(T t);
+  pure virtual function T get();
+  
+endclass
+

@@ -73,8 +73,7 @@ module map_iterators_unit_test;
   endclass
 
   map#(string, symbol, symbol_traits) symbol_table;
-  map#(string, symbol, symbol_traits
-) one_map;
+  map#(string, symbol, symbol_traits) one_map;
   size_t map_size;
 
   //===================================
@@ -102,8 +101,6 @@ module map_iterators_unit_test;
 
     //randomize the size of the test vector;
     map_size = size_t'($urandom()) % 100;
-
-    $display("map_size = %0d", map_size);
 
     rs = new();
     symbol_table = new();

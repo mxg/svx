@@ -102,12 +102,20 @@ module range_unit_test;
   //===================================
   `SVUNIT_TESTS_BEGIN
 
+    //------------------------------------------------------------------
+    // basic_range
+    //
+    // Ceate a range of a vector.  Traverse the range in the forward
+    // direction.
+    //------------------------------------------------------------------
+    
     `SVTEST(basic_range)
       index_t ub;
       index_t lb;
       range#(uint32_t, uint32_traits) rg;
       list_bidir_uint32_iterator iter;
-  
+
+      // Generate randomized upper and lower bounds of the range.
       ub = index_t'($urandom()) % vector_size;
       lb = index_t'($urandom()) % ub;
       $display("vector size = %0d, lower bound = %0d, upper bound = %0d",
@@ -115,7 +123,7 @@ module range_unit_test;
       iter = new(vec);
       rg = new(iter, lb, ub);
   
-      // print range
+      // print range -- traverse the range in the forward direction.
       $write("range:");
       void'(rg.first());
       while(!rg.at_end()) begin
@@ -135,6 +143,9 @@ module range_unit_test;
 
     `SVTEST_END
 
+    //------------------------------------------------------------------
+    // bkwd_range
+    //------------------------------------------------------------------
    `SVTEST(bkwd_range)
       index_t ub;
       index_t lb;
@@ -148,7 +159,7 @@ module range_unit_test;
       iter = new(vec);
       rg = new(iter, lb, ub);
   
-      // print vector
+      // print vector -- in forward direction
       $write("vector:");
       void'(iter.first());
       while(!iter.at_end()) begin
@@ -158,8 +169,11 @@ module range_unit_test;
       $display();
 
       // print range in reverse order
+      $display("range: lower bound = %0d  upper bound = %0d",
+	       rg.get_lower_bound(), rg.get_upper_bound());
       $write("range:");
       void'(rg.last());
+      `FAIL_UNLESS(rg.is_last());
       while(!rg.at_beginning()) begin
 	$write(" %4d", rg.get());
         void'(rg.prev());

@@ -39,14 +39,30 @@ class range_base#(type T=int, type P=void_traits)
   protected index_t lb; // lower cound
   protected index_t idx;
 
+  function index_t get_lower_bound();
+    return lb;
+  endfunction
+
+  function index_t get_upper_bound();
+    return ub;
+  endfunction
+
+  //--------------------------------------------------------------------
+  // set
+  //
   // Set the value of the item at the current index
+  //--------------------------------------------------------------------
   virtual function void set(T t);
     if(!is_empty()) begin
       iter.set(t);
     end
   endfunction
 
+  //--------------------------------------------------------------------
+  // get
+  //
   // Retrieve the iterm at the current index
+  //--------------------------------------------------------------------
   virtual function T get();
     if(is_empty())
       return P::empty;
@@ -54,12 +70,16 @@ class range_base#(type T=int, type P=void_traits)
       return iter.get();
   endfunction
 
-  // The Verilator compiler doesn't seem to be able to find the
-  // implementations in the base class, so we give it a hint.
+  //--------------------------------------------------------------------
+  // size
+  //--------------------------------------------------------------------
   virtual function size_t size();
     return iter.size();
   endfunction
     
+  //--------------------------------------------------------------------
+  // is_empty
+  //--------------------------------------------------------------------
   virtual function bit is_empty();
     return iter.is_empty();
   endfunction
@@ -69,7 +89,6 @@ endclass
 //----------------------------------------------------------------------
 // range
 //----------------------------------------------------------------------
-
 class range#(type T=int, type P=void_traits)
   extends range_base#(T,P)
   implements bidir_intf;
@@ -113,6 +132,8 @@ class range#(type T=int, type P=void_traits)
     return super.is_empty();
   endfunction
 
+  //--------------------------------------------------------------------
+  //--------------------------------------------------------------------
   virtual function bit first();
     idx = lb;
     if(is_empty())
@@ -122,6 +143,8 @@ class range#(type T=int, type P=void_traits)
     return 1;
   endfunction
 
+  //--------------------------------------------------------------------
+  //--------------------------------------------------------------------
   virtual function bit next();
     if(is_empty() || ((idx > lb) && (idx > ub)))
       return 0;
@@ -132,23 +155,33 @@ class range#(type T=int, type P=void_traits)
     return 1;
   endfunction    
 
+  //--------------------------------------------------------------------
+  //--------------------------------------------------------------------
   virtual function bit is_last();
     return (!is_empty() && (idx >= ub));
   endfunction
 
+  //--------------------------------------------------------------------
+  //--------------------------------------------------------------------
   virtual function bit at_end();
     if(is_empty())
       return 1;
     return (idx > ub);    
   endfunction
 
+  //--------------------------------------------------------------------
+  //--------------------------------------------------------------------
   virtual function bit last();
+    idx = ub;
     if(is_empty())
       return 0;
-    idx = ub;
+    void'(iter.first());
+    void'(iter.skip(ub));
     return (iter.size() > 0);
   endfunction
 
+  //--------------------------------------------------------------------
+  //--------------------------------------------------------------------
   virtual function bit prev();
     if(is_empty())
       return 0;
@@ -159,34 +192,25 @@ class range#(type T=int, type P=void_traits)
     return 1;
   endfunction
 
+  //--------------------------------------------------------------------
+  //--------------------------------------------------------------------
   virtual function bit is_first();
     return (!is_empty() && (idx == lb));
   endfunction
 
+  //--------------------------------------------------------------------
+  //--------------------------------------------------------------------
   virtual function bit at_beginning();
     if(is_empty())
       return 1;
     return (idx < lb);
   endfunction 
 
+  //--------------------------------------------------------------------
+  //--------------------------------------------------------------------
   virtual function bit skip(signed_index_t distance);
-    signed_index_t tmp_idx;
-
-    // Increment or decrement the index using the distance.  Distance
-    // may be less than zero.
-    tmp_idx = idx + distance;
-
-    // Is the new (computed) index within rangef the current list?
-    if (is_empty() || (tmp_idx < 0) || (tmp_idx >= iter.size()))
-      return 0;
-
-    void'(iter.skip(distance));
-    // New index is in the valid range, 
-    idx = tmp_idx;
-    return 1;
+    return iter.skip(distance);
   endfunction
-
- 
 
 endclass
 

@@ -1,0 +1,218 @@
+build_dir/Vtestrunner +UVM_NO_RELNOTES +UVM_TESTNAME=
+INFO:  [0][algorithms_ts]: Registering Unit Test Case algo_ut
+INFO:  [0][testrunner]: Registering Test Suite algorithms_ts
+INFO:  [0][apps_ts]: Registering Unit Test Case mem_ut
+INFO:  [0][apps_ts]: Registering Unit Test Case mem_map_ut
+INFO:  [0][apps_ts]: Registering Unit Test Case mem_bounded_ut
+INFO:  [0][testrunner]: Registering Test Suite apps_ts
+INFO:  [0][containers_ts]: Registering Unit Test Case container_ut
+INFO:  [0][containers_ts]: Registering Unit Test Case type_handle_ut
+INFO:  [0][containers_ts]: Registering Unit Test Case vector_ut
+INFO:  [0][containers_ts]: Registering Unit Test Case map_ut
+INFO:  [0][containers_ts]: Registering Unit Test Case singleton_map_ut
+INFO:  [0][containers_ts]: Registering Unit Test Case queue_ut
+INFO:  [0][containers_ts]: Registering Unit Test Case fixed_size_queue_ut
+INFO:  [0][containers_ts]: Registering Unit Test Case deque_ut
+INFO:  [0][containers_ts]: Registering Unit Test Case stack_ut
+INFO:  [0][containers_ts]: Registering Unit Test Case sorter_ut
+INFO:  [0][testrunner]: Registering Test Suite containers_ts
+INFO:  [0][permute_iterator_ut]: permutation vector size = 4, permutations = 24
+INFO:  [0][iterators_ts]: Registering Unit Test Case list_iterators_ut
+INFO:  [0][iterators_ts]: Registering Unit Test Case map_iterators_ut
+INFO:  [0][iterators_ts]: Registering Unit Test Case permute_iterator_ut
+INFO:  [0][iterators_ts]: Registering Unit Test Case range_ut
+INFO:  [0][testrunner]: Registering Test Suite iterators_ts
+INFO:  [0][lexer_ts]: Registering Unit Test Case ctypes_ut
+INFO:  [0][lexer_ts]: Registering Unit Test Case lexer_core_ut
+INFO:  [0][testrunner]: Registering Test Suite lexer_ts
+INFO:  [0][linked_ts]: Registering Unit Test Case node_ut
+INFO:  [0][linked_ts]: Registering Unit Test Case tree_ut
+INFO:  [0][linked_ts]: Registering Unit Test Case tree_iterator_ut
+INFO:  [0][testrunner]: Registering Test Suite linked_ts
+INFO:  [0][algorithms_ts]: RUNNING
+INFO:  [0][algo_ut]: RUNNING
+INFO:  [0][algo_ut]: basic_algo::RUNNING
+vector: [97]   135  189  123  128  148  192  127   95  189  165  111  192  161   18  188   73  117  106  126    0  195   50  141   59  108   76  114   71  122  133  100  185   96  123   33   28   51  140  190  144   84  167   60  156   88   51  180  170  174  103  120  123  142   73  136   56  151  161   43  165  190  172   96  103   46  192  199   81   25   53   59  198  179  157   28   12    9   63   53   69  108  175  154   48   87  108  109   61   11   52   49  109  103  113  160   28  134
+count predicate = 38
+count true = 97
+count false = 0
+INFO:  [0][algo_ut]: basic_algo::PASSED
+INFO:  [0][algo_ut]: PASSED (1 of 1 tests passing)
+
+INFO:  [0][algorithms_ts]: PASSED (1 of 1 testcases passing)
+INFO:  [0][apps_ts]: RUNNING
+INFO:  [0][mem_ut]: RUNNING
+INFO:  [0][mem_ut]: parameters::RUNNING
+INFO:  [0][mem_ut]: parameters::PASSED
+INFO:  [0][mem_ut]: masks::RUNNING
+INFO:  [0][mem_ut]: masks::PASSED
+INFO:  [0][mem_ut]: small_mem::RUNNING
+INFO:  [0][mem_ut]: small_mem::PASSED
+INFO:  [0][mem_ut]: pages::RUNNING
+INFO:  [0][mem_ut]: pages::PASSED
+INFO:  [0][mem_ut]: big_mem::RUNNING
+INFO:  [0][mem_ut]: big_mem::PASSED
+INFO:  [0][mem_ut]: security::RUNNING
+INFO:  [0][mem_ut]: security::PASSED
+INFO:  [0][mem_map_ut]: RUNNING
+INFO:  [0][mem_map_ut]: construction::RUNNING
+INFO:  [0][mem_map_ut]: construction::PASSED
+INFO:  [0][mem_map_ut]: overlap::RUNNING
+*** error: The following two spaces overlap:
+REGISTER  * [0008:000b] 0008+00004: region_with_overlaps.r1
+REGISTER  * [0006:0009] 0006+00004: region_with_overlaps.r2
+*** error: The following two spaces overlap:
+REGISTER  * [0008:000b] 0008+00004: region_with_overlaps.r1
+REGISTER  * [000a:000b] 000a+00002: region_with_overlaps.r3
+*** error: The following two spaces overlap:
+REGISTER  * [0008:000b] 0008+00004: region_with_overlaps.r1
+REGISTER  * [0009:0009] 0009+00001: region_with_overlaps.r4
+*** error: The following two spaces overlap:
+REGISTER  * [0006:0009] 0006+00004: region_with_overlaps.r2
+REGISTER  * [0009:0009] 0009+00001: region_with_overlaps.r4
+INFO:  [0][mem_map_ut]: overlap::PASSED
+INFO:  [0][mem_map_ut]: no_overlap::RUNNING
+INFO:  [0][mem_map_ut]: no_overlap::PASSED
+INFO:  [0][mem_map_ut]: some_overlap::RUNNING
+*** error: The following two spaces overlap:
+REGISTER  * [00f0:00f3] 00f0+00004: region_some_overlaps.r1
+REGISTER  * [00f0:00f7] 00f0+00008: region_some_overlaps.r2
+INFO:  [0][mem_map_ut]: some_overlap::PASSED
+INFO:  [0][mem_map_ut]: hier::RUNNING
+mem_map::hier test
+--- Memory Map Dump for: system ---
+  REGION    [00000000:ffffffff] 00000000+100000000: system
+    VIEW    [00000000:ffffffff] 00000000+100000000: system.bus_a
+  REGION    [0000ff00:0000fffe] 0000ff00+0000000ff: system.bus_a.p1
+REGISTER    [0000ff04:0000ff07] 00000004+000000004: system.bus_a.p1.ctrl
+REGISTER    [0000ff00:0000ff03] 00000000+000000004: system.bus_a.p1.data
+REGISTER    [0000ff08:0000ff0b] 00000008+000000004: system.bus_a.p1.status
+  REGION    [0000f100:0000f1fe] 0000f100+0000000ff: system.bus_a.p2
+REGISTER    [0000f104:0000f107] 00000004+000000004: system.bus_a.p2.ctrl
+REGISTER    [0000f100:0000f103] 00000000+000000004: system.bus_a.p2.data
+REGISTER    [0000f108:0000f10b] 00000008+000000004: system.bus_a.p2.status
+    VIEW    [00000000:ffffffff] 00000000+100000000: system.bus_b
+--- End Memory Map Dump ---
+INFO:  [0][mem_map_ut]: hier::PASSED
+INFO:  [0][mem_bounded_ut]: RUNNING
+INFO:  [0][mem_bounded_ut]: set_bounds::RUNNING
+INFO:  [0][mem_bounded_ut]: set_bounds::PASSED
+INFO:  [0][mem_bounded_ut]: read_write::RUNNING
+INFO:  [0][mem_bounded_ut]: read_write::PASSED
+INFO:  [0][mem_ut]: PASSED (6 of 6 tests passing)
+INFO:  [0][mem_map_ut]: PASSED (5 of 5 tests passing)
+INFO:  [0][mem_bounded_ut]: PASSED (2 of 2 tests passing)
+
+INFO:  [0][apps_ts]: PASSED (3 of 3 testcases passing)
+INFO:  [0][containers_ts]: RUNNING
+INFO:  [0][container_ut]: RUNNING
+INFO:  [0][container_ut]: container_test::RUNNING
+INFO:  [0][container_ut]: container_test::PASSED
+INFO:  [0][container_ut]: typed_container_test::RUNNING
+INFO:  [0][container_ut]: typed_container_test::PASSED
+INFO:  [0][type_handle_ut]: RUNNING
+INFO:  [0][type_handle_ut]: set::RUNNING
+INFO:  [0][type_handle_ut]: set::PASSED
+INFO:  [0][type_handle_ut]: map_test::RUNNING
+INFO:  [0][type_handle_ut]: map_test::PASSED
+INFO:  [0][vector_ut]: RUNNING
+INFO:  [0][vector_ut]: zero_size::RUNNING
+INFO:  [0][vector_ut]: zero_size::PASSED
+INFO:  [0][vector_ut]: fill_vector::RUNNING
+INFO:  [0][vector_ut]: fill_vector::PASSED
+INFO:  [0][vector_ut]: clone::RUNNING
+INFO:  [0][vector_ut]: clone::PASSED
+INFO:  [0][vector_ut]: clear::RUNNING
+INFO:  [0][vector_ut]: clear::PASSED
+INFO:  [0][vector_ut]: real_vector_test::RUNNING
+INFO:  [0][vector_ut]: real_vector_test::PASSED
+INFO:  [0][vector_ut]: string_vector_test::RUNNING
+INFO:  [0][vector_ut]: string_vector_test::PASSED
+INFO:  [0][vector_ut]: append::RUNNING
+INFO:  [0][vector_ut]: append::PASSED
+INFO:  [0][vector_ut]: appendc::RUNNING
+INFO:  [0][vector_ut]: appendc::PASSED
+INFO:  [0][map_ut]: RUNNING
+INFO:  [0][map_ut]: string_map_test::RUNNING
+INFO:  [0][map_ut]: string_map_test::PASSED
+INFO:  [0][map_ut]: exists_test::RUNNING
+INFO:  [0][map_ut]: exists_test::PASSED
+INFO:  [0][map_ut]: clone_test::RUNNING
+INFO:  [0][map_ut]: clone_test::PASSED
+INFO:  [0][map_ut]: delete_test::RUNNING
+INFO:  [0][map_ut]: delete_test::PASSED
+INFO:  [0][singleton_map_ut]: RUNNING
+INFO:  [0][singleton_map_ut]: singleton_test::RUNNING
+INFO:  [0][singleton_map_ut]: singleton_test::PASSED
+INFO:  [0][queue_ut]: RUNNING
+INFO:  [0][queue_ut]: empty_queue::RUNNING
+INFO:  [0][queue_ut]: empty_queue::PASSED
+INFO:  [0][queue_ut]: fifo::RUNNING
+INFO:  [0][queue_ut]: fifo::PASSED
+INFO:  [0][queue_ut]: peek::RUNNING
+INFO:  [0][queue_ut]: peek::PASSED
+INFO:  [0][queue_ut]: clone::RUNNING
+INFO:  [0][queue_ut]: clone::PASSED
+INFO:  [0][fixed_size_queue_ut]: RUNNING
+INFO:  [0][fixed_size_queue_ut]: full::RUNNING
+INFO:  [0][fixed_size_queue_ut]: full::PASSED
+INFO:  [0][fixed_size_queue_ut]: clone::RUNNING
+INFO:  [0][fixed_size_queue_ut]: clone::PASSED
+INFO:  [0][deque_ut]: RUNNING
+INFO:  [0][deque_ut]: fwd_queue::RUNNING
+INFO:  [0][deque_ut]: fwd_queue::PASSED
+INFO:  [0][deque_ut]: bkwd_queue::RUNNING
+INFO:  [0][deque_ut]: bkwd_queue::PASSED
+INFO:  [0][deque_ut]: reverse::RUNNING
+INFO:  [0][deque_ut]: reverse::PASSED
+INFO:  [0][deque_ut]: clone::RUNNING
+INFO:  [0][deque_ut]: clone::PASSED
+INFO:  [0][stack_ut]: RUNNING
+INFO:  [0][stack_ut]: push_and_pop::RUNNING
+INFO:  [0][stack_ut]: push_and_pop::PASSED
+INFO:  [0][stack_ut]: clone::RUNNING
+INFO:  [0][stack_ut]: clone::PASSED
+INFO:  [0][sorter_ut]: RUNNING
+INFO:  [0][sorter_ut]: uint32_sort::RUNNING
+INFO:  [0][sorter_ut]: uint32_sort::PASSED
+INFO:  [0][sorter_ut]: worst_case_sort::RUNNING
+INFO:  [0][sorter_ut]: worst_case_sort::PASSED
+INFO:  [0][sorter_ut]: coordinate_sort::RUNNING
+INFO:  [0][sorter_ut]: coordinate_sort::PASSED
+INFO:  [0][sorter_ut]: coordinate_worst_case_sort::RUNNING
+INFO:  [0][sorter_ut]: coordinate_worst_case_sort::PASSED
+INFO:  [0][sorter_ut]: string_sort::RUNNING
+INFO:  [0][sorter_ut]: string_sort::PASSED
+INFO:  [0][container_ut]: PASSED (2 of 2 tests passing)
+INFO:  [0][type_handle_ut]: PASSED (2 of 2 tests passing)
+INFO:  [0][vector_ut]: PASSED (8 of 8 tests passing)
+INFO:  [0][map_ut]: PASSED (4 of 4 tests passing)
+INFO:  [0][singleton_map_ut]: PASSED (1 of 1 tests passing)
+INFO:  [0][queue_ut]: PASSED (4 of 4 tests passing)
+INFO:  [0][fixed_size_queue_ut]: PASSED (2 of 2 tests passing)
+INFO:  [0][deque_ut]: PASSED (4 of 4 tests passing)
+INFO:  [0][stack_ut]: PASSED (2 of 2 tests passing)
+INFO:  [0][sorter_ut]: PASSED (5 of 5 tests passing)
+
+INFO:  [0][containers_ts]: PASSED (10 of 10 testcases passing)
+INFO:  [0][iterators_ts]: RUNNING
+INFO:  [0][list_iterators_ut]: RUNNING
+INFO:  [0][list_iterators_ut]: forward_iteration::RUNNING
+INFO:  [0][list_iterators_ut]: forward_iteration::PASSED
+INFO:  [0][list_iterators_ut]: backward_iteration::RUNNING
+INFO:  [0][list_iterators_ut]: backward_iteration::PASSED
+INFO:  [0][list_iterators_ut]: begin_and_end::RUNNING
+INFO:  [0][list_iterators_ut]: begin_and_end::PASSED
+INFO:  [0][list_iterators_ut]: zero_length::RUNNING
+INFO:  [0][list_iterators_ut]: zero_length::PASSED
+INFO:  [0][list_iterators_ut]: unbound::RUNNING
+INFO:  [0][list_iterators_ut]: unbound::PASSED
+INFO:  [0][list_iterators_ut]: bidir_fwd_bkwd::RUNNING
+INFO:  [0][list_iterators_ut]: bidir_fwd_bkwd::PASSED
+INFO:  [0][list_iterators_ut]: random::RUNNING
+INFO:  [0][list_iterators_ut]: random::PASSED
+INFO:  [0][list_iterators_ut]: one::RUNNING
+INFO:  [0][list_iterators_ut]: one::PASSED
+INFO:  [0][map_iterators_ut]: RUNNING
+INFO:  [0][map_iterators_ut]: forward_iteration::RUNNING
+map_size = 49
