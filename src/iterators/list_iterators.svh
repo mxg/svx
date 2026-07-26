@@ -539,6 +539,10 @@ endclass
 // Common list iterators
 //
 // Forward iterators
+typedef list_fwd_iterator#(int8_t,    int8_traits    ) list_fwd_int8_iterator;
+typedef list_fwd_iterator#(uint8_t,   uint8_traits   ) list_fwd_uint8_iterator;
+typedef list_fwd_iterator#(int16_t,   int16_traits   ) list_fwd_int16_iterator;
+typedef list_fwd_iterator#(uint16_t,  uint16_traits  ) list_fwd_uint16_iterator;
 typedef list_fwd_iterator#(int32_t,   int32_traits   ) list_fwd_int32_iterator;
 typedef list_fwd_iterator#(uint32_t,  uint32_traits  ) list_fwd_uint32_iterator;
 typedef list_fwd_iterator#(int64_t,   int64_traits   ) list_fwd_int64_iterator;
@@ -551,7 +555,10 @@ typedef list_fwd_iterator#(string,    string_traits  ) list_fwd_string_iterator;
 //
 // Backward iterators
 //
-typedef list_bkwd_iterator#(int32_t,   int32_traits  ) list_bkwd_int32_iterator;
+typedef list_bkwd_iterator#(uint8_t,   uint8_traits  ) list_bkwd_uint8_iterator;
+typedef list_bkwd_iterator#(int8_t,    int8_traits   ) list_bkwd_int8_iterator;
+typedef list_bkwd_iterator#(uint16_t,  uint16_traits ) list_bkwd_uint16_iterator;
+typedef list_bkwd_iterator#(int16_t,   int16_traits  ) list_bkwd_int16_iterator;
 typedef list_bkwd_iterator#(uint32_t,  uint32_traits ) list_bkwd_uint32_iterator;
 typedef list_bkwd_iterator#(int64_t,   int64_traits  ) list_bkwd_int64_iterator;
 typedef list_bkwd_iterator#(uint64_t,  uint64_traits ) list_bkwd_uint64_iterator;
@@ -563,6 +570,11 @@ typedef list_bkwd_iterator#(string,    string_traits ) list_bkwd_string_iterator
 //
 // Bidirectional iterators
 //
+
+typedef list_bidir_iterator#(int8_t,    int8_traits   ) list_bidir_int8_iterator;
+typedef list_bidir_iterator#(uint8_t,   uint8_traits  ) list_bidir_uint8_iterator;
+typedef list_bidir_iterator#(int16_t,   int16_traits  ) list_bidir_int16_iterator;
+typedef list_bidir_iterator#(uint16_t,  uint16_traits ) list_bidir_uint16_iterator;
 typedef list_bidir_iterator#(int32_t,   int32_traits  ) list_bidir_int32_iterator;
 typedef list_bidir_iterator#(uint32_t,  uint32_traits ) list_bidir_uint32_iterator;
 typedef list_bidir_iterator#(int64_t,   int64_traits  ) list_bidir_int64_iterator;

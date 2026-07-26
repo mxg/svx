@@ -3,12 +3,26 @@
 package algo_utils;
 
   import svx::*;
-  
-  class pred extends predicate#(uint32_t);
+
+  //--------------------------------------------------------------------
+  // some predicates
+  //--------------------------------------------------------------------
+  class lt_100 extends predicate#(uint32_t);
     function bit is_true(uint32_t t);
       return (t < 100);
     endfunction
-    
+  endclass
+
+  class gt_0 extends predicate#(uint8_t);
+    function bit is_true(uint8_t t);
+      return (t > 0);
+    endfunction
+  endclass
+
+  class eq_0 extends predicate#(uint8_t);
+    function bit is_true(uint8_t t);
+      return (t == 0);
+    endfunction
   endclass
   
 endpackage
@@ -89,7 +103,7 @@ module algo_unit_test;
       uint32_t actual_count;
 
       // predicates
-      pred p;
+      lt_100 p;
       always_true#(uint32_t) p_true;
       always_false#(uint32_t) p_false;
 
@@ -123,7 +137,27 @@ module algo_unit_test;
   
     `SVTEST_END
 
+    `SVTEST(preds)
+      uint32_t count;
+      bit is_true;
+      gt_0 p0 = new();
+      vector#(uint8_t, uint8_traits) v = 
+	 vector#(uint8_t, uint8_traits)::create({8'h1, 8'h2, 8'h3, 8'h4, 8'h5, 8'h6, 8'h7, 8'h8});
+      list_bidir_uint8_iterator iter = new(v);
 
+      count = algo#(uint8_t, uint8_traits)::count(iter, p0);
+      `FAIL_UNLESS(count == 8);
+
+      is_true = algo#(uint8_t, uint8_traits)::none_of(iter, p0);
+      `FAIL_UNLESS(is_true == 0);
+
+      is_true = algo#(uint8_t, uint8_traits)::all_of(iter, p0);
+      `FAIL_UNLESS(is_true == 1);
+      
+      is_true = algo#(uint8_t, uint8_traits)::any_of(iter, p0);
+      `FAIL_UNLESS(is_true == 1);
+
+    `SVTEST_END
 
   `SVUNIT_TESTS_END
 

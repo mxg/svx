@@ -195,10 +195,6 @@ module type_handle_unit_test;
       `FAIL_IF(index_t'(iter_count) != type_map.size())
     `SVTEST_END
 
-    `SVTEST(fake)
-      $display("fake test");
-    `SVTEST_END
-
   `SVUNIT_TESTS_END
 
 endmodule

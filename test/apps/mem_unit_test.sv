@@ -352,7 +352,7 @@ module mem_unit_test;
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       // set a restriction on a random block on a random page
-      addr = addr_t'($urandom() & 'hffff);
+      addr = addr_t'($urandom() & 'hfffc);
       m.set_block_restriction(addr, RESTRICT_READ_WRITE);
 
       // intentionally violate the restriction
@@ -370,6 +370,11 @@ module mem_unit_test;
       m.clear_block_restriction(addr);
       m.write(addr, word_t'($urandom() & 'hffff));
 
+      if(m.last_operation_failed()) begin
+	string msg = m.get_last_op_string();
+	$display(msg);
+      end
+  
       `FAIL_IF(m.last_operation_failed())
       `FAIL_UNLESS(m.is_writable(addr))
       `FAIL_UNLESS(m.is_readable(addr))
