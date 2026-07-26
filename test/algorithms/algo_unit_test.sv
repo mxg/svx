@@ -141,19 +141,25 @@ module algo_unit_test;
       uint32_t count;
       bit is_true;
       gt_0 p0 = new();
+
+      // Create a vector from a constant list
       vector#(uint8_t, uint8_traits) v = 
 	 vector#(uint8_t, uint8_traits)::create({8'h1, 8'h2, 8'h3, 8'h4, 8'h5, 8'h6, 8'h7, 8'h8});
       list_bidir_uint8_iterator iter = new(v);
 
+      // How many elements in the vector are greater than 0?
       count = algo#(uint8_t, uint8_traits)::count(iter, p0);
       `FAIL_UNLESS(count == 8);
 
+      // Are none of the elements in the vector greater than 0?
       is_true = algo#(uint8_t, uint8_traits)::none_of(iter, p0);
       `FAIL_UNLESS(is_true == 0);
 
+      // Are all the elements in the vector greater than 0?
       is_true = algo#(uint8_t, uint8_traits)::all_of(iter, p0);
       `FAIL_UNLESS(is_true == 1);
-      
+
+      // Is at least one element in the list greater than 0?
       is_true = algo#(uint8_t, uint8_traits)::any_of(iter, p0);
       `FAIL_UNLESS(is_true == 1);
 

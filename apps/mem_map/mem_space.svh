@@ -33,7 +33,7 @@
 // a memory space.  This could be a register, field, memory, or a memory
 // region.
 //----------------------------------------------------------------------
-virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
+virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
 
   typedef mem_space#(ADDR_SIZE) mem_space_t;
 
@@ -97,8 +97,8 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
   // These two fields are used in the construction of the print format
   // to print the memory space.  The sizes are computed based on the
   // ADDR_SIZE parameter.
-  local static int unsigned addr_print_len = compute_addr_print_len();
-  local static int unsigned size_print_len = compute_size_print_len();
+  local static uint32_t addr_print_len = compute_addr_print_len();
+  local static uint32_t size_print_len = compute_size_print_len();
   local static string print_fmt = compute_print_fmt();
 
   //--------------------------------------------------------------------
@@ -143,11 +143,11 @@ virtual class mem_space #(int unsigned ADDR_SIZE=32) extends tree;
   endfunction
   
 
-  static local function int unsigned compute_addr_print_len();
+  static local function uint32_t compute_addr_print_len();
     return (ADDR_SIZE / 4) + (ADDR_SIZE % 4);
   endfunction
 
-  static local function int unsigned compute_size_print_len();
+  static local function uint32_t compute_size_print_len();
     return ((ADDR_SIZE+1) / 4) + ((ADDR_SIZE+1) % 4);
   endfunction
 

@@ -41,7 +41,7 @@ module type_handle_unit_test;
   svunit_testcase svunit_ut;
 
   class base extends object;
-    int i;
+    int32_t i;
   endclass
 
   class base_traits extends class_traits#(base);
@@ -183,7 +183,7 @@ module type_handle_unit_test;
 
       map_fwd_iterator#(type_handle_base, base, base_traits) iter = new(type_map);
       base b;
-      int unsigned iter_count = 0;
+      uint32_t iter_count = 0;
 
       void'(iter.first());
       while(!iter.at_end()) begin

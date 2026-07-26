@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// opyrioght 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -74,7 +75,7 @@ module stack_unit_test;
     /* Place Teardown Code Here */
   endtask
 
-  parameter int unsigned STACK_SIZE = 20;
+  parameter uint32_t STACK_SIZE = 20;
 
   //===================================
   // All tests are defined between the
@@ -95,10 +96,10 @@ module stack_unit_test;
   // push and pop
   //--------------------------------------------------------------------    
     `SVTEST(push_and_pop)
-      int array[STACK_SIZE];
-      int unsigned i;
-      int val;
-      int unsigned pop_count;
+      int32_t array[STACK_SIZE];
+      uint32_t i;
+      int32_t val;
+      uint32_t pop_count;
 
       // Populate the stack with random integers
       for(i = 0; i < STACK_SIZE; i++) begin
@@ -127,8 +128,8 @@ module stack_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(clone)
       begin
-        int unsigned i;
-        stack#(int, int32_traits) cloned_stack;
+        uint32_t i;
+        stack#(int32_t, int32_traits) cloned_stack;
         cloned_stack = stk.clone();
 
         `FAIL_IF(stk.size() != cloned_stack.size())

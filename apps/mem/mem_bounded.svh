@@ -31,10 +31,10 @@
 // Bounded Memory
 //
 //----------------------------------------------------------------------
-class mem_bounded #(int unsigned ADDR_BITS = 32,
-		    int unsigned PAGE_BITS = 16,
-		    int unsigned BLOCK_BITS = 8,
-		    int unsigned WORD_SIZE = 4)
+class mem_bounded #(uint32_t ADDR_BITS = 32,
+		    uint32_t PAGE_BITS = 16,
+		    uint32_t BLOCK_BITS = 8,
+		    uint32_t WORD_SIZE = 4)
   extends mem#(ADDR_BITS, PAGE_BITS, BLOCK_BITS, WORD_SIZE);
 
   // lower address bound -- cannot access memory below this point.

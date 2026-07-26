@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -96,9 +97,9 @@ module list_iterators_unit_test;
   //--------------------------------------------------------------------    
     `SVTEST(forward_iteration)
   
-      int unsigned iter_count;
-      int unsigned i;
-      int last_item;
+      uint32_t iter_count;
+      uint32_t i;
+      int32_t last_item;
   
       list_fwd_iterator#(int32_t, int32_traits) iter = new();
 
@@ -157,10 +158,10 @@ module list_iterators_unit_test;
   //--------------------------------------------------------------------    
     `SVTEST(backward_iteration)
 
-      int unsigned iter_count;
-      int unsigned i;
-      int first_item;
-      list_bkwd_iterator#(int, int32_traits) iter = new();
+      uint32_t iter_count;
+      uint32_t i;
+      int32_t first_item;
+      list_bkwd_iterator#(int32_t, int32_traits) iter = new();
       iter.bind_list(vec);
 
       // The vector was filled with random numbers in the last test, so
@@ -214,8 +215,8 @@ module list_iterators_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(begin_and_end)
 
-      list_fwd_iterator#(int, int32_traits) fwd_iter = new(vec);
-      list_bkwd_iterator#(int, int32_traits) bkwd_iter = new(vec);
+      list_fwd_iterator#(int32_t, int32_traits) fwd_iter = new(vec);
+      list_bkwd_iterator#(int32_t, int32_traits) bkwd_iter = new(vec);
 
       // beginning...
       `FAIL_IF(!fwd_iter.first())
@@ -234,10 +235,10 @@ module list_iterators_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(zero_length)
   
-      list_fwd_iterator#(int, int32_traits) fwd_iter = new(vec);
-      list_bkwd_iterator#(int, int32_traits) bkwd_iter = new(vec);
-      list_bidir_iterator#(int, int32_traits) bidir_iter = new(vec);
-      list_random_iterator#(int, int32_traits) random_iter = new(vec);
+      list_fwd_iterator#(int32_t, int32_traits) fwd_iter = new(vec);
+      list_bkwd_iterator#(int32_t, int32_traits) bkwd_iter = new(vec);
+      list_bidir_iterator#(int32_t, int32_traits) bidir_iter = new(vec);
+      list_random_iterator#(int32_t, int32_traits) random_iter = new(vec);
 
       // empty the vector
       vec.clear();
@@ -291,8 +292,8 @@ module list_iterators_unit_test;
     `SVTEST(unbound)
 
       // create an iterator that is not bound to a list
-      list_fwd_iterator#(int, int32_traits) fwd_iter = new(null);
-      list_bkwd_iterator#(int, int32_traits) bkwd_iter = new(null);
+      list_fwd_iterator#(int32_t, int32_traits) fwd_iter = new(null);
+      list_bkwd_iterator#(int32_t, int32_traits) bkwd_iter = new(null);
 
       `FAIL_IF(fwd_iter.first())
       `FAIL_IF(fwd_iter.next())
@@ -317,9 +318,9 @@ module list_iterators_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(bidir_fwd_bkwd)
 
-      list_bidir_iterator#(int, int32_traits) iter;
-      int unsigned iter_count;
-      int unsigned i;
+      list_bidir_iterator#(int32_t, int32_traits) iter;
+      uint32_t iter_count;
+      uint32_t i;
 
       // Make sure the vector is empty and then Fill it with random
       // numbers
@@ -410,13 +411,13 @@ module list_iterators_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(random)
 
-      list_random_iterator#(int, int32_traits) iter;
-      int t;
-      int unsigned i;
-      int unsigned iterations;
-      int array1[];
-      int array2[];
-      int seed;
+      list_random_iterator#(int32_t, int32_traits) iter;
+      int32_t t;
+      uint32_t i;
+      uint32_t iterations;
+      int32_t array1[];
+      int32_t array2[];
+      int32_t seed;
 
       iter = new(vec);
 
@@ -471,14 +472,14 @@ module list_iterators_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(one)
 
-      int unsigned iter_count;
-      int t;
+      uint32_t iter_count;
+      int32_t t;
 
-      vector#(int, int32_traits) one_list;
+      vector#(int32_t, int32_traits) one_list;
 
-      list_fwd_iterator#(int, int32_traits) fwd_iter;
-      list_bkwd_iterator#(int, int32_traits) bkwd_iter;
-      list_bidir_iterator#(int, int32_traits) bidir_iter;
+      list_fwd_iterator#(int32_t, int32_traits) fwd_iter;
+      list_bkwd_iterator#(int32_t, int32_traits) bkwd_iter;
+      list_bidir_iterator#(int32_t, int32_traits) bidir_iter;
 
       // create a list with a single element in it.
       one_list = new();

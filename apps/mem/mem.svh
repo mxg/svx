@@ -31,10 +31,10 @@
 // Sparse Memory Model
 //
 //----------------------------------------------------------------------
-class mem#(int unsigned ADDR_BITS = 32,
-	   int unsigned PAGE_BITS = 16,
-	   int unsigned BLOCK_BITS = 8,
-	   int unsigned WORD_SIZE = 4)
+class mem#(uint32_t ADDR_BITS = 32,
+	   uint32_t PAGE_BITS = 16,
+	   uint32_t BLOCK_BITS = 8,
+	   uint32_t WORD_SIZE = 4)
   extends mem_base#(ADDR_BITS, PAGE_BITS, BLOCK_BITS, WORD_SIZE);
 
   typedef bit [PAGE_BITS-1:0] page_key_t; 

@@ -40,7 +40,7 @@ class restrict_traits extends void_t;
     return (a == b);
   endfunction
 
-  static function int compare(restrict_t a, restrict_t b);
+  static function int32_t compare(restrict_t a, restrict_t b);
     if(a > b)
       return 1;     // a > b
     else

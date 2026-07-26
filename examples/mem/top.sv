@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Fopyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,15 +38,13 @@ import mem_pkg::*;
 //----------------------------------------------------------------------
 class test;
 
-  parameter int unsigned ADDR_BITS = 32;
-  parameter int unsigned PAGE_BITS = 16;
-  parameter int unsigned BLOCK_BITS = 8;
-  parameter int unsigned WORD_SIZE = 4;
+  parameter uint32_t ADDR_BITS = 32;
+  parameter uint32_t PAGE_BITS = 16;
+  parameter uint32_t BLOCK_BITS = 8;
+  parameter uint32_t WORD_SIZE = 4;
 
   typedef mem#(ADDR_BITS, PAGE_BITS, BLOCK_BITS, WORD_SIZE) mem_t;
   mem_t m;
-  //typedef mem_t::addr_t addr_t;
-  //typedef mem_t::word_t word_t;
 
   typedef mem#(ADDR_BITS, PAGE_BITS, BLOCK_BITS, WORD_SIZE)::addr_t addr_t;
   typedef mem#(ADDR_BITS, PAGE_BITS, BLOCK_BITS, WORD_SIZE)::word_t word_t;
@@ -53,7 +52,6 @@ class test;
   function new();
     m = new();
   endfunction
-
 
   function void run2();
     addr_t base_addr = 'hf300;

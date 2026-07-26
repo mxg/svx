@@ -46,8 +46,8 @@ module sorter_unit_test;
   //===================================
 
   class coordinate;
-    rand int x;
-    rand int y;
+    rand int32_t x;
+    rand int32_t y;
 
     constraint c { (x < 1000 && x > -1000) && (y < 1000 & y > -1000); };
   endclass
@@ -63,7 +63,7 @@ module sorter_unit_test;
       return ((a.x == b.x) && (a.y == b.y));
     endfunction
     
-    static function int compare(coordinate a,  b);
+    static function int32_t compare(coordinate a,  b);
       if(equal(a,b))
 	return 0;
       if(a.x > b.x)
@@ -219,7 +219,7 @@ module sorter_unit_test;
       for(i = 0; i < N; i++) begin
 	    c = new();
 	    void'(c.randomize());
-	    c.x = int'(N-i);
+	    c.x = int32_t'(N-i);
         v.appendc(c);
       end
 

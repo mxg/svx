@@ -46,7 +46,7 @@ typedef class mem_view;
 //
 // For a field, the offset and size refer to bits within the field
 //----------------------------------------------------------------------
-class mem_field #(int unsigned ADDR_SIZE = 32)
+class mem_field #(uint32_t ADDR_SIZE = 32)
   extends mem_space #(ADDR_SIZE);
 
   function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);
@@ -67,7 +67,7 @@ endclass
 //----------------------------------------------------------------------
 // mem_register
 //----------------------------------------------------------------------
-class mem_register #(int unsigned ADDR_SIZE = 32)
+class mem_register #(uint32_t ADDR_SIZE = 32)
   extends mem_space #(ADDR_SIZE);
 
   function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);
@@ -91,7 +91,7 @@ endclass
 //----------------------------------------------------------------------
 // mem_memory
 //----------------------------------------------------------------------
-class mem_memory #(int unsigned ADDR_SIZE = 32)
+class mem_memory #(uint32_t ADDR_SIZE = 32)
   extends mem_space #(ADDR_SIZE);
 
   function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);
@@ -111,7 +111,7 @@ endclass
 //----------------------------------------------------------------------
 // mem_region
 //----------------------------------------------------------------------
-class mem_region #(int unsigned ADDR_SIZE = 32)
+class mem_region #(uint32_t ADDR_SIZE = 32)
   extends mem_space #(ADDR_SIZE);
   
   function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);
@@ -153,7 +153,7 @@ endclass
 // can overlap each other, where other space types cannot overlap at
 // all.
 //----------------------------------------------------------------------
-class mem_view #(int unsigned ADDR_SIZE = 32)
+class mem_view #(uint32_t ADDR_SIZE = 32)
   extends mem_space #(ADDR_SIZE);
 
   function new(string name, mem_space_t parent, addr_t _offset, mem_size_t _size);

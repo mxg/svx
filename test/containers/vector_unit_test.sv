@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,7 +46,7 @@ module vector_unit_test;
   // This is the UUT that we're 
   // running the Unit Tests on
   //===================================
-  vector#(int, int32_traits) vi;
+  vector#(int32_t, int32_traits) vi;
 
   //===================================
   // Build
@@ -122,8 +123,8 @@ module vector_unit_test;
     `SVTEST(fill_vector)
       begin
         index_t i;
-        int value;
-        int array[VECTOR_SIZE];
+        int32_t value;
+        int32_t array[VECTOR_SIZE];
 
         for(i = 0; i < VECTOR_SIZE; i++) begin
           value = $random();
@@ -151,7 +152,7 @@ module vector_unit_test;
     `SVTEST(clone)
       begin
         index_t i;
-        vector#(int, int32_traits) cloned_vector;
+        vector#(int32_t, int32_traits) cloned_vector;
         cloned_vector = vi.clone();
 
         `FAIL_IF(vi.size() != cloned_vector.size())
@@ -236,8 +237,8 @@ module vector_unit_test;
         index_t i;
         uint32_vector v_a = new();
         uint32_vector v_b = new();
-        int unsigned value;
-        int unsigned array[VECTOR_SIZE + OTHER_SIZE];
+        uint32_t value;
+        uint32_t array[VECTOR_SIZE + OTHER_SIZE];
         v_a.extend(VECTOR_SIZE);
         v_b.extend(OTHER_SIZE);
 
@@ -245,14 +246,14 @@ module vector_unit_test;
         for(i = 0; i < VECTOR_SIZE; i++) begin
           value = $urandom();
           array[i[4:0]] = value;
-          v_a.write(i, int'(value));
+          v_a.write(i, int32_t'(value));
         end
 
         // Fill vector B
         for(i = 0; i < OTHER_SIZE; i++) begin
           value = $urandom();
           array[5'(VECTOR_SIZE + i)] = value;
-          v_b.write(i, int'(value));
+          v_b.write(i, int32_t'(value));
         end
 
         // Append B to A
@@ -279,8 +280,8 @@ module vector_unit_test;
       begin
         index_t i;
         uint32_vector v_a = new();
-        int unsigned value;
-        int unsigned array[VECTOR_SIZE + OTHER_SIZE];
+        uint32_t value;
+        uint32_t array[VECTOR_SIZE + OTHER_SIZE];
         v_a.extend(VECTOR_SIZE);
 
         // Fill vector A

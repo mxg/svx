@@ -13,6 +13,7 @@
 #
 #
 # Copyright 2016 NVIDIA Corporation
+# Copyright 2026 Mark Glasser
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,7 +37,7 @@
 #######################################################################
 
 # create containers test suite
-echo "*** Create containters test suite"
+echo "*** Create containers test suite"
 create_testsuite.pl -add containers/container_unit_test.sv            \
                     -add containers/type_handle_unit_test.sv          \
                     -add containers/vector_unit_test.sv               \

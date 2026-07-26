@@ -43,7 +43,7 @@ module queue_unit_test;
   // This is the UUT that we're 
   // running the Unit Tests on
   //===================================
-  queue#(int, int32_traits) my_queue;
+  queue#(int32_t, int32_traits) my_queue;
 
 
   //===================================
@@ -111,8 +111,8 @@ module queue_unit_test;
     `SVTEST(fifo)
       begin
         index_t i;
-        int value;
-        int array[QUEUE_SIZE];
+        int32_t value;
+        int32_t array[QUEUE_SIZE];
 
         // fill queue from the front
         for(i = 0; i < QUEUE_SIZE; i++) begin
@@ -170,7 +170,7 @@ module queue_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(clone)
       begin
-        queue#(int, int32_traits) cloned_queue;
+        queue#(int32_t, int32_traits) cloned_queue;
 	
         cloned_queue = my_queue.clone();
 
@@ -199,7 +199,7 @@ module fixed_size_queue_unit_test;
   // This is the UUT that we're 
   // running the Unit Tests on
   //===================================
-  fixed_size_queue#(int, int32_traits) fq;
+  fixed_size_queue#(int32_t, int32_traits) fq;
 
 
   //===================================
@@ -251,13 +251,13 @@ module fixed_size_queue_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(full)
       index_t i;
-      int t;
+      int32_t t;
 
       `FAIL_IF(fq.size != 0)
       `FAIL_IF(!fq.is_empty())
 
       for(i = 0; i < 4; i++) begin
-        fq.put(int'(i));
+        fq.put(int32_t'(i));
       end
 
       `FAIL_IF(fq.size() != 4)
@@ -289,7 +289,7 @@ module fixed_size_queue_unit_test;
   // clone
   //--------------------------------------------------------------------
     `SVTEST(clone)
-      fixed_size_queue#(int, int32_traits) cloned_queue;
+      fixed_size_queue#(int32_t, int32_traits) cloned_queue;
 
       cloned_queue = fq.clone();
 

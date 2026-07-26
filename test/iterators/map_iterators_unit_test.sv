@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,9 +52,9 @@ module map_iterators_unit_test;
 
   class symbol extends object;
     string name;
-    int val;
+    int32_t val;
 
-    function new(string nm, int v);
+    function new(string nm, int32_t v);
       name = nm;
       val = v;
     endfunction
@@ -93,7 +94,7 @@ module map_iterators_unit_test;
     size_t i;
     rand_string rs;
     string name;
-    int val;
+    int32_t val;
     symbol sym;
     index_t dup;
 
@@ -513,7 +514,7 @@ module map_iterators_unit_test;
       uint32_t iterations;
       symbol array1[];
       symbol array2[];
-      int seed;
+      int32_t seed;
 
       iter = new(symbol_table);
 

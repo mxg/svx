@@ -40,11 +40,11 @@ class rand_string;
                   (c >=97 && c <= 122);
                 };
 
-  function string rand_string(int unsigned maxlen = 16);
+  function string rand_string(uint32_t maxlen = 16);
 
     string s;
-    int unsigned i;
-    int unsigned n;
+    uint32_t i;
+    uint32_t n;
 
     if(maxlen < 2)
       n = 1;

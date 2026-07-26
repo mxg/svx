@@ -133,6 +133,7 @@ class range#(type T=int, type P=void_traits)
   endfunction
 
   //--------------------------------------------------------------------
+  // first
   //--------------------------------------------------------------------
   virtual function bit first();
     idx = lb;
@@ -144,6 +145,7 @@ class range#(type T=int, type P=void_traits)
   endfunction
 
   //--------------------------------------------------------------------
+  // next
   //--------------------------------------------------------------------
   virtual function bit next();
     if(is_empty() || ((idx > lb) && (idx > ub)))
@@ -156,12 +158,14 @@ class range#(type T=int, type P=void_traits)
   endfunction    
 
   //--------------------------------------------------------------------
+  // is_last
   //--------------------------------------------------------------------
   virtual function bit is_last();
     return (!is_empty() && (idx >= ub));
   endfunction
 
   //--------------------------------------------------------------------
+  // at_end
   //--------------------------------------------------------------------
   virtual function bit at_end();
     if(is_empty())
@@ -170,6 +174,7 @@ class range#(type T=int, type P=void_traits)
   endfunction
 
   //--------------------------------------------------------------------
+  // last
   //--------------------------------------------------------------------
   virtual function bit last();
     idx = ub;
@@ -181,6 +186,7 @@ class range#(type T=int, type P=void_traits)
   endfunction
 
   //--------------------------------------------------------------------
+  // prev
   //--------------------------------------------------------------------
   virtual function bit prev();
     if(is_empty())
@@ -193,12 +199,14 @@ class range#(type T=int, type P=void_traits)
   endfunction
 
   //--------------------------------------------------------------------
+  // is_first
   //--------------------------------------------------------------------
   virtual function bit is_first();
     return (!is_empty() && (idx == lb));
   endfunction
 
   //--------------------------------------------------------------------
+  // at_beginning
   //--------------------------------------------------------------------
   virtual function bit at_beginning();
     if(is_empty())
@@ -207,6 +215,7 @@ class range#(type T=int, type P=void_traits)
   endfunction 
 
   //--------------------------------------------------------------------
+  // skip
   //--------------------------------------------------------------------
   virtual function bit skip(signed_index_t distance);
     return iter.skip(distance);
@@ -214,6 +223,9 @@ class range#(type T=int, type P=void_traits)
 
 endclass
 
+//
+// Some convenience typedefs for ranges
+//
 typedef range#(int8_t,    int8_traits   ) int8_range;
 typedef range#(uint8_t,   uint8_traits  ) uint8_range;
 typedef range#(int16_t,   int16_traits  ) int16_range;

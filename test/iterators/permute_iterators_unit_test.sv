@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyroght 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,7 +45,7 @@ module permute_iterator_unit_test;
   //===================================
 
   vector#(string, string_traits) vec;
-  longint unsigned fact;
+  uint64_t fact;
 
   //===================================
   // Build
@@ -94,7 +95,7 @@ module permute_iterator_unit_test;
   //
   // A little utility to compute n!
   //--------------------------------------------------------------------
-  function longint unsigned factorial(longint unsigned n);
+  function uint64_t factorial(uint64_t n);
     return (n <= 2)
       ? n
       : (n * factorial(n-1));
@@ -130,7 +131,7 @@ module permute_iterator_unit_test;
     `SVTEST(forward)
 
       index_t i;
-      longint unsigned iter_count;
+      uint64_t iter_count;
       permute_fwd_iterator#(string, string_traits) iter;
       string permutation;
       index_t perm_map[string];
@@ -260,7 +261,7 @@ module permute_iterator_unit_test;
       index_t i;
       index_t j;
       index_t iterations = 20;
-      int seed;
+      int32_t seed;
 
       iter = new(vec);
 

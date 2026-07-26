@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,12 +59,12 @@
 // time)hi will be computed from these values.  If duty cycle is not
 // supplied then the deault of 0.5 (50%) is used.
 //----------------------------------------------------------------------
-class clk_descriptor #(int unsigned N=1) extends object;
+class clk_descriptor #(uint32_t N=1) extends object;
 
   typedef enum { MILLISEC, MICROSEC, NANOSEC, PICOSEC, FEMTOSEC} scale_t;
 
   string name;
-  int unsigned clk_index;
+  uint32_t clk_index;
   real freq; // Hz
   real duty_cycle; // 0 < duty_cycle <= 1.0
   time time_lo;
@@ -87,7 +88,7 @@ class clk_descriptor #(int unsigned N=1) extends object;
 
   // store the virtual clock interface and the index for this clock
   // within the array of clock signals within the interface.
-  function void set_vif(virtual clk_if#(N) vif, int unsigned index);
+  function void set_vif(virtual clk_if#(N) vif, uint32_t index);
     ckif = vif;
     clk_index = index;
   endfunction
@@ -232,7 +233,7 @@ class clk_descriptor #(int unsigned N=1) extends object;
     return s;
   endfunction
 
-  function int compare(object obj);
+  function int32_t compare(object obj);
     clk_descriptor cd;
 
     // cast the input argument to a clk_descriptor

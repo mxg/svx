@@ -56,7 +56,7 @@ endclass
 // ensures there's no funny business (i.e. the object is not modified,
 // intentionally or unintentionally, in this context).
 
-class int_container extends type_container#(int);
+class int_container extends type_container#(int32_t);
   function string convert2string();
     string s;
     $sformat(s, "%0d", get());
@@ -262,9 +262,9 @@ class map_example;
       
       /* verilator lint_off SIDEEFFECT */      
       case(tcb.get_type_handle())
-	(type_handle#(int)::get_type())  :
+	(type_handle#(int32_t)::get_type())  :
 	  begin
-	    type_container#(int) c;
+	    type_container#(int32_t) c;
 	    $cast(c, tcb);
 	    $display("%s = %0d", iter.get_index(), c.get());
 	  end

@@ -44,7 +44,7 @@ class list_example;
   // create a vector and traverse it in in the forward direction.
   function void fwd();
 
-    int unsigned i;
+    uint32_t i;
     uint32_t n;
     
     // A vector of integers

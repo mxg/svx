@@ -1,3 +1,32 @@
+//======================================================================
+//
+//               .oooooo..o oooooo     oooo ooooooo  ooooo     
+//              d8P'    `Y8  `888.     .8'   `8888    d8'      
+//              Y88bo.        `888.   .8'      Y888..8P        
+//               `"Y8888o.     `888. .8'        `8888'         
+//                   `"Y88b     `888.8'        .8PY888.        
+//              oo     .d8P      `888'        d8'  `888b       
+//              8""88888P'        `8'       o888o  o88888o
+//
+//                  SystemVerilog Extension Library
+//
+//
+// Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+// implied.  See the License for the specific language governing
+// permissions and limitations under the License.
+//======================================================================
+
 //----------------------------------------------------------------------
 // Data Type Traits
 //
@@ -32,7 +61,7 @@ class void_traits extends void_t;
     return 1; // void objects are always equivalent
   endfunction
 
-  static function int compare(input void_t a, input void_t b);
+  static function int32_t compare(input void_t a, input void_t b);
     return int'(!equal(a,b));
   endfunction
 
@@ -53,7 +82,7 @@ class object_traits extends void_t;
     return (a.compare(b) == 0);
   endfunction
 
-  static function int compare(input object a, input object b);
+  static function int32_t compare(input object a, input object b);
     return a.compare(b);
   endfunction
 
@@ -74,7 +103,7 @@ class class_traits#(type T=int) extends void_t;
     return (a == b);
   endfunction
 
-  static function int compare(input T a, input T b);
+  static function int32_t compare(input T a, input T b);
     return int'(!equal(a,b));
   endfunction
 
@@ -95,7 +124,7 @@ class base_int_traits #(type T=int) extends void_t;
     return (a == b);
   endfunction
 
-  static function int compare(T a, T b);
+  static function int32_t compare(T a, T b);
     if(a > b)
       return 1;
     else
@@ -134,7 +163,7 @@ class int8_traits extends base_int_traits#(int8_t);
     return (a == b);
   endfunction
 
-  static function int compare(int8_t a, int8_t b);
+  static function int32_t compare(int8_t a, int8_t b);
     if(a > b)
       return 1;
     else
@@ -160,7 +189,7 @@ class uint8_traits;
     return (a == b);
   endfunction
 
-  static function int compare(uint8_t a, uint8_t b);
+  static function int32_t compare(uint8_t a, uint8_t b);
     if(a > b)
       return 1;
     else
@@ -186,7 +215,7 @@ class int16_traits extends base_int_traits#(int16_t);
     return (a == b);
   endfunction
 
-  static function int compare(int16_t a, int16_t b);
+  static function int32_t compare(int16_t a, int16_t b);
     if(a > b)
       return 1;
     else
@@ -212,7 +241,7 @@ class uint16_traits;
     return (a == b);
   endfunction
 
-  static function int compare(uint16_t a, uint16_t b);
+  static function int32_t compare(uint16_t a, uint16_t b);
     if(a > b)
       return 1;
     else
@@ -238,7 +267,7 @@ class int32_traits extends base_int_traits#(int32_t);
     return (a == b);
   endfunction
 
-  static function int compare(int32_t a, int32_t b);
+  static function int32_t compare(int32_t a, int32_t b);
     if(a > b)
       return 1;
     else
@@ -264,7 +293,7 @@ class uint32_traits;
     return (a == b);
   endfunction
 
-  static function int compare(uint32_t a, uint32_t b);
+  static function int32_t compare(uint32_t a, uint32_t b);
     if(a > b)
       return 1;
     else
@@ -296,7 +325,7 @@ class uint64_traits extends base_int_traits#(uint64_t);
     return (a == b);
   endfunction
 
-  static function int compare(uint64_t a, uint64_t b);
+  static function int32_t compare(uint64_t a, uint64_t b);
     if(a > b)
       return 1;
     else
@@ -345,7 +374,7 @@ class real_traits extends void_t;
     return (diff >= -epsilon && diff <= epsilon);
   endfunction
 
-  static function int compare(real a, real b);
+  static function int32_t compare(real a, real b);
     if((a > b) && !equal(a, b))
       return 1;
     else
@@ -373,7 +402,7 @@ class string_traits extends void_t;
     return (a == b);
   endfunction
 
-  static function int compare(string a, string b);
+  static function int32_t compare(string a, string b);
     return int'(!equal(a,b));
   endfunction
 

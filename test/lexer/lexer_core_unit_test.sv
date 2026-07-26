@@ -82,7 +82,7 @@ module lexer_core_unit_test;
 
   task parse_token(input token_t compare_token,
                    input string s,
-                   output int unsigned count);
+                   output uint32_t count);
 
     token_t token;
     lexer_core lex;
@@ -219,7 +219,7 @@ module lexer_core_unit_test;
     `SVTEST(integers)
 
       string s;
-      int unsigned count;
+      uint32_t count;
       queue#(token_t, token_traits) q = new();
 
       // A string with a collection of signed and unsigned integers
@@ -257,7 +257,7 @@ module lexer_core_unit_test;
     `SVTEST(floats)
 
       string s;
-      int unsigned count;
+      uint32_t count;
 
       // A string with a collection of signed and unsigned integers
       s = "42.0 0.0 1.1 8.99999 -13.66 +82.479990";

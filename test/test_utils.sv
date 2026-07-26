@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,6 +28,8 @@
 //======================================================================
 
 /* verilator lint_off DECLFILENAME */
+
+`include "svx_types.svh"
 
 package test_utils;
 

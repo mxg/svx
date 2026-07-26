@@ -31,10 +31,10 @@
 //
 // A block is a vector of words, a word is one or more bytes.
 //----------------------------------------------------------------------
-class mem_block#(int unsigned ADDR_BITS = 32,
-		 int unsigned PAGE_BITS = 16,
-		 int unsigned BLOCK_BITS = 8,
-		 int unsigned WORD_SIZE = 4)
+class mem_block#(uint32_t ADDR_BITS = 32,
+		 uint32_t PAGE_BITS = 16,
+		 uint32_t BLOCK_BITS = 8,
+		 uint32_t WORD_SIZE = 4)
   extends mem_base#(ADDR_BITS, PAGE_BITS, BLOCK_BITS, WORD_SIZE);
 
   typedef byte unsigned byte_t;

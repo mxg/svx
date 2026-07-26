@@ -33,7 +33,7 @@
 // operate comes from the bound context object.  The variable that holds
 // the context object is c.
 //----------------------------------------------------------------------
-class clk_behavior#(int unsigned N=1)
+class clk_behavior#(uint32_t N=1)
   extends task_behavior#(clk_descriptor#(N));
 
   task tsk();
@@ -79,7 +79,7 @@ endclass
 // Takes a vector of clock descriptors and creates a clock process for
 // each.
 // ----------------------------------------------------------------------
-class clk_processor#(int unsigned N=1) implements process_if;
+class clk_processor#(uint32_t N=1) implements process_if;
   
   typedef vector#(clk_descriptor#(N), class_traits#(clk_descriptor#(N))) clk_vec_t;
   typedef list_fwd_iterator#(clk_descriptor#(N), class_traits#(clk_descriptor#(N))) iter_t;

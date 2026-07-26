@@ -29,7 +29,7 @@
 //---------------------------------------------------------------------
 // RPN CALCULATOR
 //----------------------------------------------------------------------
-typedef triple#(token_t, int, real) item_t;
+typedef triple#(token_t, int32_t, real) item_t;
 
 class calc;
 
@@ -90,7 +90,7 @@ class calc;
 	// int operand
 	TOKEN_INT: begin
 	  string lexeme = lex.get_lexeme();
-	  int i= lexeme.atoi();
+	  int32_t i= lexeme.atoi();
 	  a = new(TOKEN_INT, i, 0.0);
 	  stk.push(a);
 	end

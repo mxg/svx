@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -98,8 +99,8 @@ module deque_unit_test;
     `SVTEST(fwd_queue)
       begin
         index_t i;
-        int value;
-        int array[DEQUE_SIZE];
+        int32_t value;
+        int32_t array[DEQUE_SIZE];
 
         // fill deque from the front
         for(i = 0; i < DEQUE_SIZE; i++) begin
@@ -127,8 +128,8 @@ module deque_unit_test;
     `SVTEST(bkwd_queue)
       begin
         index_t i;
-        int value;
-        int array[DEQUE_SIZE];
+        int32_t value;
+        int32_t array[DEQUE_SIZE];
 
         // fill deque from the back
         for(i = 0; i < DEQUE_SIZE; i++) begin
@@ -156,8 +157,8 @@ module deque_unit_test;
     `SVTEST(reverse)
       begin
         index_t i;
-        int value;
-        int array[DEQUE_SIZE];
+        int32_t value;
+        int32_t array[DEQUE_SIZE];
 
         // fill deque from the back
         for(i = 0; i < DEQUE_SIZE; i++) begin
@@ -188,7 +189,7 @@ module deque_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(clone)
       begin
-        deque#(int, int32_traits) cloned_deque;
+        deque#(int32_t, int32_traits) cloned_deque;
         cloned_deque = my_deque.clone();
 
         `FAIL_IF(my_deque.size() != cloned_deque.size())
