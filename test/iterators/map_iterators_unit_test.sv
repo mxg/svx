@@ -214,6 +214,7 @@ module map_iterators_unit_test;
       iter.bind_map(symbol_table);
 
       // Iterate through the map
+      iter_count = 0;
       void'(iter.last());
       while(!iter.at_beginning()) begin
         void'(iter.prev());
@@ -450,18 +451,20 @@ module map_iterators_unit_test;
       end while(!iter.at_end());
 
       `FAIL_IF(iter_count != symbol_table.size())
-
+  
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // Iterate through the map in the backward direction
       iter_count = 0;
       void'(iter.last());
       while(!iter.at_beginning()) begin
+	symbol s = iter.get();
+	$display("[%0d] symbol = %s", iter_count, s.convert2string());
         void'(iter.prev());
         iter_count++;
       end
 
       `FAIL_IF(iter_count != symbol_table.size())
-
+  
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // Iterate through the list in the backward direction using the
       // alternate idiom
@@ -476,8 +479,8 @@ module map_iterators_unit_test;
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // back-and-forth
-
-      // advance from the beginning and then back
+      //
+      // Advance from the beginning and then back.
       // We should end up where we started
       `FAIL_IF(!iter.first())
       `FAIL_IF(!iter.next())
@@ -487,7 +490,7 @@ module map_iterators_unit_test;
       `FAIL_IF(!iter.prev())
       `FAIL_IF(!iter.is_first())
 
-      // Retard from the end and then back
+      // Start from the end and then back.
       // We should end up where we started
       `FAIL_IF(!iter.last())
       `FAIL_IF(!iter.prev())
@@ -497,7 +500,7 @@ module map_iterators_unit_test;
       `FAIL_IF(!iter.next())
       `FAIL_IF(!iter.is_last())
 
-      // Find the middle of the map
+      // Find the middle of the map.
       `FAIL_IF(!iter.first())
       `FAIL_IF(!iter.skip(symbol_table.size()/2))
 

@@ -11,7 +11,6 @@
 //                  SystemVerilog Extension Library
 //
 //
-// Copyright 2016 NVIDIA Corporation
 // Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,13 +26,19 @@
 // permissions and limitations under the License.
 //======================================================================
 
-//----------------------------------------------------------------------
-// iterators
-//----------------------------------------------------------------------
-`include "iterators/iterator_intf.svh"
-`include "iterators/iterator_base.svh"
-`include "iterators/map_iterators.svh"
-`include "iterators/list_iterators.svh"
-`include "iterators/permute_iterators.svh"
-`include "iterators/range.svh"
-`include "iterators/map_range.svh"
+class map_range #(type KEY=int, type T=void_t, type P=void_traits)
+  extends range #(T,P);
+
+  typedef map_bidir_iterator#(KEY,T,P) map_iter_t;
+  map_iter_t map_iter;
+
+  function new(map_iter_t it, index_t lower_bound, index_t upper_bound);
+    super.new(it, lb, ub);
+    map_iter = it;
+  endfunction
+
+  virtual function KEY get_index();
+    return map_iter.get_index();
+  endfunction
+  
+endclass

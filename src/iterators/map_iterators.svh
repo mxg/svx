@@ -421,7 +421,7 @@ class map_random_iterator#(type KEY=int, type T=int, type P=void_traits)
   virtual function T get();
     return super.get();
   endfunction  
-  
+
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   // set_seed
@@ -508,6 +508,10 @@ class map_bidir_iterator#(type KEY=int, type T=int, type P=void_traits)
     return super.get();
   endfunction  
 
+  virtual function KEY get_index();
+    return super.get_index();
+  endfunction
+  
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   virtual function bit first();

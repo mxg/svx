@@ -61,7 +61,6 @@ module range_unit_test;
 
   //===================================
   // Setup for running the Unit Tests
-  //==ector_siz
   // ==================v===============
   task setup();
     index_t i;
@@ -180,6 +179,51 @@ module range_unit_test;
       end
       $display();
 
+    `SVTEST_END
+
+    `SVTEST(range_map)
+      index_t ub;
+      index_t lb;
+      map_range#(string, uint32_t, uint32_traits) rg;
+      map#(string, uint32_t, uint32_traits) m = new();
+      map_bidir_iterator#(string, uint32_t, uint32_traits) iter = new(m);
+  
+      // populate the map
+      void'(m.insert("a", 100));
+      void'(m.insert("z", 200));
+      void'(m.insert("q", 300));
+      void'(m.insert("c", 400));
+      void'(m.insert("r", 500));
+
+      // generate upper and lower bounds for the range
+      ub = index_t'($urandom()) % m.size();
+      lb = index_t'($urandom()) % ub;
+      $display("map size = %0d, lower bound = %0d, upper bound = %0d",
+	       m.size(), lb, ub);
+
+      rg = new(iter, lb, ub);
+  
+      $write("map:");
+      void'(iter.first());
+      while(!iter.at_end()) begin
+	$write(" %s = %4d", iter.get_index(), iter.get());
+	//$write(" %4d", iter.get());
+        void'(iter.next());
+      end
+      $display();
+
+      // print range in reverse order
+      $display("range: lower bound = %0d  upper bound = %0d",
+	       rg.get_lower_bound(), rg.get_upper_bound());
+      $write("range:");
+      void'(rg.last());
+      `FAIL_UNLESS(rg.is_last());
+      while(!rg.at_beginning()) begin
+	//$write(" %4d", iter.get());
+	$write(" %s = %4d", rg.get_index(), rg.get());
+        void'(rg.prev());
+      end
+      $display();
     `SVTEST_END      
 
   `SVUNIT_TESTS_END
