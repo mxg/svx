@@ -113,32 +113,39 @@ module range_unit_test;
       index_t lb;
       range#(uint32_t, uint32_traits) rg;
       list_bidir_uint32_iterator iter;
+      size_t iter_count;
 
       // Generate randomized upper and lower bounds of the range.
       ub = index_t'($urandom()) % vector_size;
       lb = index_t'($urandom()) % ub;
-      $display("vector size = %0d, lower bound = %0d, upper bound = %0d",
-	       vector_size, lb, ub);
       iter = new(vec);
       rg = new(iter, lb, ub);
   
       // print range -- traverse the range in the forward direction.
+      iter_count = 0;
       $write("range:");
       void'(rg.first());
       while(!rg.at_end()) begin
 	$write(" %4d", rg.get());
+	iter_count++;
         void'(rg.next());
       end
       $display();
 
+      `FAIL_UNLESS(iter_count == rg.size());
+
       // print vector
+      iter_count = 0;
       $write("vector:");
       void'(iter.first());
       while(!iter.at_end()) begin
 	$write(" %4d", iter.get());
+	iter_count++;
         void'(iter.next());
       end
       $display();
+
+      `FAIL_UNLESS(iter_count == iter.size());
 
     `SVTEST_END
 

@@ -458,7 +458,6 @@ module map_iterators_unit_test;
       void'(iter.last());
       while(!iter.at_beginning()) begin
 	symbol s = iter.get();
-	$display("[%0d] symbol = %s", iter_count, s.convert2string());
         void'(iter.prev());
         iter_count++;
       end

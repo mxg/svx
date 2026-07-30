@@ -74,7 +74,7 @@ class range_base#(type T=int, type P=void_traits)
   // size
   //--------------------------------------------------------------------
   virtual function size_t size();
-    return iter.size();
+    return (ub - lb) + 1;
   endfunction
     
   //--------------------------------------------------------------------

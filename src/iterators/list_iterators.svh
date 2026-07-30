@@ -536,7 +536,7 @@ class list_bidir_iterator#(type T=int, type P=void_traits)
 endclass
 
 //----------------------------------------------------------------------
-// Common list iterators
+// Convenience typedefs for common list iterators
 //
 // Forward iterators
 typedef list_fwd_iterator#(int8_t,    int8_traits    ) list_fwd_int8_iterator;

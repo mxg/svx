@@ -101,6 +101,22 @@ class algo#(type T=int, type P=void_traits);
     end
     return iter;
   endfunction
+
+  //--------------------------------------------------------------------
+  // for_each
+  //
+  // Traverse all the items in a bidirectional iterator or a range
+  //--------------------------------------------------------------------
+  static function void for_each(bidir_iterator_base#(T,P) iter, fcn#(T) fn);
+
+    void'(iter.first());
+    while(!iter.at_end()) begin
+      T t = iter.get();
+      fn.f(t);
+      void'(iter.next());
+    end
+    
+  endfunction
   
 endclass
 

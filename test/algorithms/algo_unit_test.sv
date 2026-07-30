@@ -24,6 +24,12 @@ package algo_utils;
       return (t == 0);
     endfunction
   endclass
+
+  class print extends fcn#(uint64_t);
+    function void f(uint64_t t);
+      $write(" %16x", t);
+    endfunction
+  endclass
   
 endpackage
 
@@ -81,6 +87,10 @@ module algo_unit_test;
 
   endtask
 
+  function automatic uint64_t rand64();
+    uint64_t val = (uint64_t'($urandom()) << 32) |  uint64_t'($urandom());
+    return val;
+  endfunction
 
   //===================================
   // All tests are defined between the
@@ -97,6 +107,9 @@ module algo_unit_test;
   //===================================
   `SVUNIT_TESTS_BEGIN
 
+  //--------------------------------------------------------------------
+  // basic_algo
+  //--------------------------------------------------------------------
     `SVTEST(basic_algo)
       list_bidir_uint32_iterator iter;
       uint32_t count;
@@ -137,6 +150,9 @@ module algo_unit_test;
   
     `SVTEST_END
 
+  //--------------------------------------------------------------------
+  // preds
+  //--------------------------------------------------------------------
     `SVTEST(preds)
       uint32_t count;
       bit is_true;
@@ -144,7 +160,8 @@ module algo_unit_test;
 
       // Create a vector from a constant list
       vector#(uint8_t, uint8_traits) v = 
-	 vector#(uint8_t, uint8_traits)::create({8'h1, 8'h2, 8'h3, 8'h4, 8'h5, 8'h6, 8'h7, 8'h8});
+	 vector#(uint8_t, uint8_traits)::create({8'h1, 8'h2, 8'h3, 8'h4, 
+                                                 8'h5, 8'h6, 8'h7, 8'h8});
       list_bidir_uint8_iterator iter = new(v);
 
       // How many elements in the vector are greater than 0?
@@ -162,6 +179,35 @@ module algo_unit_test;
       // Is at least one element in the list greater than 0?
       is_true = algo#(uint8_t, uint8_traits)::any_of(iter, p0);
       `FAIL_UNLESS(is_true == 1);
+
+    `SVTEST_END
+
+  //--------------------------------------------------------------------
+  // for_each
+  //--------------------------------------------------------------------
+    `SVTEST(for_each)
+
+      uint64_vector vec = new();
+      list_bidir_uint64_iterator iter = new(vec);
+      print p = new();
+      size_t vector_size = size_t'($urandom()) % 25;
+	
+      // populate the vector
+      for(index_t idx = 0; idx < vector_size; idx++) begin
+	vec.appendc(rand64());
+      end
+
+  $display("vector size = %0d iter size = %0d", vec.size(), iter.size());
+
+      $write("vector:");
+      algo#(uint64_t, uint64_traits)::for_each(iter, p);
+      $display();
+
+      vec.sort();
+  
+      $write("sorted vector:");
+      algo#(uint64_t, uint64_traits)::for_each(iter, p);
+      $display();
 
     `SVTEST_END
 

@@ -26,10 +26,14 @@
 // permissions and limitations under the License.
 //======================================================================
 
-//----------------------------------------------------------------------
-// algorithms
-//----------------------------------------------------------------------
+virtual class fcn_base;
+endclass
 
-`include "algorithms/predicate.svh"
-`include "algorithms/fcn.svh"
-`include "algorithms/algo.svh"
+//----------------------------------------------------------------------
+// fcn
+//----------------------------------------------------------------------
+virtual class fcn#(type T=int) extends fcn_base;
+
+  pure virtual function void f(T t);
+  
+endclass
