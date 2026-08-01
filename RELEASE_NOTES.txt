@@ -2,6 +2,112 @@
 
 RELEASE NOTES
 
+Version svx-2.0 <beta 0>
+
+August 2026
+
+----------------------------------------------------------------------
+
+* Verilator port
+
+I've ported the SVX library to run under Verilator. The version of
+Verilator used for the port is:
+
+Verilator 5.050 2026-07-01 rev v5.050
+
+Verilator has some idiosyncrasies, quirks, and yes, even bugs that
+made the port challenging, but not impossible.  The result is the
+introduction of some unusual things in the code.  Two kinds of things
+appear often.
+
+First, Verilator is very pedantic about insisting that types match. It
+does not do automatic type coercion. The work around is to use explicit
+type casts to change types.  You'll see lots of things like:
+
+  size_t rand = size_t'($urandom());
+
+Also, Verilator does not let you get away with ignoring the return
+value of a function call.  So there are a lot calls like:
+
+  void'(some_call());
+
+In my opinion, insisting on matching types and sizes is not
+necessarily a bad thing. The compiler makes sure you are doing what
+you think you are doing.  Were the compiler to do automatic type
+coercion it could silently do the wrong thing, introducing a bug that
+is difficult to find.  However, most of the time an automatic
+conversion would be benign, not resulting in the loss of data.
+Assigning a 32-bit value to a 64-bit variable, for example, could
+easily be handled by the compiler.
+
+it's obvious that a call to a function that returns a value and is not
+on the right-hand-side of an assignment means that the intent is to
+ignore the return value.  The compiler could easily detect this
+situation without the void'() construct.
+
+The second thing is that sometimes the compiler has trouble finding
+functions in a base class, particularly in parameterized classes. The
+work-around is to make a call to the super class -- e.g.,
+
+  virtual function f();
+    super.f();
+  endfunction
+
+* Behaviors
+
+The previous release of SVX included classes that implemented various
+behaviors.  The idea was to blur the line between functions and tasks
+so that you don't have to always have to know whether a behavior was
+implented using a function or a time-consuming task.  Also, an attempt
+was made to introduce functor-like classes.  This section of SVX
+has not been ported to run under Verilator.
+
+This code was not ported for two reasons.  The first, is that
+Verilator does not fully support fine-grained process control just
+yet.  The second reason is that I'm not sure how useful the behavior
+features are.  The features need to be re-evaluated.
+
+The code has been left in the library for now, though it has not been
+tested under Verilator.  The SVUnit test suite does not exercise the
+behavioral code.  Also, the clk_gen example has been disabled.
+
+* New Features
+
+-- Ranges
+
+A range is a subset of a container.  An iterator, when bound to a
+container, provides a means to traverse the elements in the container.
+A range allows you to traverse a contiuguous subset of the items in
+the container.
+
+-- Algorithms
+
+Algorithms are functions that operate on elements of a container via
+an iterator. The class algo#() contains a set of static functions:
+
+  all_of()
+  none_of()
+  any_of()
+  find()
+  for_each()
+
+They each take a bidirectional iterator as an argument.  Each function
+traverses the iterator.  The first three (all_of, none_of, and any_of)
+take a predicate as an additional argument.  A pre dicate is a class
+derived from predicate#() and implements the function is_true().
+Find() also takes a prediate argument so it can locate the elements
+ror which the predicate evaluates to true.  For_each() takes a
+function, a class derived from fcn#(), as an additional argument, The
+function is evaluated for each element in the iterator.
+
+* Other Things
+
+  + Use of svx_types is more consistent
+  + The test suite was ported to use SVUnit version 3.38.1
+----------------------------------------------------------------------
+
+RELEASE NOTES
+
 March 12, 2016
 
 Initial release of version svx-1.0 <beta 1>

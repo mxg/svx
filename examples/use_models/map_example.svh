@@ -86,7 +86,7 @@ endclass
 class map_example;
 
   function void run();
-    $display("** Map Example");
+    $display("\n** Map Example");
     basic_example();
     polymorphic_example();
   endfunction

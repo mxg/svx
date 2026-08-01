@@ -38,7 +38,7 @@ import svx::*;
 // include our example code
 `include "list_example.svh"
 `include "map_example.svh"
-
+`include "algo_example.svh"
 
 //----------------------------------------------------------------------
 // use_model_examples
@@ -50,6 +50,7 @@ class use_model_examples;
 
   list_example list_ex;
   map_example map_ex;
+  algo_example algo_ex;
 
   function void run();
     
@@ -58,6 +59,10 @@ class use_model_examples;
 
     map_ex = new();
     map_ex.run();
+
+    algo_ex = new();
+    algo_ex.run();
+    
   endfunction
     
 endclass

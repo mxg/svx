@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +33,6 @@
                +---------------------------------------+
 
                           Author: Mark Glasser
-                       email: mglasser@nvidia.com
 
 The SystemVerilog Extension library is a library of utilities that
 extend the functionality of SystemVerilog.  The utilities include data

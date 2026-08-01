@@ -115,7 +115,7 @@ class algo#(type T=int, type P=void_traits);
       fn.f(t);
       void'(iter.next());
     end
-    
+
   endfunction
   
 endclass

@@ -27,17 +27,32 @@
 //======================================================================
 
 //----------------------------------------------------------------------
-// range
+// range_base
 //----------------------------------------------------------------------
-class range_base#(type T=int, type P=void_traits)
-  implements typed_iterator#(T,P);
-
-  typedef bidir_iterator_base #(T,P) iter_t;
-  
-  protected iter_t iter;
+class range_base;
   protected index_t ub; // upper bound
   protected index_t lb; // lower cound
   protected index_t idx;
+
+  function new(index_t size, index_t lower_bound, index_t upper_bound);
+
+    lb = lower_bound;
+    ub = upper_bound;
+
+    // Make sure upper and lower bounds are within range of the
+    // vector.
+    if(lb >= size)
+      lb = size - 1;
+    if(ub >= size)
+      ub = size - 1;
+    if(lb > ub) begin
+      // swap ub and lb
+      index_t tmp;
+      tmp = lb;
+      ub = lb;
+      lb = tmp;
+    end
+  endfunction
 
   function index_t get_lower_bound();
     return lb;
@@ -46,7 +61,24 @@ class range_base#(type T=int, type P=void_traits)
   function index_t get_upper_bound();
     return ub;
   endfunction
+endclass
 
+//----------------------------------------------------------------------
+// range
+//----------------------------------------------------------------------
+class range#(type T=int, type P=void_traits)
+  extends range_base
+  implements bidir_iterator_base#(T,P);
+
+  typedef bidir_iterator_base #(T,P) iter_t;
+  
+  protected iter_t iter;
+
+  function new(iter_t it, index_t lower_bound, index_t upper_bound);
+    super.new(it.size(), lower_bound, upper_bound);
+    iter = it;
+  endfunction
+  
   //--------------------------------------------------------------------
   // set
   //
@@ -61,7 +93,7 @@ class range_base#(type T=int, type P=void_traits)
   //--------------------------------------------------------------------
   // get
   //
-  // Retrieve the iterm at the current index
+  // Retrieve the item at the current index
   //--------------------------------------------------------------------
   virtual function T get();
     if(is_empty())
@@ -83,56 +115,7 @@ class range_base#(type T=int, type P=void_traits)
   virtual function bit is_empty();
     return iter.is_empty();
   endfunction
-  
-endclass
 
-//----------------------------------------------------------------------
-// range
-//----------------------------------------------------------------------
-class range#(type T=int, type P=void_traits)
-  extends range_base#(T,P)
-  implements bidir_intf;
-
-  function new(iter_t it, index_t lower_bound, index_t upper_bound);
-
-    iter = it;
-    lb = lower_bound;
-    ub = upper_bound;
-
-    // Make sure upper and lower bounds are within range of the
-    // vector.
-    if(lb >= iter.size())
-      lb = iter.size() - 1;
-    if(ub >= iter.size())
-      ub = iter.size() - 1;
-    if(lb > ub) begin
-      // swap ub and lb
-      index_t tmp;
-      tmp = lb;
-      ub = lb;
-      lb = tmp;
-    end
-  endfunction
-
-  // The compiler should find this in the bse class.
-  virtual function void set(T t);
-    super.set(t);
-  endfunction
-  
-  virtual function T get();
-    return super.get();
-  endfunction
-
-  // The Verilator compiler doesn't seem to be able to find the
-  // implementations in the base class, so we give it a hint.
-  virtual function size_t size();
-    return super.size();
-  endfunction
-    
-  virtual function bit is_empty();
-    return super.is_empty();
-  endfunction
-  
   //--------------------------------------------------------------------
   // first
   //--------------------------------------------------------------------

@@ -7,6 +7,8 @@ module testrunner();
   import svunit_uvm_mock_pkg::uvm_report_mock;
 `endif
 
+  import svx::ver;
+
   string name = "testrunner";
   svunit_testrunner svunit_tr;
 
@@ -28,6 +30,8 @@ module testrunner();
   //===================================
   initial
   begin
+
+    ver::print_banner();
 
     `ifdef RUN_SVUNIT_WITH_UVM_REPORT_MOCK
       uvm_report_cb::add(null, uvm_report_mock::reports);

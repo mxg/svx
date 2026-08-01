@@ -32,12 +32,11 @@
 //
 // Demonstrate use models for lists.  We are using the vector
 // container for our lists.
-
 //----------------------------------------------------------------------
 class list_example;
 
   function void run();
-    $display("** List Example");
+    $display("\n** List Example");
     fwd();
   endfunction
 
