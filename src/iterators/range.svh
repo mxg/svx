@@ -29,10 +29,10 @@
 //----------------------------------------------------------------------
 // range_base
 //----------------------------------------------------------------------
-class range_base;
+virtual class range_base;
   protected index_t ub; // upper bound
   protected index_t lb; // lower cound
-  protected index_t idx;
+  protected signed_index_t idx;
 
   function new(index_t size, index_t lower_bound, index_t upper_bound);
 
@@ -113,7 +113,7 @@ class range#(type T=int, type P=void_traits)
   // is_empty
   //--------------------------------------------------------------------
   virtual function bit is_empty();
-    return iter.is_empty();
+    return iter == null || iter.is_empty();
   endfunction
 
   //--------------------------------------------------------------------
@@ -152,9 +152,7 @@ class range#(type T=int, type P=void_traits)
   // at_end
   //--------------------------------------------------------------------
   virtual function bit at_end();
-    if(is_empty())
-      return 1;
-    return (idx > ub);    
+    return(!is_empty() && (idx > ub));
   endfunction
 
   //--------------------------------------------------------------------
@@ -175,7 +173,7 @@ class range#(type T=int, type P=void_traits)
   virtual function bit prev();
     if(is_empty())
       return 0;
-    if(idx >= lb && idx > 0) begin
+    if(idx >= lb && idx >= 0) begin
       idx--;
       return iter.prev();
     end
@@ -193,9 +191,7 @@ class range#(type T=int, type P=void_traits)
   // at_beginning
   //--------------------------------------------------------------------
   virtual function bit at_beginning();
-    if(is_empty())
-      return 1;
-    return (idx <= lb);
+    return(!is_empty() && (idx < signed_index_t'(lb)));
   endfunction 
 
   //--------------------------------------------------------------------

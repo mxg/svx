@@ -178,6 +178,7 @@ module range_unit_test;
       $display("range: lower bound = %0d  upper bound = %0d",
 	       rg.get_lower_bound(), rg.get_upper_bound());
       $write("range:");
+  
       void'(rg.last());
       `FAIL_UNLESS(rg.is_last());
       while(!rg.at_beginning()) begin
@@ -191,6 +192,7 @@ module range_unit_test;
     `SVTEST(range_map)
       index_t ub;
       index_t lb;
+      size_t iter_count;
       map_range#(string, uint32_t, uint32_traits) rg;
       map#(string, uint32_t, uint32_traits) m = new();
       map_bidir_iterator#(string, uint32_t, uint32_traits) iter = new(m);
@@ -223,14 +225,20 @@ module range_unit_test;
       $display("range: lower bound = %0d  upper bound = %0d",
 	       rg.get_lower_bound(), rg.get_upper_bound());
       $write("range:");
+  
       void'(rg.last());
       `FAIL_UNLESS(rg.is_last());
+  
+      iter_count = 0;
       while(!rg.at_beginning()) begin
 	//$write(" %4d", iter.get());
 	$write(" %s = %4d", rg.get_index(), rg.get());
+	iter_count++;
         void'(rg.prev());
       end
-      $display();
+
+  $display("range size = %0d, iter_count = %0d", rg.size(), iter_count);
+      `FAIL_UNLESS(iter_count == rg.size());
     `SVTEST_END      
 
   `SVUNIT_TESTS_END
