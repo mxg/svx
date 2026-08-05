@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,7 +46,7 @@ class tree extends node;
 
   local string full_name;
   local tree parent;
-  local map#(string, tree, void_traits) m_children;
+  local map#(string, tree, class_traits#(tree)) m_children;
 
   //--------------------------------------------------------------------
   // Constructor

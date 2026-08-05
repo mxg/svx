@@ -80,6 +80,10 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
     return size_t'(m_map.num());
   endfunction
 
+  virtual function bit is_empty();
+    return (size == 0);
+  endfunction
+
   //--------------------------------------------------------------------
   // function: delete
   //

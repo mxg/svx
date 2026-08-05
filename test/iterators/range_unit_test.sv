@@ -211,33 +211,37 @@ module range_unit_test;
 	       m.size(), lb, ub);
 
       rg = new(iter, lb, ub);
-  
+
+      // Print the entire map
       $write("map:");
       void'(iter.first());
+
+      `FAIL_UNLESS(iter.is_first());
+
+      iter_count = 0;
       while(!iter.at_end()) begin
-	$write(" %s = %4d", iter.get_index(), iter.get());
-	//$write(" %4d", iter.get());
+	$write(" [%s = %4d]", iter.get_index(), iter.get());
         void'(iter.next());
+	iter_count++;
       end
       $display();
 
+      `FAIL_UNLESS(iter_count == iter.size());
+
       // print range in reverse order
-      $display("range: lower bound = %0d  upper bound = %0d",
-	       rg.get_lower_bound(), rg.get_upper_bound());
       $write("range:");
-  
       void'(rg.last());
+
       `FAIL_UNLESS(rg.is_last());
   
       iter_count = 0;
       while(!rg.at_beginning()) begin
-	//$write(" %4d", iter.get());
-	$write(" %s = %4d", rg.get_index(), rg.get());
+	$write(" [%s = %4d]", rg.get_index(), rg.get());
 	iter_count++;
         void'(rg.prev());
       end
-
-  $display("range size = %0d, iter_count = %0d", rg.size(), iter_count);
+      $display();
+  
       `FAIL_UNLESS(iter_count == rg.size());
     `SVTEST_END      
 

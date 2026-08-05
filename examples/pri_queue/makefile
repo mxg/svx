@@ -11,6 +11,7 @@
 #                  SystemVerilog Extension Library
 #
 #
+# Copyright 2016 NVIDIA Corporation
 # Copyright 2026 Mark Glasser
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,31 +27,9 @@
 # permissions and limitations under the License.
 #=======================================================================
 
-EXAMPLES	:= mem mem_map use_models calc pri_queue
+TOP		= ../..
+TOP_MODULE	= top
 
-MAKE		:= /usr/bin/make -s
+SV_SRC		+= ${wildcard *.sv}
 
-phony: clean build run
-
-all: clean build run
-
-clean:
-	@for f in ${EXAMPLES}; do \
-	  cd $$f; \
-	  ${MAKE} clean; \
-	  cd ..; \
-	done
-
-build:
-	@for f in ${EXAMPLES}; do \
-	  cd $$f; \
-	  ${MAKE} build; \
-	  cd ..; \
-	done
-
-run:
-	@for f in ${EXAMPLES}; do \
-	  cd $$f; \
-	  ${MAKE} run; \
-	  cd ..; \
-	done
+include ${TOP}/make/makefile
