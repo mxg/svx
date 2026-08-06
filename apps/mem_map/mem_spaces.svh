@@ -60,7 +60,6 @@ class mem_field #(uint32_t ADDR_SIZE = 32)
   function bit check_child(mem_space_t child);
     return 0; // fields cannot have children
   endfunction
-  
 
 endclass
 

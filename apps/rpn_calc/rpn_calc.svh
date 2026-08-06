@@ -28,6 +28,15 @@
 
 //---------------------------------------------------------------------
 // RPN CALCULATOR
+//
+// The calculator uses a stack to implement an RPN calculator.
+// Operands are pushed on to the stack and then an operation is
+// applied to one or more operands, depending on the operation.
+//
+// In addition to the stack, the calculator uses triple#() from the
+// SVX library.  A triple (along with pair and quadruple) is a
+// convenient way to bind data items together into a single box for
+// eacy maniuplation.
 //----------------------------------------------------------------------
 typedef triple#(token_t, int32_t, real) item_t;
 

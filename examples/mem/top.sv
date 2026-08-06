@@ -53,23 +53,6 @@ class test;
     m = new();
   endfunction
 
-  function void run2();
-    addr_t base_addr = 'hf300;
-    word_t word = 'h98;
-    word_t data;
-
-    m.write(base_addr, word);
-
-    data = m.read(base_addr);
-
-    $display("word = %x %s data = %x", word, ((word==data)?"==":"!="), data);
-
-    m.show();
-    m.dump();
-    
-  endfunction
-  
-
   function void run();
     typedef bit [(WORD_SIZE*8)-1:0] bytes_t;
     typedef bit[6:0] short_ix_t;
@@ -79,7 +62,6 @@ class test;
     bytes_t array[100];
 
     m.set_word_restriction(base_addr + 'h3f, RESTRICT_WRITE);
-//    m.set_block_restriction(base_addr + 'h0100, RESTRICT_WRITE);
 
     for(i = 0; i < 100; i++) begin
       data = ($urandom() << 32) | $urandom();
