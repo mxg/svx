@@ -54,6 +54,9 @@ virtual class range_base;
     end
   endfunction
 
+  //--------------------------------------------------------------------
+  // accessors
+
   function index_t get_lower_bound();
     return lb;
   endfunction
@@ -74,6 +77,9 @@ class range#(type T=int, type P=void_traits)
   
   protected iter_t iter;
 
+  //--------------------------------------------------------------------
+  // constructor
+  //--------------------------------------------------------------------
   function new(iter_t it, index_t lower_bound, index_t upper_bound);
     super.new(it.size(), lower_bound, upper_bound);
     iter = it;

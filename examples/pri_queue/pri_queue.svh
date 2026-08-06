@@ -28,45 +28,76 @@
 
 //----------------------------------------------------------------------
 // pri_queue
+//
+// The priority queue supports two operations, push and pop.  Push()
+// inserts a new item into the queue.  Pop retrieves the item with
+// the highest priority.
+
+// The underlying structure of the priority queue is a map of queues
+// -- that is, a map whose entries are queues.  The key for the map is
+// the priority.  So, each unique priority value has its own queue of
+// items.  Because each map entry is a queue, the items in each queue
+// -- the items with the same priority -- are stored in the order in
+// which they were inserted.
+//
+// To retrieve the item with the highest priority we rely on the fact
+// that SystemVerilog's associative array is implemented using some
+// sort of tree structure (the exact implementation details are
+// unknown to SystemVerilog programmers). The associative array's
+// last() function retrieves the key with the highest value.  Because
+// the keys in the priority queue represent priorities, the last
+// element is the one with the highest priority.
 //----------------------------------------------------------------------
 class pri_queue #(type T=int, type P=void_traits);
 
+  // The priorty queue is a _compound_ data structure, a map of
+  // queues. Each entry in the map is a queue.
   map#(pri_t, queue#(T, P), class_traits#(queue#(T, P))) qmap;
   map_bidir_iterator#(pri_t, queue#(T,P),
 		      class_traits#(queue#(T,P))) iter;
 
 
   function new();
-    qmap = new();
-    iter = new(qmap);
+    qmap = new();     // create the map
+    iter = new(qmap); // create the iterator and bind it to the map
   endfunction
 
   //--------------------------------------------------------------------
   // is_empty
+  //
+  // Does the queue contain any items?
   //--------------------------------------------------------------------
   function bit is_empty();
     return qmap.is_empty();
   endfunction
   
   //--------------------------------------------------------------------
-  // insert
+  // push
+  //
+  // Put a new item into the queue.  The priority determines where it
+  // is put into the queue
   //--------------------------------------------------------------------
-  function insert(pri_t pri, T item);
+  function push(pri_t pri, T item);
     queue#(T,P) q;
-    
+
+    // If the prioroty queue has no other items that match the
+    // priority of the one we are pusing, then create a new queue for
+    // it and insert it into the map.
     if(qmap.get(pri) == null) begin
       q = new();
       void'(qmap.insert(pri, q));
     end
-      
+    
     q = qmap.get(pri);
     q.put(item);
   endfunction
 
   //--------------------------------------------------------------------
-  // pull
+  // pop
+  //
+  // Pop retrieves the highest priority item from the queue.
   //--------------------------------------------------------------------
-  function T pull();
+  function T pop();
     queue#(T,P) q;
     T item;
     pri_t pri;
@@ -80,7 +111,7 @@ class pri_queue #(type T=int, type P=void_traits);
     pri = iter.get_index();
     q = iter.get();
 
-    item = q.get();
+    item = q.get(); // get() pops the item off the queue
 
     // If there are no more items with the same priority the remove
     // the queue.

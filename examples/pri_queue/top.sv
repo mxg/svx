@@ -26,11 +26,29 @@
 // permissions and limitations under the License.
 //======================================================================
 
+
+//----------------------------------------------------------------------
+// A "job", for the purposes of this example, is a string.  The
+// priority queue sfhedules jobs in priority order.  The push()
+// operation adds a new job to the queue, and the pop() operation
+// removes the job for "execution."
+//
+// The example has two threads, one for inserting jobs into the
+// priority queue (pushing), and another for pulling (popping) jobs
+// from the queue.  The time delay between pushed and the delay
+// between pops is different, demonstrating that the queue will
+// retrieve the highest priority from among the items still in the
+// queue.
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+// top
+//----------------------------------------------------------------------
 module top;
 
   import svx::*;
-  `include "svx_macros.svh"
-    
+`include "svx_macros.svh"
+  
   import pri_queue_pkg::*;
 
   pri_queue#(string, string_traits) q;
@@ -41,12 +59,15 @@ module top;
   initial begin
     queue#(string, string_traits) jobs;
     string job;
-    uint32_t pri;
+    pri_t pri;
 
     jobs = new();
     q = new();
 
-    // pre-load jobs queue with a bunch of jobs
+    // Pre-load jobs into a queue of strings.  These will then be
+    // loaded into the priority queue. Putting the jobs into a
+    // separate queue is for coding convenience and is not strictly
+    // necessary.
     jobs.put("A");
     jobs.put("B");
     jobs.put("C");
@@ -67,9 +88,9 @@ module top;
     // Populate the priority queue with jobs.  The job priorities are
     // randomized.
     while(!jobs.is_empty()) begin
-      pri = $urandom() % 10;
+      pri = $urandom() % 10; // randomize priority
       job = jobs.get();
-      void'(q.insert(pri, job));
+      void'(q.push(pri, job));
       $display("%6t: inserting job %s with pri = %0d", $time, job, pri);
       #2;
     end
@@ -85,7 +106,7 @@ module top;
     forever begin
       wait (!q.is_empty());
       #5;
-      $display("%6t: executing job = %s", $time, q.pull());
+      $display("%6t: executing job %s", $time, q.pop());
     end
   end
 endmodule

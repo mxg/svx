@@ -27,12 +27,12 @@
 //======================================================================
 
 //----------------------------------------------------------------------
-// class: node
+// node
 //
-// A node is a named container.  It inherits from container which
-// provides the notion of a type handle.  The node class further
-// provides a naming service and marking, which can be used for
-// traversals to avoid redundant visits
+// A node is a named container.  It inherits from object which
+// provides some commonly used virtual functions.  The node class
+// further provides a naming service and marking, which can be used
+// for traversals to avoid redundant visits
 //----------------------------------------------------------------------
 class node extends object;
 

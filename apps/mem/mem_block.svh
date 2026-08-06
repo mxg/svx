@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------
 // block
 //
-// A block is a vector of words, a word is one or more bytes.
+// A block is a vector of words; a word is one or more bytes.
 //----------------------------------------------------------------------
 class mem_block#(uint32_t ADDR_BITS = 32,
 		 uint32_t PAGE_BITS = 16,

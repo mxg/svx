@@ -43,44 +43,44 @@ virtual class list_iterator_base#(type T=int, type P=void_traits)
   // number [0, N-1] where N is the number of items in the vector.
   protected signed_index_t idx;
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // constructor
   //
   // If a vector is supplied as an argument then it is bound to the
   // iterator.  If the argument is optional then the iterator remains
   // unbound and bind_list() must be called to bind the iterator to a
   // vector.
+  //--------------------------------------------------------------------
   function new(list_t list = null);
     super.new();
     bind_list(list);
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // bind_list
   //
   // Bind a vector to the iterator.  A vector must be bound in order for
   // the iterator to do anything useful.
+  //--------------------------------------------------------------------
   virtual function void bind_list(list_t list = null);
     m_list = list;
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
+  //--------------------------------------------------------------------
   // set
   //
   // Set the value of the item at the current location of the iterator.
+  //--------------------------------------------------------------------
   virtual function void set(T t);
     if(m_list != null)
       m_list.write(idx, t);
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // get
   //
   // Retrieve the object at the current location of the iterator.
+  //--------------------------------------------------------------------
   virtual function T get();
     if(m_list == null)
       return P::empty;
@@ -88,8 +88,7 @@ virtual class list_iterator_base#(type T=int, type P=void_traits)
       return m_list.read(idx);
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // skip
   //
   // Skip forward or backward.  If distance is positive then the
@@ -97,6 +96,7 @@ virtual class list_iterator_base#(type T=int, type P=void_traits)
   // moves backward.  In no case will the current position of the
   // iterator by moved out of bounds.  That is the current position can
   // never be less than 0 or greater than N-1.
+  //--------------------------------------------------------------------
   virtual function bit skip(signed_index_t distance);
     signed_index_t tmp_idx;
 
@@ -113,23 +113,23 @@ virtual class list_iterator_base#(type T=int, type P=void_traits)
     return 1;
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // size
   //
   // Return the number of elements in the container underlying the
   // iterator..
+  //--------------------------------------------------------------------
   virtual function size_t size();
     return m_list.size();
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // is_empty
   //
   // Answer the question: is the container underlying the iterator
-  // empty.
-  virtual function bit is_empty();
+  // empty. 
+  //--------------------------------------------------------------------
+ virtual function bit is_empty();
     return (m_list == null) || (size() == 0);
   endfunction
 
@@ -144,15 +144,16 @@ class list_fwd_iterator#(type T=int, type P=void_traits)
   extends list_iterator_base#(T,P)
   implements fwd_iterator_base#(T,P);
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // constructor
   //
   // Optionally bind the iterator to a vector.
+  //--------------------------------------------------------------------
   function new(list_t list_inst = null);
     super.new(list_inst);
   endfunction
 
+  //--------------------------------------------------------------------
   // The Verilator compiler doesn't seem to be able to find the
   // implementations in the base class, so we give it a hint.
   virtual function size_t size();
@@ -173,25 +174,25 @@ class list_fwd_iterator#(type T=int, type P=void_traits)
     return super.is_empty();
   endfunction
     
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // first
   //
   // Move the current position of the iterator to the first item in the
   // vector -- i.e. the 0th position.
+  //--------------------------------------------------------------------
   virtual function bit first();
     idx = 0;
     return (m_list != null && m_list.size() > 0);
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // next
   //
   // Advance the current position to the next item, the one whose index
   // is one greater than the current index.  If the next() position is
   // beyond the end of the vector then the iterator is in the at_end()
   // condition.
+  //--------------------------------------------------------------------
   virtual function bit next();
     if((m_list == null) || (m_list.size() == 0) ||
        (idx > 0 && (idx >= m_list.size())))
@@ -200,36 +201,36 @@ class list_fwd_iterator#(type T=int, type P=void_traits)
     return 1;
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // is_last()
   //
   // Answer the question: is the current position the last item in the
   // vector?
+  //--------------------------------------------------------------------
   virtual function bit is_last();
     return ((m_list != null) && (m_list.size() > 0) && (idx >= m_list.size() - 1));
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // at_end
   //
   // Answer the question: is the current position at the end of the
   // list?  Note that is_last() and at_end() are two different
   // conditions. At_end() is the condition where the current postion is
   // past the end of the list and not referring to a valid location.
+  //--------------------------------------------------------------------
   virtual function bit at_end();
     if(m_list == null || m_list.size() == 0)
       return 1;
     return (idx >= m_list.size());
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // skip
   //
   // The Verilator compiler could not find the skip() implementation
   // in the base class, so we gave it a hint.
+  //--------------------------------------------------------------------
   virtual function bit skip(signed_index_t distance);
     return super.skip(distance);
   endfunction
@@ -246,11 +247,11 @@ class list_bkwd_iterator#(type T=int, type P=void_traits)
   extends list_iterator_base#(T,P)
   implements bkwd_iterator_base#(T,P);
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // constructor
   //
   // Optionally bind a vector to the iterator. 
+  //--------------------------------------------------------------------
   function new(list_t list_inst = null);
     super.new(list_inst);
   endfunction
@@ -275,12 +276,12 @@ class list_bkwd_iterator#(type T=int, type P=void_traits)
     return super.is_empty();
   endfunction
     
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // last
   //
   // Most the current position to the last item in the vector -- i.e. to
   // position N-1.
+  //--------------------------------------------------------------------
   virtual function bit last();
     if(m_list == null)
       return 0;
@@ -288,14 +289,14 @@ class list_bkwd_iterator#(type T=int, type P=void_traits)
     return (m_list.size() > 0);
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // prev
   //
   // Move the current postion to the item whose index is one less than
   // the current one.  If the current position becomes negative, that
   // is, goes beyond the beginning of the vector, then the iterator is
   // in the condition at_beginning().
+  //--------------------------------------------------------------------
   virtual function bit prev();
     if(m_list == null || m_list.size() == 0 || idx < 0)
       return 0;
@@ -303,34 +304,34 @@ class list_bkwd_iterator#(type T=int, type P=void_traits)
     return 1;
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // is_first
   //
   // Answer the question: Is the current position the first item in the
   // vector, the 0th position?
+  //--------------------------------------------------------------------
   virtual function bit is_first();
     return ((m_list != null) && ((m_list.size() > 0) && (idx == 0)));
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // at_beginning
   //
   // Answer the question: Is the current position of the iterator beyond
   // the first item.
+  //--------------------------------------------------------------------
   virtual function bit at_beginning();
     if(m_list == null || m_list.size() == 0)
       return 1;
     return (idx < 0);
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // skip
   //
   // The Verilator compiler could not find the skip() implementation
   // in the base class, so we gave it a hint.
+  //--------------------------------------------------------------------
   virtual function bit skip(signed_index_t distance);
     return super.skip(distance);
   endfunction
@@ -348,11 +349,11 @@ class list_random_iterator#(type T=int, type P=void_traits)
 
   local const int default_seed = 1;
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // constructor
   //
   // Optionally bind a vector to the iterator
+  //--------------------------------------------------------------------
   function new(list_t list_inst = null);
     super.new(list_inst);
     set_default_seed();
@@ -378,30 +379,30 @@ class list_random_iterator#(type T=int, type P=void_traits)
     return super.is_empty();
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // set_seed
   //
   // Set a new random seed for the RNG
+  //--------------------------------------------------------------------
   virtual function void set_seed(int seed);
     int	  n = $urandom(seed);
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // set_default_seed
   //
   // set a new default seed for the RNG
+  //--------------------------------------------------------------------
   virtual function void set_default_seed();
     set_seed(default_seed);
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // random
   //
   // Choose a random item in the vector and set the current position to
   // this randomly chosen item.
+  //--------------------------------------------------------------------
   virtual function bit random();
     size_t n;
 
@@ -414,11 +415,11 @@ class list_random_iterator#(type T=int, type P=void_traits)
 
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // skip
   // The Verilator compiler could not find the skip() implementation
   // in the base class, so we gave it a hint.
+  //--------------------------------------------------------------------
   virtual function bit skip(signed_index_t distance);
     return super.skip(distance);
   endfunction
@@ -434,8 +435,9 @@ class list_bidir_iterator#(type T=int, type P=void_traits)
   extends list_iterator_base#(T,P)
   implements bidir_iterator_base#(T,P);
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // constrtuctor
+  //--------------------------------------------------------------------
   function new(list_t list_inst = null);
     super.new(list_inst);
   endfunction
@@ -460,15 +462,17 @@ class list_bidir_iterator#(type T=int, type P=void_traits)
     return super.is_empty();
   endfunction
     
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // is_first
+  //--------------------------------------------------------------------
   virtual function bit first();
     idx = 0;
     return (m_list != null && m_list.size() > 0);
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // next
+  //--------------------------------------------------------------------
   virtual function bit next();
     if((m_list == null) || (m_list.size() == 0) ||
        (idx > 0 && (idx >= m_list.size())))
@@ -477,22 +481,25 @@ class list_bidir_iterator#(type T=int, type P=void_traits)
     return 1;
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // is_last
+  //--------------------------------------------------------------------
   virtual function bit is_last();
     return ((m_list != null) && (m_list.size() > 0) && (idx >= m_list.size() - 1));
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // at_end
+  //--------------------------------------------------------------------
   virtual function bit at_end();
     if(m_list == null || m_list.size() == 0)
       return 1;
     return (idx >= m_list.size());    
   endfunction
   
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // last
+  //--------------------------------------------------------------------
   virtual function bit last();
     if(m_list == null)
       return 0;
@@ -500,8 +507,9 @@ class list_bidir_iterator#(type T=int, type P=void_traits)
     return (m_list.size() > 0);
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // prev
+  //--------------------------------------------------------------------
   virtual function bit prev();
     if(m_list == null || m_list.size() == 0 || idx < 0)
       return 0;
@@ -509,26 +517,28 @@ class list_bidir_iterator#(type T=int, type P=void_traits)
     return 1;
   endfunction
   
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // is_first
+  //--------------------------------------------------------------------
   virtual function bit is_first();
     return ((m_list != null) && ((m_list.size() > 0) && (idx == 0)));
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // at_beginning
+  //--------------------------------------------------------------------
   virtual function bit at_beginning();
     if(m_list == null || m_list.size() == 0)
       return 1;
     return (idx < 0);
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // skip
   //
   // The Verilator compiler could not find the skip() implementation
   // in the base class, so we gave it a hint.
+  //--------------------------------------------------------------------
   virtual function bit skip(signed_index_t distance);
     return super.skip(distance);
   endfunction
@@ -570,7 +580,6 @@ typedef list_bkwd_iterator#(string,    string_traits ) list_bkwd_string_iterator
 //
 // Bidirectional iterators
 //
-
 typedef list_bidir_iterator#(int8_t,    int8_traits   ) list_bidir_int8_iterator;
 typedef list_bidir_iterator#(uint8_t,   uint8_traits  ) list_bidir_uint8_iterator;
 typedef list_bidir_iterator#(int16_t,   int16_traits  ) list_bidir_int16_iterator;

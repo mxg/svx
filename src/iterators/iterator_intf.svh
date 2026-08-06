@@ -107,7 +107,7 @@ interface class fwd_intf extends iterator_intf_base;
 endclass
 
 //----------------------------------------------------------------------
-// class: bkwd_intf
+// bkwd_intf
 //----------------------------------------------------------------------
 interface class bkwd_intf extends iterator_intf_base;
 
@@ -138,14 +138,14 @@ interface class bkwd_intf extends iterator_intf_base;
 endclass
 
 //----------------------------------------------------------------------
-// class: bidir_intf
+// bidir_intf
 //----------------------------------------------------------------------
 interface class bidir_intf extends fwd_intf, bkwd_intf;
   pure virtual function bit prev();
 endclass
 
 //----------------------------------------------------------------------
-// class: random_intf
+// random_intf
 //----------------------------------------------------------------------
 interface class random_intf extends iterator_intf_base;
 

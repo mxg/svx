@@ -49,66 +49,68 @@ virtual class map_iterator_base#(type KEY=int,
   typedef enum {INVALID, FIRST, VALID, LAST} state_t;
   protected state_t state;
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // constructor
   //
   // Optionally, bind a map to the iterator
+  //--------------------------------------------------------------------
   function new(map_t map_inst = null);
     super.new();
     bind_map(map_inst);
     state = INVALID;
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // bind_map
   //
   // Bind a map to the iterator
+  //--------------------------------------------------------------------
    virtual function void bind_map(map_t m = null);
      m_map = m;
    endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // set
   //
   // Set the value of the item at the current position
+  //--------------------------------------------------------------------
   virtual function void set(T t);
     if(m_map == null)
       return;
     void'(m_map.insert(index, t));
   endfunction
   
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // get
   //
   // Retrieve the item at the current position
+  //--------------------------------------------------------------------
   virtual function T get();
     if(m_map == null)
       return m_empty;
     return m_map.get(index);
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // get_index
   //
   // Reteive the index (key) associated with the item at the current
   // position.
+  //--------------------------------------------------------------------
   virtual function KEY get_index();
     return index;
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // size
+  //--------------------------------------------------------------------
   virtual function size_t size();
     return (m_map == null) ? 0 : m_map.size();
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // is_empty
+  //--------------------------------------------------------------------
   virtual function bit is_empty();
     return (m_map == null) || (size() == 0);
   endfunction
@@ -124,9 +126,11 @@ class map_fwd_iterator#(type KEY=int, type T=int, type P=void_traits)
   extends map_iterator_base#(KEY,T,P)
   implements fwd_iterator_base#(T,P);
 
+  //--------------------------------------------------------------------
   // constructor
   //
   // Optionally, bind a map to the iterator.
+  //--------------------------------------------------------------------
   function new(map_t map_inst = null);
     super.new(map_inst);
   endfunction
@@ -137,17 +141,20 @@ class map_fwd_iterator#(type KEY=int, type T=int, type P=void_traits)
     super.set(t);
   endfunction
 
+  //--------------------------------------------------------------------
+  // get
+  //--------------------------------------------------------------------
   virtual function T get();
     return super.get();
   endfunction  
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // first
   //
-  // Move the current position to the first item in the map.  The item
+  // move the current position to the first item in the map.  the item
   // that is chosen as the first one is based on the underlying
   // associative array.
+  //--------------------------------------------------------------------
   virtual function bit first();
     state = FIRST;
     if(is_empty())
@@ -155,13 +162,13 @@ class map_fwd_iterator#(type KEY=int, type T=int, type P=void_traits)
     return m_map.first(index);
   endfunction
   
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // next
   //
   // Move the current position to the next item item in the map.  The
   // item defined as the next one is based on the underlying associative
   // array.
+  //--------------------------------------------------------------------
   virtual function bit next();
 
     // check for error conditions
@@ -179,12 +186,12 @@ class map_fwd_iterator#(type KEY=int, type T=int, type P=void_traits)
     return 1;
 
   endfunction
-    
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+  //--------------------------------------------------------------------
   // is_last
   //
   // Answer the question: Is the current item the last one in the map?
+  //--------------------------------------------------------------------
   virtual function bit is_last();
 
     KEY last_key;
@@ -200,24 +207,24 @@ class map_fwd_iterator#(type KEY=int, type T=int, type P=void_traits)
 
   endfunction
     
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // at_end
   //
   // Answer the question: Are we at the end of the map -- past the lsat
   // item?
+  //--------------------------------------------------------------------
   virtual function bit at_end();
     return ((m_map != null) &&
 	    ((size() == 0) || ((size() > 0) && (state == LAST))));
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // skip
   //
   // Skip forward the number of places specified by distance.  Since
   // this is a forward iterator we can only skip in the forward
   // direction.
+  //--------------------------------------------------------------------
   virtual function bit skip(signed_index_t distance);
     index_t ix;
     bit ok;
@@ -236,6 +243,7 @@ class map_fwd_iterator#(type KEY=int, type T=int, type P=void_traits)
     
   endfunction
 
+  //--------------------------------------------------------------------
   // The Verilator compiler doesn't seem to be able to find the
   // implementations in the base class, so we give it a hint.
   virtual function size_t size();
@@ -274,11 +282,11 @@ class map_bkwd_iterator#(type KEY=int, type T=int, type P=void_traits)
     return super.get();
   endfunction  
  
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // last
   //
   // Move the current position to the last item in the map
+  //--------------------------------------------------------------------
   virtual function bit last();
 
     // check for error conditions
@@ -290,11 +298,11 @@ class map_bkwd_iterator#(type KEY=int, type T=int, type P=void_traits)
     
   endfunction
     
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // prev
   //
   // Move the current position to the previous item in the map[
+  //--------------------------------------------------------------------
   virtual function bit prev();
 
     // check for error conditions
@@ -314,12 +322,12 @@ class map_bkwd_iterator#(type KEY=int, type T=int, type P=void_traits)
 
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // is_first()
   //
   // Answer the question: Is the current position pointing to the first
   // item in the map?
+  //--------------------------------------------------------------------
   virtual function bit is_first();
 
     KEY k;
@@ -337,24 +345,24 @@ class map_bkwd_iterator#(type KEY=int, type T=int, type P=void_traits)
 
   endfunction
     
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // at_beginning
   //
   // Answer the question: Is the current position at the beginning of
   // the map -- before the first item?
+  //--------------------------------------------------------------------
   virtual function bit at_beginning();
     return ((m_map != null) &&
 	    ((size() == 0) || ((size() > 0) && (state == FIRST))));
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // skip
   //
   // Move the current position one or more places.  Since this is a
   // backward iterator we can only move backward -- that is, distance
   // can only be negative.
+  //--------------------------------------------------------------------
   virtual function bit skip(signed_index_t distance);
     index_t ix;
     bit ok;
@@ -372,6 +380,7 @@ class map_bkwd_iterator#(type KEY=int, type T=int, type P=void_traits)
     
   endfunction
     
+  //--------------------------------------------------------------------
   // The Verilator compiler doesn't seem to be able to find the
   // implementations in the base class, so we give it a hint.
   virtual function size_t size();
@@ -402,16 +411,17 @@ class map_random_iterator#(type KEY=int, type T=int, type P=void_traits)
 
   local const int default_seed = 1;
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // constructor
   //
   // Optionally, bind a map to the iterator.
+  //--------------------------------------------------------------------
   function new(map_t map_inst = null);
     super.new(map_inst);
     set_default_seed();
   endfunction
 
+  //--------------------------------------------------------------------
   // Sometimes Verilator cannot find things in a base class.  We
   // provide a hint for set() and get().
   virtual function void set(T t);
@@ -422,27 +432,29 @@ class map_random_iterator#(type KEY=int, type T=int, type P=void_traits)
     return super.get();
   endfunction  
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // set_seed
   //
   // Set the seed for the RNG
+  //--------------------------------------------------------------------
   virtual function void set_seed(int seed);
     int n = $urandom(seed);
   endfunction
 
+  //--------------------------------------------------------------------
   // set_default_seed
   //
   // Set the seed back to the default for the RNG.
+  //--------------------------------------------------------------------
   virtual function void set_default_seed();
     set_seed(default_seed);
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
   // random
   //
   // Choose a random entry from the map.
+  //--------------------------------------------------------------------
   virtual function bit random();
     index_t n;
     KEY ix;
@@ -460,10 +472,9 @@ class map_random_iterator#(type KEY=int, type T=int, type P=void_traits)
 
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-  // The compiler should find this in the base class.  
+  //--------------------------------------------------------------------
+  // skip
+  //--------------------------------------------------------------------
   virtual function bit skip(signed_index_t distance);
     return super.skip(distance);
   endfunction
@@ -512,8 +523,9 @@ class map_bidir_iterator#(type KEY=int, type T=int, type P=void_traits)
     return super.get_index();
   endfunction
   
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // first
+  //--------------------------------------------------------------------
   virtual function bit first();
     if(is_empty())
       return 0;
@@ -521,8 +533,9 @@ class map_bidir_iterator#(type KEY=int, type T=int, type P=void_traits)
     return m_map.first(index);
   endfunction
   
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // next
+  //--------------------------------------------------------------------
   virtual function bit next();
     if(is_empty() || (state == INVALID) || (state == LAST))
       return 0;
@@ -538,8 +551,9 @@ class map_bidir_iterator#(type KEY=int, type T=int, type P=void_traits)
 
   endfunction
     
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // is_last
+  //--------------------------------------------------------------------
   virtual function bit is_last();
 
     KEY last_key;
@@ -552,15 +566,17 @@ class map_bidir_iterator#(type KEY=int, type T=int, type P=void_traits)
 
   endfunction
     
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // at_end
+  //--------------------------------------------------------------------
   virtual function bit at_end();
     return ((m_map != null) &&
 	    ((size() == 0) || ((size() > 0) && (state == LAST))));
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // last
+  //--------------------------------------------------------------------
   virtual function bit last();
     if(is_empty())
       return 0;
@@ -568,8 +584,9 @@ class map_bidir_iterator#(type KEY=int, type T=int, type P=void_traits)
     return m_map.last(index);
   endfunction
     
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // prev
+  //--------------------------------------------------------------------
   virtual function bit prev();
     if(is_empty() ||
        (state == FIRST) || (state == INVALID))
@@ -586,8 +603,9 @@ class map_bidir_iterator#(type KEY=int, type T=int, type P=void_traits)
 
   endfunction
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // is_first
+  //--------------------------------------------------------------------
   virtual function bit is_first();
 
     KEY k;
@@ -604,8 +622,9 @@ class map_bidir_iterator#(type KEY=int, type T=int, type P=void_traits)
 
   endfunction
     
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  //--------------------------------------------------------------------
+  // at_beginning
+  //--------------------------------------------------------------------
   virtual function bit at_beginning();
     return ((m_map != null) &&
 	    ((size() == 0) || ((size() > 0) && (state == FIRST))));
@@ -636,6 +655,7 @@ class map_bidir_iterator#(type KEY=int, type T=int, type P=void_traits)
     
   endfunction
 
+  //--------------------------------------------------------------------
   // The Verilator compiler doesn't seem to be able to find the
   // implementations in the base class, so we give it a hint.
   virtual function size_t size();

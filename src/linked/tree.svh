@@ -40,7 +40,7 @@
 
 
 //----------------------------------------------------------------------
-// class: tree
+// tree
 //----------------------------------------------------------------------
 class tree extends node;
 
@@ -49,7 +49,7 @@ class tree extends node;
   local map#(string, tree, class_traits#(tree)) m_children;
 
   //--------------------------------------------------------------------
-  // Constructor
+  // constructor
   //
   // Create a new tree node with a name.  Construct the full path name
   // to this node and store it in m_full_name.  The constructor inserts
@@ -76,12 +76,8 @@ class tree extends node;
     m_children = new();
   endfunction
 
-  // function: insert
-  //
-  // insert a new node into the tree.
-
   //--------------------------------------------------------------------
-  // function: insert
+  // insert
   //
   // insert a new node into the tree as a child of the current node.
   // The name must be unique amongst all its siblings.
@@ -99,53 +95,68 @@ class tree extends node;
     
   endfunction
 
-  //--------------------------------------------------------------------
-  // group: Accessors
-  //--------------------------------------------------------------------
+  //====================================================================
+  //
+  // Accessors
+  //
+  //====================================================================
 
+  //--------------------------------------------------------------------
+  // get_parent
+  //
   // return a handle to this node's parent
-
+  //--------------------------------------------------------------------
   function tree get_parent();
     return parent;
   endfunction
 
+  //--------------------------------------------------------------------
+  // get_full_name
+  //
   // Return the fully qualified hierarchical name
-  
+  //--------------------------------------------------------------------
   function string get_full_name();
     return full_name;
   endfunction
 
-  // function: first_child
+  // first_child
   //
   // Obtain the index (name) of the first child in the set of children
   // for this tree node.  If there are no children then the return value
   // is zero.
- 
+  //--------------------------------------------------------------------
   function bit first_child(ref string nm);
     if(m_children == null)
       return 0;
     return m_children.first(nm);
   endfunction
 
-  // function: next_child
+  //--------------------------------------------------------------------
+  // next_child
   //
   // Obtain the index (name) of the next child in the set of children
   // for this tree node.  If there is no next child return 0;
-
+  //--------------------------------------------------------------------
   function bit next_child(ref string nm);
     if(m_children == null)
       return 0;
     return m_children.next(nm);
   endfunction
 
+  //--------------------------------------------------------------------
+  // num_children
+  //
   // Return the number of children of the current node.
-
+  //--------------------------------------------------------------------
   function size_t num_children();
     if(m_children == null)
       return 0;
     return size_t'(m_children.size());
   endfunction
 
+  //--------------------------------------------------------------------
+  // size
+  //--------------------------------------------------------------------
   function size_t size();
     deque#(tree, class_traits#(tree)) deq;
     deq = get_children();
@@ -156,7 +167,7 @@ class tree extends node;
   endfunction
 
   //--------------------------------------------------------------------
-  // function: get_children
+  // get_children
   //
   // Return the set of children owned by this node.  In order to avoid
   // any tampering with the m_children list, m_children is local and
@@ -167,7 +178,6 @@ class tree extends node;
   // the function call return.  If there are no children the deque
   // structure is not created and null is returned.
   // --------------------------------------------------------------------
-
   function deque#(tree, class_traits#(tree)) get_children();
 
     deque#(tree, class_traits#(tree)) deq;
@@ -189,12 +199,11 @@ class tree extends node;
   endfunction
 
   //--------------------------------------------------------------------
-  // function: child
+  // get_child
   //
   // Given the name of a child, return the handle to the child node.  If
   // the child doesn't exist for this node then return null.
   //--------------------------------------------------------------------
-
   function tree get_child(string nm);
     return m_children.get(nm);
   endfunction
@@ -205,8 +214,9 @@ class tree extends node;
   //
   //======================================================================
 
-
   //----------------------------------------------------------------------
+  // find
+  //
   // Find a node by its path name.  The path name is parsed into an
   // ordered set of name elements and each element is put into a
   // queue. The queue is passed to the find_recurse routine which gets
@@ -244,6 +254,9 @@ class tree extends node;
 
   endfunction
 
+  //--------------------------------------------------------------------
+  // find_recurse
+  //--------------------------------------------------------------------
   local function tree find_recurse(tree t, ref queue#(string, string_traits) q);
 
     string id;
@@ -263,15 +276,18 @@ class tree extends node;
   endfunction
   
   //====================================================================
-  // group: Marking
+  // Marking
   //
   // Various algorithms may need to mark and unmark nodes in the tree.
   // Here is a function interface that supports that.
   //====================================================================
 
+  //--------------------------------------------------------------------
+  // mark_all
+  //
   // Mark all the nodes in the tree.  Traverse the tree and call mark()
   // on every node
-
+  //--------------------------------------------------------------------
   function void mark_all();
 
     string nm;
@@ -290,9 +306,12 @@ class tree extends node;
 
   endfunction
 
+  //--------------------------------------------------------------------
+  // unmark_all
+  //
   // Unmark all the nodes in the tree.  Traverse the tree and call
   // unmark() on every node.
-
+  //--------------------------------------------------------------------
   function void unmark_all();
 
     string nm;
