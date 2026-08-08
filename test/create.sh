@@ -36,10 +36,18 @@
 # test suites into a single testrunner.
 #######################################################################
 
+# create types test suite
+echo
+echo "*** Create types test suite"
+create_testsuite.pl -add types/type_handle_unit_test.sv               \
+		    -add types/typeid_unit_test.sv                    \
+		    -out types/types_testsuite.sv                     \
+                    -overwrite
+
 # create containers test suite
+echo
 echo "*** Create containers test suite"
 create_testsuite.pl -add containers/container_unit_test.sv            \
-                    -add containers/type_handle_unit_test.sv          \
                     -add containers/vector_unit_test.sv               \
                     -add containers/map_unit_test.sv                  \
                     -add containers/queue_unit_test.sv                \
@@ -47,7 +55,7 @@ create_testsuite.pl -add containers/container_unit_test.sv            \
                     -add containers/stack_unit_test.sv                \
                     -add containers/sorter_unit_test.sv               \
                     -out containers/containers_testsuite.sv           \
-                    -overwrite
+                   -overwrite
 
 # create iterators test suite
 echo
@@ -104,7 +112,8 @@ create_testsuite.pl -add apps/mem_unit_test.sv                        \
 # create testrunner
 echo
 echo "*** Create top-level test runner"
-create_testrunner.pl -add containers/containers_testsuite.sv          \
+create_testrunner.pl -add types/types_testsuite.sv                    \
+                     -add containers/containers_testsuite.sv          \
                      -add iterators/iterators_testsuite.sv            \
 		     -add algorithms/algorithms_testsuite.sv          \
                      -add linked/linked_testsuite.sv                  \

@@ -138,13 +138,16 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
   // memory space object or an entire (sub)tree.
   //--------------------------------------------------------------------
   function void insert_space(mem_space_t space);
-    void'(check_child(space));
-    insert(space);
+    if(check_child(space))
+      insert(space);
+    else
+      $display("*** error: Invalid child type %s for parent %s", 
+	       space.get_type_name(), get_full_name());
   endfunction
   
 
   static local function uint32_t compute_addr_print_len();
-    return (ADDR_SIZE / 4) + (ADDR_SIZE % 4);
+  return (ADDR_SIZE + 3) / 4;
   endfunction
 
   static local function uint32_t compute_size_print_len();
@@ -413,29 +416,25 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
   //--------------------------------------------------------------------
   function bit overlaps(mem_space_t space, mem_space_t sibling);
 
-    addr_t start_addr;
-    addr_t end_addr;
-    addr_t sibling_start_addr;
-    addr_t sibling_end_addr;
-
     if(sibling == null)
       return 0;
 
-    start_addr = space.get_addr();
-    end_addr = space.get_end_addr();
-    sibling_start_addr = sibling.get_addr();
-    sibling_end_addr = sibling.get_end_addr();
-
-    if(sibling_start_addr > end_addr || start_addr > sibling_end_addr)
+    if(sibling.get_addr() > space.get_end_addr()) 
       return 0;
-    
-    if(sibling_start_addr < start_addr && sibling_end_addr >= start_addr)
+    if(space.get_addr() > sibling.get_end_addr())
+      return 0;
+
+    if(sibling.get_addr() < space.get_addr() && 
+       sibling.get_end_addr() >= space.get_addr())
       return 1;
-    if(sibling_start_addr >= start_addr && sibling_end_addr <= end_addr)
+    if(sibling.get_addr() >= space.get_addr() && 
+       sibling.get_end_addr() <= space.get_end_addr())
       return 1;
-    if(sibling_start_addr <= end_addr && sibling_end_addr >= end_addr)
+    if(sibling.get_addr() <= space.get_end_addr() && 
+       sibling.get_end_addr() >= space.get_end_addr())
       return 1;
-    if(sibling_start_addr <= start_addr && sibling_end_addr >= end_addr)
+    if(sibling.get_addr() <= space.get_addr() && 
+       sibling.get_end_addr() >= space.get_end_addr())
       return 1;
 
     return 0;  // we should never get here
@@ -488,8 +487,7 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
     bit is_in_space = 0;
 
     // Is the search address within range of this memory space?
-    is_in_space = (search_addr >= get_addr() &&
-		   search_addr < (get_addr() + (addr_t'(get_size()) - addr_t'(1))));
+    is_in_space = (search_addr >= get_addr() && search_addr <= get_end_addr());
 
     if(!is_in_space) begin
       // search address is not in the space, no further searching is
@@ -499,7 +497,7 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
 
     if(all) begin
       list.push_back(this);
-      if(num_children == 0)
+      if(num_children() == 0)
 	return;
     end
     else
@@ -528,15 +526,19 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
 
   function void dump();
     
-    tree t;
     tree_fwd_iterator iter = new(this);
 
     $display("--- Memory Map Dump for: %s ---", get_full_name());
     
     void'(iter.first());
     while(!iter.at_end()) begin
-      t = iter.get();
-      $display("%s", t.to_str());
+      mem_space ms;
+      tree t = iter.get();
+      if(!$cast(ms, t)) begin
+	$display("*** error Attempt to dump a tree that is not a memory space");
+	return;
+      end
+      $display("%s", ms.to_str());
       void'(iter.next());
     end
 

@@ -29,7 +29,7 @@
 
 /* verilator lint_off DECLFILENAME */
 
-`include "svx_types.svh"
+`include "types/svx_types.svh"
 
 package test_utils;
 

@@ -7,8 +7,6 @@ module testrunner();
   import svunit_uvm_mock_pkg::uvm_report_mock;
 `endif
 
-  import svx::ver;
-
   string name = "testrunner";
   svunit_testrunner svunit_tr;
 
@@ -23,6 +21,7 @@ module testrunner();
   iterators_testsuite iterators_ts();
   lexer_testsuite lexer_ts();
   linked_testsuite linked_ts();
+  types_testsuite types_ts();
 
 
   //===================================
@@ -30,8 +29,6 @@ module testrunner();
   //===================================
   initial
   begin
-
-    ver::print_banner();
 
     `ifdef RUN_SVUNIT_WITH_UVM_REPORT_MOCK
       uvm_report_cb::add(null, uvm_report_mock::reports);
@@ -65,6 +62,8 @@ module testrunner();
     svunit_tr.add_testsuite(lexer_ts.svunit_ts);
     linked_ts.build();
     svunit_tr.add_testsuite(linked_ts.svunit_ts);
+    types_ts.build();
+    svunit_tr.add_testsuite(types_ts.svunit_ts);
   endfunction
 
 
@@ -78,6 +77,7 @@ module testrunner();
     iterators_ts.run();
     lexer_ts.run();
     linked_ts.run();
+    types_ts.run();
     svunit_tr.report();
   endtask
 

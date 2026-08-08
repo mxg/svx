@@ -11,7 +11,6 @@
 //                  SystemVerilog Extension Library
 //
 //
-// Copyright 2016 NVIDIA Corporation
 // Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,47 +27,10 @@
 //======================================================================
 
 //----------------------------------------------------------------------
-//
-//    S y s t e m V e r i l o g   E x t e n s i o n   L i b r a r y
-//
+// Types
 //----------------------------------------------------------------------
 
-`include "svx_macros.svh"
-
-//----------------------------------------------------------------------
-// ctypes
-//----------------------------------------------------------------------
-`include "lexer/ctypes.svh"
-
-//----------------------------------------------------------------------
-// svx package
-//----------------------------------------------------------------------
-package svx;
-
-  `include "types/types.svh"
-  `include "version/version.svh"
-  `include "containers/containers.svh"
-  `include "iterators/iterators.svh"
-  `include "algorithms/algorithms.svh"
-  `include "lexer/lexer.svh"
-  `include "linked/linked.svh"
-  `include "behaviors/behaviors.svh"
-
-endpackage
-
-
-//----------------------------------------------------------------------
-// svx_anchor
-//
-// A top-level module we can use to anchor things that need to be in a
-// module.
-//----------------------------------------------------------------------
-module svx_anchor;
-  
-  import svx::*;
-  
-  initial begin
-    void'(ver::print_banner());
-  end
-
-endmodule
+`include "types/svx_types.svh"
+`include "types/type_handle.svh"
+`include "types/typeid.svh"
+`include "types/type_match.svh"

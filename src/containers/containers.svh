@@ -32,7 +32,6 @@
 
 // base objects
 `include "containers/object.svh"
-`include "containers/type_handle.svh"
 `include "containers/sorter.svh"
 `include "containers/traits.svh"
 `include "containers/container.svh"

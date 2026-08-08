@@ -27,48 +27,33 @@
 // permissions and limitations under the License.
 //======================================================================
 
+
 //----------------------------------------------------------------------
+// type_match
 //
-//    S y s t e m V e r i l o g   E x t e n s i o n   L i b r a r y
-//
+// Do two types match?  This is useful for deetermining if a type
+// parameter is correct in a pasrameterized class.
 //----------------------------------------------------------------------
+class type_match #(type T1=int, type T2=int);
 
-`include "svx_macros.svh"
+  static function bit is_match();
+    return test_match();
+  endfunction
 
-//----------------------------------------------------------------------
-// ctypes
-//----------------------------------------------------------------------
-`include "lexer/ctypes.svh"
+  static function bit is_match_fail();
+    if(!test_match())
+      begin
+	$display("*** Error: Types %s and %s do not match", 
+		 $typename(T1), $typename(T2));
+	$finish;
+      end
+    return 1;
+  endfunction      
 
-//----------------------------------------------------------------------
-// svx package
-//----------------------------------------------------------------------
-package svx;
-
-  `include "types/types.svh"
-  `include "version/version.svh"
-  `include "containers/containers.svh"
-  `include "iterators/iterators.svh"
-  `include "algorithms/algorithms.svh"
-  `include "lexer/lexer.svh"
-  `include "linked/linked.svh"
-  `include "behaviors/behaviors.svh"
-
-endpackage
-
-
-//----------------------------------------------------------------------
-// svx_anchor
-//
-// A top-level module we can use to anchor things that need to be in a
-// module.
-//----------------------------------------------------------------------
-module svx_anchor;
+  local static function bit test_match();
+    type_handle_base th1 = type_handle#(T1)::get_type();
+    type_handle_base th2 = type_handle#(T2)::get_type();
+    return (th1 == th2);
+  endfunction
   
-  import svx::*;
-  
-  initial begin
-    void'(ver::print_banner());
-  end
-
-endmodule
+endclass
