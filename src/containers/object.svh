@@ -49,7 +49,7 @@ class object extends void_t;
     return 0;
   endfunction
 
-  function void copy(object rhs);
+  virtual function void copy(object rhs);
   endfunction
 
 endclass

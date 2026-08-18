@@ -118,8 +118,8 @@ class lexer_core;
     // A double quote indicates the beginning of a string.  Gobble up
     // all characters until then next double quote
     if(c == "\"") begin
-      for(c = getc(); c != "\""; c = getc());
-      return TOKEN_STRING;
+      for(c = getc(); c != "\"" && c != 0; c = getc());
+      return (c == 0) ? TOKEN_ERROR : TOKEN_STRING;
     end
 
     // Single quoted string
@@ -368,7 +368,7 @@ class lexer_core;
           // emulate here) allows for a number of things preceeding a
           // string of digits.  This includes a letter indicating the
           // radix of the constant and a size (in bits) of the constant.
-          // At the ned of the constant could be a units indicator which
+          // At the end of the constant could be a units indicator which
           // is used in time constants.
           begin
             case(c)  
@@ -506,6 +506,7 @@ class lexer_core;
               default:
                 begin
                   if(!`isdigit(c)) begin
+                    if(c != 0) putc();
                     return TOKEN_FLOAT;
                   end
                 end

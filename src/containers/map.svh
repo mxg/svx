@@ -144,7 +144,7 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   //--------------------------------------------------------------------
   // function: clone
   //
-  // Clone the map.  The implementaiton is based on copy()
+  // Clone the map.  The implementation is based on copy()
   //--------------------------------------------------------------------
   function this_t clone();
     this_t m = new();
@@ -156,7 +156,7 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   // function: compare
   //
   // Compare two maps.  Maps are either equal or not.  The notion of one
-  // map being less than or greater than onother is undefined.  This
+  // map being less than or greater than another is undefined.  This
   // function will return 1 if the two are not equal, or zero if they
   // are.  It will never return a value less than zero.
   // --------------------------------------------------------------------
@@ -253,7 +253,7 @@ class singleton_map  #(type KEY=int, type T=void_t, type P=void_traits)
 
   protected function new();
     // You can't call new() directly for this class!  You can only
-    // obtain handles to the class object thrpugh the get_inst()
+    // obtain handles to the class object through the get_inst()
     // function
   endfunction
   

@@ -33,16 +33,16 @@
 // Standardized types
 //----------------------------------------------------------------------
 
-typedef bit [127:0]          int128_t;
-typedef bit unsigned [127:0] uint128_t;
-typedef longint              int64_t;
-typedef longint unsigned     uint64_t;
-typedef int                  int32_t;
-typedef int unsigned         uint32_t;
-typedef shortint             int16_t;
-typedef shortint unsigned    uint16_t;
 typedef byte                 int8_t;
 typedef byte unsigned        uint8_t;
+typedef shortint             int16_t;
+typedef shortint unsigned    uint16_t;
+typedef int                  int32_t;
+typedef int unsigned         uint32_t;
+typedef longint              int64_t;
+typedef longint unsigned     uint64_t;
+typedef bit [127:0]          int128_t;
+typedef bit unsigned [127:0] uint128_t;
 
 // represents sizes of various things
 typedef uint64_t size_t;

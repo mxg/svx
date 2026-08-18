@@ -30,12 +30,12 @@
 //----------------------------------------------------------------------
 // class: vector
 //
-// Vector class.  The uderlying structure is based on the built-in queue.
-// Provides an interface for funciton mapping and for combining vectors in
-// addition to the usual funcitons provided by the queue structure.
+// Vector class.  The underlying structure is based on the built-in queue.
+// Provides an interface for function mapping and for combining vectors in
+// addition to the usual functions provided by the queue structure.
 //
 // Space for the elements in the vector do not have to be
-// pre-allocated. The vector will allocate space when writting a new
+// pre-allocated. The vector will allocate space when writing a new
 // element above the current high water mark.  This becomes the new high
 // water mark.  When you write a new element above the current high water
 // mark a new, larger vector is allocated and a shallow copy is done to

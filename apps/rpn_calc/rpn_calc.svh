@@ -59,7 +59,7 @@ class calc;
     case(t.first())
       TOKEN_INT:   $display("%0d", t.second());
       TOKEN_FLOAT: $display("%g",  t.third());
-      default:     $display("invlaid token");
+      default:     $display("invalid token");
     endcase
   endfunction  
 
@@ -118,7 +118,7 @@ class calc;
 	    if(!get_two_operands(a, b)) // error?
 	      return 0;
 	    c = new(TOKEN_INT, 0, 0.0);
-	    if(a.first == TOKEN_INT) begin
+	    if(a.first() == TOKEN_INT) begin
 	      // integer arithmetic
 	      c.set_first(TOKEN_INT);
 	      c.set_second(a.second() + b.second());
@@ -131,13 +131,13 @@ class calc;
 	    stk.push(c);
 	  end	
 
-	// subraction
+	// subtraction
 	TOKEN_MINUS:
 	  begin
 	    if(!get_two_operands(a, b)) // error?
 	      return 0;
 	    c = new(TOKEN_INT, 0, 0.0);
-	    if(a.first == TOKEN_INT) begin
+	    if(a.first() == TOKEN_INT) begin
 	      // integer arithmetic
 	      c.set_first(TOKEN_INT);
 	      c.set_second(b.second() - a.second());
@@ -156,7 +156,7 @@ class calc;
 	    if(!get_two_operands(a, b)) // error?
 	      return 0;
 	    c = new(TOKEN_INT, 0, 0.0);
-	    if(a.first == TOKEN_INT) begin
+	    if(a.first() == TOKEN_INT) begin
 	      // integer arithmetic
 	      c.set_first(TOKEN_INT);
 	      c.set_second(a.second() * b.second());
@@ -175,15 +175,21 @@ class calc;
 	    if(!get_two_operands(a, b)) // error?
 	      return 0;
 	    c = new(TOKEN_INT, 0, 0.0);
-	    if(a.first == TOKEN_INT) begin
+	    if(a.first() == TOKEN_INT) begin
 	      // integer arithmetic
 	      c.set_first(TOKEN_INT);
-	      c.set_second(b.second() / a.second());
+	      if(a.second() != 0)
+		c.set_second(b.second() / a.second());
+	      else
+		c.set_second(~0);
 	    end
 	    else begin
-	      // realing point arithmetic
-	      c.set_first(TOKEN_FLOAT);
-	      c.set_third(b.third() / a.third());
+	      // floating point arithmetic
+		c.set_first(TOKEN_FLOAT);
+	      if(a.third() > 1.0e-99)
+		c.set_third(b.third() / a.third());
+	      else
+		c.set_third(9.999999e99);
 	    end
 	    stk.push(c);
 	  end
@@ -233,7 +239,7 @@ class calc;
     // reals.
     
     if(op_a.first() == TOKEN_INT) begin
-      if(op_b.first == TOKEN_INT)
+      if(op_b.first() == TOKEN_INT)
 	return 1;
       if(op_b.first() == TOKEN_FLOAT) begin
 	// convert ob_a to real

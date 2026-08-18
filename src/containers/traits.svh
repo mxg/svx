@@ -140,218 +140,25 @@ class base_int_traits #(type T=int) extends void_t;
 
 endclass
 
-//----------------------------------------------------------------------
-// byte_traits
-//----------------------------------------------------------------------
-class byte_traits extends base_int_traits#(byte);
-endclass
+typedef  base_int_traits#(byte)              byte_traits;
+typedef  base_int_traits#(byte unsigned)     byte_unsigned_traits;
+typedef  base_int_traits#(shortint)          shortint_traits;
+typedef  base_int_traits#(shortint unsigned) shortint_unsigned_traits;
+typedef  base_int_traits#(int)               int_traits;
+typedef  base_int_traits#(int unsigned)      int_unsigned_traits;
+typedef  base_int_traits#(longint)           longint_traits;
+typedef  base_int_traits#(longint unsigned)  longint_unsigned_traits;
 
-//----------------------------------------------------------------------
-// byte_unsigned_traits
-//----------------------------------------------------------------------
-class byte_unsigned_traits extends base_int_traits#(byte unsigned);
-endclass
-
-//----------------------------------------------------------------------
-// int8_traits
-//----------------------------------------------------------------------
-class int8_traits extends base_int_traits#(int8_t);
-  typedef int8_t empty_t;
-  localparam empty_t empty = 0;
-
-  static function bit equal(int8_t a, int8_t b);
-    return (a == b);
-  endfunction
-
-  static function int32_t compare(int8_t a, int8_t b);
-    if(a > b)
-      return 1;
-    else
-      if(a < b)
-        return -1;
-      else
-        return 0;
-  endfunction
-
-  static function void sort(ref int8_t vec[$]);
-    vec.sort();
-  endfunction
-endclass
-
-//----------------------------------------------------------------------
-// uint8_traits
-//----------------------------------------------------------------------
-class uint8_traits;
-  typedef uint8_t empty_t;
-  localparam empty_t empty = 0;
-
-  static function bit equal(uint8_t a, uint8_t b);
-    return (a == b);
-  endfunction
-
-  static function int32_t compare(uint8_t a, uint8_t b);
-    if(a > b)
-      return 1;
-    else
-      if(a < b)
-        return -1;
-      else
-        return 0;
-  endfunction
-
-  static function void sort(ref uint8_t vec[$]);
-    vec.sort();
-  endfunction
-endclass
-
-//----------------------------------------------------------------------
-// int16_traits
-//----------------------------------------------------------------------
-class int16_traits extends base_int_traits#(int16_t);
-  typedef int16_t empty_t;
-  localparam empty_t empty = 0;
-
-  static function bit equal(int16_t a, int16_t b);
-    return (a == b);
-  endfunction
-
-  static function int32_t compare(int16_t a, int16_t b);
-    if(a > b)
-      return 1;
-    else
-      if(a < b)
-        return -1;
-      else
-        return 0;
-  endfunction
-
-  static function void sort(ref int16_t vec[$]);
-    vec.sort();
-  endfunction
-endclass
-
-//----------------------------------------------------------------------
-// uint16_traits
-//----------------------------------------------------------------------
-class uint16_traits;
-  typedef uint16_t empty_t;
-  localparam empty_t empty = 0;
-
-  static function bit equal(uint16_t a, uint16_t b);
-    return (a == b);
-  endfunction
-
-  static function int32_t compare(uint16_t a, uint16_t b);
-    if(a > b)
-      return 1;
-    else
-      if(a < b)
-        return -1;
-      else
-        return 0;
-  endfunction
-
-  static function void sort(ref uint16_t vec[$]);
-    vec.sort();
-  endfunction
-endclass
-
-//----------------------------------------------------------------------
-// int32_traits
-//----------------------------------------------------------------------
-class int32_traits extends base_int_traits#(int32_t);
-  typedef int32_t empty_t;
-  localparam empty_t empty = 0;
-
-  static function bit equal(int32_t a, int32_t b);
-    return (a == b);
-  endfunction
-
-  static function int32_t compare(int32_t a, int32_t b);
-    if(a > b)
-      return 1;
-    else
-      if(a < b)
-        return -1;
-      else
-        return 0;
-  endfunction
-
-  static function void sort(ref int32_t vec[$]);
-    vec.sort();
-  endfunction
-endclass
-
-//----------------------------------------------------------------------
-// uint32_traits
-//----------------------------------------------------------------------
-class uint32_traits;
-  typedef uint32_t empty_t;
-  localparam empty_t empty = 0;
-
-  static function bit equal(uint32_t a, uint32_t b);
-    return (a == b);
-  endfunction
-
-  static function int32_t compare(uint32_t a, uint32_t b);
-    if(a > b)
-      return 1;
-    else
-      if(a < b)
-        return -1;
-      else
-        return 0;
-  endfunction
-
-  static function void sort(ref uint32_t vec[$]);
-    vec.sort();
-  endfunction
-endclass
-
-//----------------------------------------------------------------------
-// int64_traits
-//----------------------------------------------------------------------
-class int64_traits extends base_int_traits#(int64_t);
-endclass
-
-//----------------------------------------------------------------------
-// uint64_t_traits
-//----------------------------------------------------------------------
-class uint64_traits extends base_int_traits#(uint64_t);
-  typedef uint64_t empty_t;
-  localparam empty_t empty = 0;
-
-  static function bit equal(uint64_t a, uint64_t b);
-    return (a == b);
-  endfunction
-
-  static function int32_t compare(uint64_t a, uint64_t b);
-    if(a > b)
-      return 1;
-    else
-      if(a < b)
-        return -1;
-      else
-        return 0;
-  endfunction
-
-  static function void sort(ref uint64_t vec[$]);
-    vec.sort();
-  endfunction
-endclass
-
-//----------------------------------------------------------------------
-// uint128_traits
-//----------------------------------------------------------------------
-class uint128_traits extends base_int_traits#(uint128_t);
-endclass
-
-
-//----------------------------------------------------------------------
-// int128_traits
-//----------------------------------------------------------------------
-class int128_traits extends base_int_traits#(int128_t);
-endclass
+typedef  base_int_traits#(int8_t)            int8_traits;
+typedef  base_int_traits#(uint8_t)           uint8_traits;
+typedef  base_int_traits#(int16_t)           int16_traits;
+typedef  base_int_traits#(uint16_t)          uint16_traits;
+typedef  base_int_traits#(int32_t)           int32_traits;
+typedef  base_int_traits#(uint32_t)          uint32_traits;
+typedef  base_int_traits#(int64_t)           int64_traits;
+typedef  base_int_traits#(uint64_t)          uint64_traits;
+typedef  base_int_traits#(int128_t)          int128_traits;
+typedef  base_int_traits#(uint128_t)         uint128_traits;
 
 //----------------------------------------------------------------------
 // bit_vector_traits
@@ -403,7 +210,13 @@ class string_traits extends void_t;
   endfunction
 
   static function int32_t compare(string a, string b);
-    return int'(!equal(a,b));
+    if(a > b)
+      return 1;
+    else
+      if(a < b)
+        return -1;
+      else
+        return 0;
   endfunction
 
   static function void sort(ref string vec[$]);

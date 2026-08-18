@@ -115,10 +115,10 @@ module vector_unit_test;
   //--------------------------------------------------------------------
   // fill_vector
   //
-  // fill up the vector with a fixed number of items with known values.
-  // Ensure that the vector is filled correct and each item is at the
-  // right index.  Tests the read() and write() methods.  Also tests
-  // array extension -- the extend() method.
+  // Populate the vector with a fixed number of items with known
+  // values.  Ensure that the vector is filled correctly and each item
+  // is at the right index.  Tests the read() and write() methods.
+  // Also tests array extension -- the extend() method.
   //--------------------------------------------------------------------
     `SVTEST(fill_vector)
       begin
@@ -164,19 +164,6 @@ module vector_unit_test;
 	`FAIL_IF(vi.equal(cloned_vector))
       end
 
-    `SVTEST_END
-
-  //--------------------------------------------------------------------
-  // clear
-  //
-  // test the clear() method by calling it and confirming that all of
-  // the items have been cleared
-  //--------------------------------------------------------------------
-    `SVTEST(clear)
-      begin
-        vi.clear();
-        `FAIL_IF(vi.size() != 0)
-      end
     `SVTEST_END
 
   //--------------------------------------------------------------------
@@ -259,7 +246,7 @@ module vector_unit_test;
         // Append B to A
         v_a.append(v_b);
 
-        // Now, let's see of the combined vector is correct.
+        // Now, let's see if the combined vector is correct.
         `FAIL_IF(v_a.size() != (VECTOR_SIZE + OTHER_SIZE))
 
         for(i = 0; i < (VECTOR_SIZE + OTHER_SIZE); i++) begin
@@ -308,6 +295,61 @@ module vector_unit_test;
       end
     `SVTEST_END
 
+  //--------------------------------------------------------------------
+  // sort
+  //
+  // Make sure the sort function works correctly
+  //--------------------------------------------------------------------
+    `SVTEST(sort)
+      begin
+	uint32_t a;
+	uint32_t b;
+
+	vi.sort();
+	`FAIL_UNLESS(vi.size() == VECTOR_SIZE);
+
+	for(index_t ix = 0; ix < (VECTOR_SIZE-1); ix++) begin
+	  a = vi.read(ix);
+	  b = vi.read(ix+1);
+	end
+      end
+    `SVTEST_END
+
+  //--------------------------------------------------------------------
+  // out_of_bounds
+  //
+  // Ensure that reading and writing outside the bounds of a vector
+  // does the right thing.
+  //--------------------------------------------------------------------
+    `SVTEST(out_of_bounds)
+      begin
+        // Reading outside the bounds of the vector should return the
+        // empty element.xs
+	index_t ix = VECTOR_SIZE + 5;
+	uint32_t a = vi.read(ix);
+	`FAIL_UNLESS(a == int32_traits::empty);
+
+        // Writing outside the bounds of the vector should extend its
+        // size.
+	a = $urandom() % 100;
+	vi.write(ix, a);
+	`FAIL_UNLESS(vi.size() == (VECTOR_SIZE + 5 + 1));
+      end
+    `SVTEST_END
+
+  //--------------------------------------------------------------------
+  // clear
+  //
+  // test the clear() method by calling it and confirming that all of
+  // the items have been cleared
+  //--------------------------------------------------------------------
+    `SVTEST(clear)
+      begin
+        vi.clear();
+        `FAIL_IF(vi.size() != 0)
+      end
+    `SVTEST_END
+      
   `SVUNIT_TESTS_END
 
 endmodule

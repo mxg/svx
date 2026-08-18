@@ -82,7 +82,7 @@ class queue #(type T=int, type P=void_traits) extends vector#(T,P);
   //--------------------------------------------------------------------
   // function: clone
   //
-  // Clone a stack
+  // Clone a queue
   //--------------------------------------------------------------------
   function this_t clone();
     this_t q = new();

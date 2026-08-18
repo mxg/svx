@@ -83,7 +83,7 @@ endclass
 //----------------------------------------------------------------------
 // quadruple
 //----------------------------------------------------------------------
-class quadruple#(type T1=int, type T2=int, type T3=int, T4=int)
+class quadruple#(type T1=int, type T2=int, type T3=int, type T4=int)
   extends triple#(T1,T2,T3);
 
   T4 t4;

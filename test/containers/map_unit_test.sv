@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -94,22 +95,26 @@ module map_unit_test;
   //--------------------------------------------------------------------
   // string_map
   //
-  // Ensure basic functinality of a map that maps strings to integers.
-  // Insert some randomly generated keys into the map and see that they
-  // are all there.
+  // Ensure basic functionality of a map that maps strings to
+  // integers.  Insert some randomly generated keys into the map and
+  // see that they are all there.
   //--------------------------------------------------------------------
 
     `SVTEST(string_map_test)
       string s;
-      index_t i;
+      bit ok;
 
       m = new();
 
       // Load up the map
-      for(i = 0; i < MAP_SIZE; i++) begin
+      for(index_t ix = 0; ix < index_t'(MAP_SIZE); ++ix) begin
         s = rs.rand_string();
-        void'(m.insert(s, int32_t'(i)));
-        array[s] = int32_t'(i);
+        ok = m.insert(s, int32_t'(ix));
+	if(!ok) begin
+	  $display("duplicate key: %s", s);
+	  `FAIL_IF(!ok);
+	end
+        array[s] = int32_t'(ix);
       end 
 
       `FAIL_IF(m.size() != MAP_SIZE)
@@ -191,6 +196,14 @@ module map_unit_test;
       `FAIL_IF(m.equal(cloned_map))
 
     `SVTEST_END
+
+  //--------------------------------------------------------------------
+  // empty_test
+  //--------------------------------------------------------------------
+    `SVTEST(empty_test)
+      int32_t a = m.get("xxxxxx");
+      `FAIL_UNLESS(a == int32_traits::empty)
+    `SVTEST_END
       
   //--------------------------------------------------------------------
   // delete
@@ -219,6 +232,14 @@ module map_unit_test;
       // Let's make sure it's really gone
       `FAIL_IF(m.exists(s))
       `FAIL_IF(m.size() != (MAP_SIZE - 1))
+    `SVTEST_END
+
+  //--------------------------------------------------------------------
+  // clear
+  //--------------------------------------------------------------------
+    `SVTEST(clear)
+      m.clear();
+      `FAIL_UNLESS(m.size() == 0);
     `SVTEST_END
 
   `SVUNIT_TESTS_END

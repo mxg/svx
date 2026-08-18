@@ -46,10 +46,11 @@ class rand_string;
     uint32_t i;
     uint32_t n;
 
+    // Strings must be at least 2 characters long.
     if(maxlen < 2)
-      n = 1;
+      n = 2;
     else
-      n = ($urandom % (maxlen - 1)) + 1;
+      n = $urandom_range(2, maxlen);
 
     for(i = 0; i < n; i++) begin
       assert(bit'(randomize()));

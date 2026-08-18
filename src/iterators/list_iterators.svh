@@ -409,7 +409,7 @@ class list_random_iterator#(type T=int, type P=void_traits)
     if((m_list == null) || (m_list.size() == 0))
       return 0;
 
-    n = size_t'($urandom()) % m_list.size();
+    n = size_t'($urandom_range(0, uint32_t'(m_list.size() - 1)));
     idx = n;
     return 1;
 
