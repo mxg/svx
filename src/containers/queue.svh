@@ -221,14 +221,3 @@ class fixed_size_queue #(type T=int, type P=void_traits)
   endfunction
 
 endclass
-
-//----------------------------------------------------------------------
-// Common queue types
-typedef queue#(int32_t,   int32_traits  ) int32_queue;
-typedef queue#(uint32_t,  uint32_traits ) uint32_queue;
-typedef queue#(int64_t,   int64_traits  ) int64_queue;
-typedef queue#(uint64_t,  uint64_traits ) uint64_queue;
-typedef queue#(int128_t,  int128_traits ) int128_queue;
-typedef queue#(uint128_t, uint128_traits) uint128_queue;
-typedef queue#(real,      real_traits   ) real_queue;
-typedef queue#(string,    string_traits ) string_queue;

@@ -249,18 +249,3 @@ class vector #(type T=int, type P=void_traits)
   endfunction
 
 endclass
-
-//----------------------------------------------------------------------
-// Common vector types
-typedef vector#(int8_t,    int8_traits   ) int8_vector;
-typedef vector#(uint8_t,   uint8_traits  ) uint8_vector;
-typedef vector#(int16_t,   int16_traits  ) int16_vector;
-typedef vector#(uint16_t,  uint16_traits ) uint16_vector;
-typedef vector#(int32_t,   int32_traits  ) int32_vector;
-typedef vector#(uint32_t,  uint32_traits ) uint32_vector;
-typedef vector#(int64_t,   int64_traits  ) int64_vector;
-typedef vector#(uint64_t,  uint64_traits ) uint64_vector;
-typedef vector#(int128_t,  int128_traits ) int128_vector;
-typedef vector#(uint128_t, uint128_traits) uint128_vector;
-typedef vector#(real,      real_traits   ) real_vector;
-typedef vector#(string,    string_traits ) string_vector;

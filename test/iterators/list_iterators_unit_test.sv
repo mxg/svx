@@ -45,7 +45,7 @@ module list_iterators_unit_test;
   // This is the UUT that we're 
   // running the Unit Tests on
   //===================================
-  int32_vector vec;
+  vector_int32 vec;
   uint32_t vector_size;
 
   //===================================

@@ -222,8 +222,8 @@ module vector_unit_test;
     `SVTEST(append)
       begin
         index_t i;
-        uint32_vector v_a = new();
-        uint32_vector v_b = new();
+        vector_uint32 v_a = new();
+        vector_uint32 v_b = new();
         uint32_t value;
         uint32_t array[VECTOR_SIZE + OTHER_SIZE];
         v_a.extend(VECTOR_SIZE);
@@ -266,7 +266,7 @@ module vector_unit_test;
     `SVTEST(appendc)
       begin
         index_t i;
-        uint32_vector v_a = new();
+        vector_uint32 v_a = new();
         uint32_t value;
         uint32_t array[VECTOR_SIZE + OTHER_SIZE];
         v_a.extend(VECTOR_SIZE);

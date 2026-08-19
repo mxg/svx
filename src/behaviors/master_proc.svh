@@ -61,7 +61,7 @@ class master_control;
   map#(process_base, pid_t, int32_traits) active_processes;
 
   // Deque of available PIDs.
-  uint32_deque available;
+  deque_uint32 available;
 
   // initialize a new master control context
   function new();

@@ -44,7 +44,7 @@ module stack_unit_test;
   // This is the UUT that we're 
   // running the Unit Tests on
   //===================================
-  int32_stack stk;
+  stack_int32 stk;
 
 
   //===================================

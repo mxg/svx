@@ -91,13 +91,3 @@ class deque #(type T=int, type P=void_traits) extends vector#(T,P);
 
 endclass
 
-//----------------------------------------------------------------------
-// Common deque types
-typedef deque#(int32_t,   int32_traits  ) int32_deque;
-typedef deque#(uint32_t,  uint32_traits ) uint32_deque;
-typedef deque#(int64_t,   int64_traits  ) int64_deque;
-typedef deque#(uint64_t,  uint64_traits ) uint64_deque;
-typedef deque#(int128_t,  int128_traits ) int128_deque;
-typedef deque#(uint128_t, uint128_traits) uint128_deque;
-typedef deque#(real,      real_traits   ) real_deque;
-typedef deque#(string,    string_traits ) string_deque;

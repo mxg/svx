@@ -144,7 +144,7 @@ module queue_unit_test;
       begin
 
         const string str = "abcdef";
-        string_queue q = new();
+        queue_string q = new();
 
         // The queue is empty, so a peek should return the empty item
         `FAIL_IF(q.peek() != string_traits::empty)
@@ -178,8 +178,27 @@ module queue_unit_test;
 	`FAIL_IF(!my_queue.equal(cloned_queue))
       end
 
-    `SVTEST_END      
+    `SVTEST_END
 
+  //--------------------------------------------------------------------
+  // clear
+  //--------------------------------------------------------------------
+    `SVTEST(clear)
+      int32_t a;
+
+      // put some things in the queue
+      for(index_t ix = 0; ix < 4; ix++) begin
+	my_queue.put($urandom());
+      end
+  
+      `FAIL_UNLESS(my_queue.size() > 0);
+      my_queue.clear();
+      `FAIL_UNLESS(my_queue.size() == 0);
+
+      a = my_queue.get();
+      `FAIL_UNLESS(a == int32_traits::empty);
+    `SVTEST_END
+  
   `SVUNIT_TESTS_END
 
 endmodule
@@ -284,7 +303,6 @@ module fixed_size_queue_unit_test;
 
     `SVTEST_END
 
-
   //--------------------------------------------------------------------
   // clone
   //--------------------------------------------------------------------
@@ -297,6 +315,21 @@ module fixed_size_queue_unit_test;
       `FAIL_IF(!cloned_queue.equal(fq))
     `SVTEST_END
 
+  //--------------------------------------------------------------------
+  // clear
+  //--------------------------------------------------------------------
+    `SVTEST(clear)
+      int32_t a;
+  
+      `FAIL_UNLESS(fq.size() > 0);
+      fq.clear();
+      `FAIL_UNLESS(fq.size() == 0);
+
+      a = fq.get();
+      `FAIL_UNLESS(a == int32_traits::empty);
+  
+    `SVTEST_END
+  
   `SVUNIT_TESTS_END
 
 endmodule

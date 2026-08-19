@@ -49,7 +49,7 @@ module algo_unit_test;
   // This is the UUT that we're 
   // running the Unit Tests on
   //===================================
-  uint32_vector vec;
+  vector_uint32 vec;
   index_t vector_size;
 
   //===================================
@@ -126,26 +126,21 @@ module algo_unit_test;
       $write("vector: [%0d] ", vector_size);
       void'(iter.first());
       while(!iter.at_end()) begin
-	$write(" %4d", iter.get());
 	if(iter.get() < 100)
 	  actual_count++;
         void'(iter.next());
       end
-      $display();
 
       p = new();
       count = algo#(uint32_t, uint32_traits)::count(iter, p);
-      $display("count predicate = %0d", count);
       `FAIL_IF(count != actual_count)
 
       p_true = new();
       count = algo#(uint32_t, uint32_traits)::count(iter, p_true);
-      $display("count true = %0d", count);
       `FAIL_IF(count != uint32_t'(vector_size))
 
       p_false = new();
       count = algo#(uint32_t, uint32_traits)::count(iter, p_false);
-      $display("count false = %0d", count);
       `FAIL_IF(count != 0)
   
     `SVTEST_END
@@ -187,7 +182,7 @@ module algo_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(for_each)
 
-      uint64_vector vec = new();
+      vector_uint64 vec = new();
       list_bidir_uint64_iterator iter = new(vec);
       print p = new();
       size_t vector_size = size_t'($urandom()) % 25;
@@ -197,18 +192,17 @@ module algo_unit_test;
 	vec.appendc(rand64());
       end
 
-  $display("vector size = %0d iter size = %0d", vec.size(), iter.size());
-
+      // Use for_each to print the vector
       $write("vector:");
       algo#(uint64_t, uint64_traits)::for_each(iter, p);
       $display();
 
       vec.sort();
-  
-      $write("sorted vector:");
-      algo#(uint64_t, uint64_traits)::for_each(iter, p);
-      $display();
 
+      // Make sure the vector is indeed sorted
+      for(index_t ix = 0; ix < vec.size() - 1; ix++) begin
+	`FAIL_UNLESS(vec.read(ix) <= vec.read(ix+1));
+      end
     `SVTEST_END
 
   `SVUNIT_TESTS_END

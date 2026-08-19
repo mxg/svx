@@ -46,7 +46,7 @@ module range_unit_test;
   // This is the UUT that we're 
   // running the Unit Tests on
   //===================================
-  uint32_vector vec;
+  vector_uint32 vec;
   index_t vector_size;
   list_bidir_uint32_iterator iter;
 

@@ -47,7 +47,7 @@ class list_example;
     uint32_t n;
     
     // A vector of integers
-    uint32_vector v;
+    vector_uint32 v;
     
     // An iterator for our list of integers.  Note that the parameters
     // for the iterator are the same as for the vector.

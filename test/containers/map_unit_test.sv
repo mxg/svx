@@ -215,7 +215,7 @@ module map_unit_test;
       string t;
 
      // The map should have all entries in it.
-      `FAIL_IF(m.size() != MAP_SIZE)
+      `FAIL_IF(m.size() != MAP_SIZE);
 
       // Randomly choose an item that is in the map
       n = index_t'($urandom()) % MAP_SIZE;
@@ -227,12 +227,28 @@ module map_unit_test;
         i++;
       end
 
-      `FAIL_IF(!m.exists(s))
+      `FAIL_IF(!m.exists(s));
       void'(m.delete(s));
       // Let's make sure it's really gone
-      `FAIL_IF(m.exists(s))
-      `FAIL_IF(m.size() != (MAP_SIZE - 1))
+      `FAIL_IF(m.exists(s));
+      `FAIL_IF(m.size() != (MAP_SIZE - 1));
     `SVTEST_END
+
+  //--------------------------------------------------------------------
+  // duplicate_key
+  //--------------------------------------------------------------------
+    `SVTEST(duplicate_key)
+      bit ok;
+      int32_t a;
+  
+      ok = m.insert("abcd", 42);
+      // The second insertion replaces the value of the first.
+      ok = m.insert("abcd", 111);
+      `FAIL_IF(ok != 0);
+  
+      a = m.get("abcd");
+      `FAIL_UNLESS(a == 111);
+    `SVTEST_END  
 
   //--------------------------------------------------------------------
   // clear

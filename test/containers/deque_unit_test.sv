@@ -44,7 +44,7 @@ module deque_unit_test;
   // This is the UUT that we're 
   // running the Unit Tests on
   //===================================
-  int32_deque my_deque;
+  deque_int32 my_deque;
 
 
   //===================================

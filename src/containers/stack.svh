@@ -75,14 +75,3 @@ class stack #(type T=int, type P=void_traits) extends vector#(T,P);
   endfunction
 
 endclass
-
-//----------------------------------------------------------------------
-// Common stack types
-typedef stack#(int32_t,   int32_traits  ) int32_stack;
-typedef stack#(uint32_t,  uint32_traits ) uint32_stack;
-typedef stack#(int64_t,   int64_traits  ) int64_stack;
-typedef stack#(uint64_t,  uint64_traits ) uint64_stack;
-typedef stack#(int128_t,  int128_traits ) int128_stack;
-typedef stack#(uint128_t, uint128_traits) uint128_stack;
-typedef stack#(real,      real_traits   ) real_stack;
-typedef stack#(string,    string_traits ) string_stack;

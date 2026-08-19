@@ -52,7 +52,9 @@ package svx;
   `include "algorithms/algorithms.svh"
   `include "lexer/lexer.svh"
   `include "linked/linked.svh"
+  `include "convenience_typedefs.svh"
   `include "behaviors/behaviors.svh"
+
 
 endpackage
 
