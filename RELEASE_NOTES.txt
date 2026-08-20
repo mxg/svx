@@ -2,6 +2,24 @@
 
 RELEASE NOTES
 
+Version svx-2.0 <beta 1>
+
+August 2026
+
+----------------------------------------------------------------------
+
+* Added some new SVUnit tests
+
+* Names for convenience typedefs for containers and iterators are now
+  more consistent.
+
+* Added accum#() class which provides an algorithm that enables
+  accumulation across iterations.
+
+----------------------------------------------------------------------
+
+RELEASE NOTES
+
 Version svx-2.0 <beta 0>
 
 August 2026
@@ -58,7 +76,7 @@ work-around is to make a call to the super class -- e.g.,
 The previous release of SVX included classes that implemented various
 behaviors.  The idea was to blur the line between functions and tasks
 so that you don't have to always have to know whether a behavior was
-implented using a function or a time-consuming task.  Also, an attempt
+implemented using a function or a time-consuming task.  Also, an attempt
 was made to introduce functor-like classes.  This section of SVX
 has not been ported to run under Verilator.
 
@@ -77,7 +95,7 @@ behavioral code.  Also, the clk_gen example has been disabled.
 
 A range is a subset of a container.  An iterator, when bound to a
 container, provides a means to traverse the elements in the container.
-A range allows you to traverse a contiuguous subset of the items in
+A range allows you to traverse a contiguous subset of the items in
 the container.
 
 -- Algorithms
@@ -93,10 +111,10 @@ an iterator. The class algo#() contains a set of static functions:
 
 They each take a bidirectional iterator as an argument.  Each function
 traverses the iterator.  The first three (all_of, none_of, and any_of)
-take a predicate as an additional argument.  A pre dicate is a class
+take a predicate as an additional argument.  A predicate is a class
 derived from predicate#() and implements the function is_true().
-Find() also takes a prediate argument so it can locate the elements
-ror which the predicate evaluates to true.  For_each() takes a
+Find() also takes a predicate argument so it can locate the elements
+for which the predicate evaluates to true.  For_each() takes a
 function, a class derived from fcn#(), as an additional argument, The
 function is evaluated for each element in the iterator.
 

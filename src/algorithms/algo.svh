@@ -117,6 +117,6 @@ class algo#(type T=int, type P=void_traits);
     end
 
   endfunction
-  
+
 endclass
 

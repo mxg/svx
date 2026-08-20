@@ -11,7 +11,7 @@
 //                  SystemVerilog Extension Library
 //
 //
-// Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,23 +26,21 @@
 // permissions and limitations under the License.
 //======================================================================
 
-//----------------------------------------------------------------------
-// Version Macros
-//----------------------------------------------------------------------
+class accum#(type T=int, type P=void_traits, type A=int);
 
-`define STRINGIFY(x) `"x`"
+  static function void accumulate(bidir_iterator_base#(T,P) iter, 
+				  accum_fcn#(T,A) fn, ref A acc);
 
-`ifdef VERILATOR
-  `define SVX_SIM Verilator
-`else
-  `define SVX_SIM ""
-`endif
+    void'(iter.first());
+    while(!iter.at_end()) begin
+      T t = iter.get();
+      fn.f(t, acc);;
+      void'(iter.next());
+    end
 
-`define SVX_PREFIX svx
-`define SVX_MAJOR_VERSION 2
-`define SVX_MINOR_VERSION 0
-`define SVX_FIX_VERSION   1
-`define SVX_RELEASE_MODE  beta
+  endfunction
 
+endclass
 
-`define SVX_VERSION `STRINGIFY(`SVX_PREFIX``-```SVX_MAJOR_VERSION``.```SVX_MINOR_VERSION <`SVX_RELEASE_MODE `SVX_FIX_VERSION> -- `SVX_SIM)
+      
+

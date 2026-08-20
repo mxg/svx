@@ -10,6 +10,7 @@ module algorithms_testsuite;
   // want included in this testsuite
   //===================================
   algo_unit_test algo_ut();
+  accum_unit_test accum_ut();
 
 
   //===================================
@@ -18,8 +19,11 @@ module algorithms_testsuite;
   function void build();
     algo_ut.build();
     algo_ut.__register_tests();
+    accum_ut.build();
+    accum_ut.__register_tests();
     svunit_ts = new(name);
     svunit_ts.add_testcase(algo_ut.svunit_ut);
+    svunit_ts.add_testcase(accum_ut.svunit_ut);
   endfunction
 
 
@@ -29,6 +33,7 @@ module algorithms_testsuite;
   task run();
     svunit_ts.run();
     algo_ut.run();
+    accum_ut.run();
     svunit_ts.report();
   endtask
 

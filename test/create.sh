@@ -71,6 +71,7 @@ create_testsuite.pl -add iterators/list_iterators_unit_test.sv        \
 echo
 echo "*** create algorithms test suite"
 create_testsuite.pl -add algorithms/algo_unit_test.sv                 \
+		    -add algorithms/accum_unit_test.sv                \
 		    -out algorithms/algorithms_testsuite.sv           \
 		    -overwrite
 

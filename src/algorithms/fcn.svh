@@ -37,3 +37,10 @@ virtual class fcn#(type T=int) extends fcn_base;
   pure virtual function void f(T t);
   
 endclass
+
+virtual class accum_fcn#(type T=int, type A=int) extends fcn_base;
+
+  pure virtual function void f(T t, ref A a);
+
+endclass
+
