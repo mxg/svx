@@ -26,31 +26,7 @@
 # permissions and limitations under the License.
 #=======================================================================
 
-EXAMPLES	:= mem mem_map use_models calc pri_queue containers
+TOP	:= ../..
+include ${TOP}/examples/makefile
 
-MAKE		:= /usr/bin/make -s
-
-phony: clean build run
-
-all: clean build run
-
-clean:
-	@for f in ${EXAMPLES}; do \
-	  cd $$f; \
-	  ${MAKE} clean; \
-	  cd ..; \
-	done
-
-build:
-	@for f in ${EXAMPLES}; do \
-	  cd $$f; \
-	  ${MAKE} build; \
-	  cd ..; \
-	done
-
-run:
-	@for f in ${EXAMPLES}; do \
-	  cd $$f; \
-	  ${MAKE} run; \
-	  cd ..; \
-	done
+EXAMPLES	:= deque map queue vector

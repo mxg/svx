@@ -26,31 +26,12 @@
 # permissions and limitations under the License.
 #=======================================================================
 
-EXAMPLES	:= mem mem_map use_models calc pri_queue containers
+TOP	:= ../../..
 
-MAKE		:= /usr/bin/make -s
+EXAMPLE_DIR	:= ${TOP}/examples
 
-phony: clean build run
+SVINC		:= +incdir+. +incdir+${EXAMPLE_DIR}
+SV_SRC		:= ${EXAMPLE_DIR}/example_pkg.sv  queue_example_pkg.sv top.sv
 
-all: clean build run
+include ${TOP}/make/makefile
 
-clean:
-	@for f in ${EXAMPLES}; do \
-	  cd $$f; \
-	  ${MAKE} clean; \
-	  cd ..; \
-	done
-
-build:
-	@for f in ${EXAMPLES}; do \
-	  cd $$f; \
-	  ${MAKE} build; \
-	  cd ..; \
-	done
-
-run:
-	@for f in ${EXAMPLES}; do \
-	  cd $$f; \
-	  ${MAKE} run; \
-	  cd ..; \
-	done
