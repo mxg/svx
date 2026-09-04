@@ -54,7 +54,9 @@ typedef int64_t signed_index_t;
 // process identifiers
 typedef int unsigned pid_t;
 
+// Package-level constants
 
-
-	     
-	     
+/* verilator lint_off UNUSEDPARAM */
+localparam bit true = 1;
+localparam bit false = 0;
+/* verilator lint_on UNUSEDPARAM */

@@ -47,7 +47,8 @@ create_testsuite.pl -add types/type_handle_unit_test.sv               \
 # create containers test suite
 echo
 echo "*** Create containers test suite"
-create_testsuite.pl -add containers/container_unit_test.sv            \
+create_testsuite.pl -add containers/traits_unit_test.sv               \
+                    -add containers/container_unit_test.sv            \
                     -add containers/vector_unit_test.sv               \
                     -add containers/map_unit_test.sv                  \
                     -add containers/queue_unit_test.sv                \

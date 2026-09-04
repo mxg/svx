@@ -9,6 +9,7 @@ module containers_testsuite;
   // These are the unit tests that we
   // want included in this testsuite
   //===================================
+  traits_unit_test traits_ut();
   container_unit_test container_ut();
   vector_unit_test vector_ut();
   map_unit_test map_ut();
@@ -24,6 +25,8 @@ module containers_testsuite;
   // Build
   //===================================
   function void build();
+    traits_ut.build();
+    traits_ut.__register_tests();
     container_ut.build();
     container_ut.__register_tests();
     vector_ut.build();
@@ -43,6 +46,7 @@ module containers_testsuite;
     sorter_ut.build();
     sorter_ut.__register_tests();
     svunit_ts = new(name);
+    svunit_ts.add_testcase(traits_ut.svunit_ut);
     svunit_ts.add_testcase(container_ut.svunit_ut);
     svunit_ts.add_testcase(vector_ut.svunit_ut);
     svunit_ts.add_testcase(map_ut.svunit_ut);
@@ -60,6 +64,7 @@ module containers_testsuite;
   //===================================
   task run();
     svunit_ts.run();
+    traits_ut.run();
     container_ut.run();
     vector_ut.run();
     map_ut.run();

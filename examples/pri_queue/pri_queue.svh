@@ -53,6 +53,7 @@ class pri_queue #(type T=int, type P=void_traits);
   // The priorty queue is a _compound_ data structure, a map of
   // queues. Each entry in the map is a queue.
   map#(pri_t, queue#(T, P), class_traits#(queue#(T, P))) qmap;
+  // Dedclare an iterator that goes with our map of queues.
   map_bidir_iterator#(pri_t, queue#(T,P),
 		      class_traits#(queue#(T,P))) iter;
 
@@ -74,8 +75,8 @@ class pri_queue #(type T=int, type P=void_traits);
   //--------------------------------------------------------------------
   // push
   //
-  // Put a new item into the queue.  The priority determines where it
-  // is put into the queue
+  // Put a new item into a queue.  The priority determines which queue
+  // it is put into.
   //--------------------------------------------------------------------
   function push(pri_t pri, T item);
     queue#(T,P) q;
@@ -106,14 +107,15 @@ class pri_queue #(type T=int, type P=void_traits);
       return P::empty;
 
     // The last element in the map is the one with the highest
-    // priority.
+    // priority.  Eet the iterator to point to the highest priority
+    // (last) item in the map.
     void'(iter.last());
     pri = iter.get_index();
     q = iter.get();
 
-    item = q.get(); // get() pops the item off the queue
+    item = q.get(); // Pop the item off the queue
 
-    // If there are no more items with the same priority the remove
+    // If there are no more items with the same priority then remove
     // the queue.
     if(q.is_empty()) begin
       void'(qmap.delete(pri));

@@ -38,9 +38,10 @@
 // convenient way to bind data items together into a single box for
 // eacy maniuplation.
 //----------------------------------------------------------------------
-typedef triple#(token_t, int32_t, real) item_t;
 
 class calc;
+
+  typedef triple(token_t, int32_t, real) item_t;
 
   local item_t last_result;
   local lexer_core lex;
@@ -63,10 +64,13 @@ class calc;
     endcase
   endfunction  
 
+  //--------------------------------------------------------------------
+  // calculate
+  //
   // Parse the input RPN string and perform the specified calculation.
   // Return 1 if the evaluation was successful, a 0 if there was an
   // error.
-  
+  //--------------------------------------------------------------------
   function bit calculate(string s);
 
     token_t tkn;
