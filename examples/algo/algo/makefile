@@ -11,7 +11,7 @@
 #                  SystemVerilog Extension Library
 #
 #
-# Copyright 2016 NVIDIA Corporation
+# Copyright 2026 Mark Glasser
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,9 +26,12 @@
 # permissions and limitations under the License.
 #=======================================================================
 
-TOP		:= ../..
+TOP	:= ../../..
 
-SV_INC		:= +incdir+.
-SV_SRC		:= top.sv
+EXAMPLE_DIR	:= ${TOP}/examples
+
+SVINC		:= +incdir+. +incdir+${EXAMPLE_DIR}
+SV_SRC		:= ${EXAMPLE_DIR}/example_pkg.sv  algo_example_pkg.sv top.sv
 
 include ${TOP}/make/makefile
+

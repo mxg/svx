@@ -43,7 +43,7 @@
 // To retrieve the item with the highest priority we rely on the fact
 // that SystemVerilog's associative array is implemented using some
 // sort of tree structure (the exact implementation details are
-// unknown to SystemVerilog programmers). The associative array's
+// invisible to SystemVerilog programmers). The associative array's
 // last() function retrieves the key with the highest value.  Because
 // the keys in the priority queue represent priorities, the last
 // element is the one with the highest priority.
@@ -53,7 +53,7 @@ class pri_queue #(type T=int, type P=void_traits);
   // The priorty queue is a _compound_ data structure, a map of
   // queues. Each entry in the map is a queue.
   map#(pri_t, queue#(T, P), class_traits#(queue#(T, P))) qmap;
-  // Dedclare an iterator that goes with our map of queues.
+  // Declare an iterator that goes with our map of queues.
   map_bidir_iterator#(pri_t, queue#(T,P),
 		      class_traits#(queue#(T,P))) iter;
 
@@ -84,12 +84,12 @@ class pri_queue #(type T=int, type P=void_traits);
     // If the prioroty queue has no other items that match the
     // priority of the one we are pusing, then create a new queue for
     // it and insert it into the map.
-    if(qmap.get(pri) == null) begin
+    q = qmap.get(pri);
+    if(q == null) begin
       q = new();
       void'(qmap.insert(pri, q));
     end
     
-    q = qmap.get(pri);
     q.put(item);
   endfunction
 

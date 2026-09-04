@@ -30,6 +30,7 @@
 TOP		= ../..
 TOP_MODULE	= top
 
-SV_SRC		+= ${wildcard *.sv}
+SV_INC		:= +incdir+.
+SV_SRC		+= top.sv
 
 include ${TOP}/make/makefile

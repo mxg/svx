@@ -54,9 +54,11 @@ APPS		:= ${TOP}/apps
 
 APPS_SRC	:= ${wildcard ${APPS}/mem/*.sv}             \
                    ${wildcard ${APPS}/mem_map/*.sv}         \
+                   ${wildcard ${APPS}/pri_queue/*.sv}       \
                    ${wildcard ${APPS}/clk_gen/*.sv}
 APPS_INC	:= +incdir+${APPS}/mem                      \
                    +incdir+${APPS}/mem_map                  \
+                   +incdir+${APPS}/pri_queue                \
 		   +incdir+${APPS}/clk_gen
 
 SV_SRC		:= ${SVX_SRC} ${APPS_SRC} ${SV_SRC}

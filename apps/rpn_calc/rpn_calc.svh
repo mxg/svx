@@ -41,7 +41,7 @@
 
 class calc;
 
-  typedef triple(token_t, int32_t, real) item_t;
+  typedef triple#(token_t, int32_t, real) item_t;
 
   local item_t last_result;
   local lexer_core lex;
