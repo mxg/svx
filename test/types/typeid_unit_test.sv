@@ -26,6 +26,32 @@
 // permissions and limitations under the License.
 //======================================================================
 
+package type_match_unit_test_pkg;
+  import svx::*;
+  `include "svx_macros.svh"
+
+  class base;
+  endclass
+
+  class derived extends base;
+  endclass
+
+  class some_class;
+  endclass
+
+  class d2 extends some_class;
+  endclass
+
+  class C#(type T=int);
+    const bit x = type_match#(T,uint64_t)::test_is_match();
+    task check();
+      `FAIL_UNLESS(x == true)
+    endtask
+  endclass
+
+endpackage
+
+
 `include "svunit_defines.svh"
 
 module type_match_unit_test;
@@ -34,6 +60,8 @@ module type_match_unit_test;
   // the library we are testing
   import svx::*;
   `include "svx_macros.svh"
+
+  import type_match_unit_test_pkg::*;
   
   string name = "type_match_ut";
   svunit_testcase svunit_ut;
@@ -88,10 +116,24 @@ module type_match_unit_test;
   //===================================
   `SVUNIT_TESTS_BEGIN
 
-    `SVTEST(match_types)
-      `FAIL_UNLESS(type_match#(int,int)::is_match());
-      `FAIL_UNLESS(type_match#(uint32_t,uint32_t)::is_match());
-      `FAIL_IF(type_match#(real,uint64_t)::is_match());
+    `SVTEST(scalar_match)
+      `FAIL_UNLESS(type_match#(int,int)::test_is_match());
+      `FAIL_UNLESS(type_match#(uint32_t,uint32_t)::test_is_match());
+      `FAIL_IF(type_match#(real,uint64_t)::test_is_match());
+    `SVTEST_END
+
+    `SVTEST(class_match)
+      `FAIL_UNLESS(type_match#(some_class, some_class)::test_is_match() == true);
+    `SVTEST_END
+
+    `SVTEST(is_derived)
+      `FAIL_UNLESS(type_match#(derived, base)::test_is_derived_from() == true);
+      `FAIL_UNLESS(type_match#(d2, base)::test_is_derived_from() == false);
+    `SVTEST_END
+
+    `SVTEST(param_match)
+      C#(uint64_t) c = new();
+      c.check();
     `SVTEST_END
 
   `SVUNIT_TESTS_END

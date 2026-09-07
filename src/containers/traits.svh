@@ -49,12 +49,9 @@
 
 /* verilator lint_off UNUSEDPARAM */
 
-// A macro to check type traits invariants
-`define check_trait(t, trait, expect) begin                                \
-                                        const bit x = t::trait;            \
-                                        if(x != expect)                    \
-                                          t::fail(`__LINE__, `__FILE__);   \
-                                      end
+// A macro to check type traits invariants.  The simulation will fail
+// if the invariant is not met. Instantiate this macro within a class.
+`define check_trait(t, trait, exp) const local bit x_``t``_``trait``_``exp = void_traits::check_trait(t::trait, exp, `__LINE__, `__FILE__);
 
 //----------------------------------------------------------------------
 // void_traits
@@ -93,8 +90,14 @@ class void_traits extends void_t;
   static function void sort(ref void_t vec[$]);
   endfunction
 
-  // fail() is a utilitiy function that can be used to induce a
-  // failure if a traits invariant is voilated.
+  static function bit check_trait(bit trait, bit exp, int line = 0, string file = "");
+    if(trait == exp)
+      return 1;
+    fail(line, file);
+  endfunction
+
+  // fail() is a utility function that can be used to induce a failure
+  // if a traits invariant is voilated.
   static function void fail(int line = 0, string file = "");
     if(file == "" && line == 0)
       $fatal(0, "Traits failure.");

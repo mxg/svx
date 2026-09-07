@@ -36,24 +36,57 @@
 //----------------------------------------------------------------------
 class type_match #(type T1=int, type T2=int);
 
-  static function bit is_match();
-    return test_match();
+  // Do the two types in the paramter list match?
+
+  static function bit is_match(int line = 0, string file = "");
+    if(!test_is_match())
+      fail_match(line, file);
   endfunction
 
-  static function bit is_match_fail();
-    if(!test_match())
-      begin
-	$display("*** Error: Types %s and %s do not match", 
-		 $typename(T1), $typename(T2));
-	$finish;
-      end
-    return 1;
-  endfunction      
-
-  local static function bit test_match();
+  static function bit test_is_match();
     type_handle_base th1 = type_handle#(T1)::get_type();
     type_handle_base th2 = type_handle#(T2)::get_type();
     return (th1 == th2);
   endfunction
+
+  static function void fail_match(int line = 0, string file = "");
+    if(file == "" && line == 0)
+      $fatal(0, "Types %s and %s do not match",  $typename(T1), $typename(T2));
+    else
+      $fatal(0, "Types %s and %s do not match at %s:%0d",  $typename(T1), $typename(T2), file, line);
+  endfunction
+
+  // Is type T1 derived from type T2?
+
+  static function bit is_derived_from(int line = 0, string file = "");
+    if(!test_is_derived_from())
+      fail_derived(line, file);
+  endfunction
+
+  static function bit test_is_derived_from();
+    T1 derived;
+    T2 base;
+    int x;
+    /* verilator lint_off CASTCONST */
+    x = $cast(derived, base);
+    /* verilator lint_on CASTCONST */
+    return (x != 0);
+  endfunction
+
+  static function void fail_derived(int line = 0, string file = "");
+    if(file == "" && line == 0)
+      $fatal(0, "Type $s is not derived from type %s", $typename(T1), $typename(T2));
+    else
+      $fatal(0, "Type $s is not derived from type %s at %s:%0d",
+	     $typename(T1), $typename(T2), file, line);
+  endfunction  
   
 endclass
+
+//----------------------------------------------------------------------
+// check_is_derived
+//
+// A convenience macro for determineing if two types match.
+//----------------------------------------------------------------------
+
+`define check_is_derived_from(t1, t2) const local bit x_``t1``_``t2``_derived = type_match#(t1,t2)::is_derived_from(`__LIBNE__, `__FILE__)
