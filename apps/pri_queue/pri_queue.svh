@@ -78,7 +78,7 @@ class pri_queue #(type T=int, type P=void_traits);
   // Put a new item into a queue.  The priority determines which queue
   // it is put into.
   //--------------------------------------------------------------------
-  function push(pri_t pri, T item);
+  function void push(pri_t pri, T item);
     queue#(T,P) q;
 
     // If the prioroty queue has no other items that match the
@@ -107,7 +107,7 @@ class pri_queue #(type T=int, type P=void_traits);
       return P::empty;
 
     // The last element in the map is the one with the highest
-    // priority.  Eet the iterator to point to the highest priority
+    // priority.  Set the iterator to point to the highest priority
     // (last) item in the map.
     void'(iter.last());
     pri = iter.get_index();
@@ -126,6 +126,3 @@ class pri_queue #(type T=int, type P=void_traits);
   endfunction
 
 endclass
-
-
-  

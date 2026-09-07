@@ -31,7 +31,7 @@
 //----------------------------------------------------------------------
 virtual class range_base;
   protected index_t ub; // upper bound
-  protected index_t lb; // lower cound
+  protected index_t lb; // lower bound
   protected signed_index_t idx;
 
   function new(index_t size, index_t lower_bound, index_t upper_bound);
@@ -49,8 +49,8 @@ virtual class range_base;
       // swap ub and lb
       index_t tmp;
       tmp = lb;
-      ub = lb;
-      lb = tmp;
+      lb = ub;
+      ub = tmp;
     end
   endfunction
 
@@ -138,7 +138,7 @@ class range#(type T=int, type P=void_traits)
   // next
   //--------------------------------------------------------------------
   virtual function bit next();
-    if(is_empty() || ((idx > lb) && (idx > ub)))
+    if(at_end())
       return 0;
     if(idx <= ub) begin
       idx++;
@@ -158,7 +158,7 @@ class range#(type T=int, type P=void_traits)
   // at_end
   //--------------------------------------------------------------------
   virtual function bit at_end();
-    return(!is_empty() && (idx > ub));
+    return(is_empty() || (idx > ub));
   endfunction
 
   //--------------------------------------------------------------------
@@ -197,7 +197,7 @@ class range#(type T=int, type P=void_traits)
   // at_beginning
   //--------------------------------------------------------------------
   virtual function bit at_beginning();
-    return(!is_empty() && (idx < signed_index_t'(lb)));
+    return(is_empty() || (idx < signed_index_t'(lb)));
   endfunction 
 
   //--------------------------------------------------------------------

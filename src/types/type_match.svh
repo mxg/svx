@@ -32,7 +32,7 @@
 // type_match
 //
 // Do two types match?  This is useful for deetermining if a type
-// parameter is correct in a pasrameterized class.
+// parameter is correct in a parameterized class.
 //----------------------------------------------------------------------
 class type_match #(type T1=int, type T2=int);
 
@@ -41,6 +41,7 @@ class type_match #(type T1=int, type T2=int);
   static function bit is_match(int line = 0, string file = "");
     if(!test_is_match())
       fail_match(line, file);
+    return 1;
   endfunction
 
   static function bit test_is_match();
@@ -61,6 +62,7 @@ class type_match #(type T1=int, type T2=int);
   static function bit is_derived_from(int line = 0, string file = "");
     if(!test_is_derived_from())
       fail_derived(line, file);
+    return 1;
   endfunction
 
   static function bit test_is_derived_from();
@@ -75,9 +77,9 @@ class type_match #(type T1=int, type T2=int);
 
   static function void fail_derived(int line = 0, string file = "");
     if(file == "" && line == 0)
-      $fatal(0, "Type $s is not derived from type %s", $typename(T1), $typename(T2));
+      $fatal(0, "Type %s is not derived from type %s", $typename(T1), $typename(T2));
     else
-      $fatal(0, "Type $s is not derived from type %s at %s:%0d",
+      $fatal(0, "Type %s is not derived from type %s at %s:%0d",
 	     $typename(T1), $typename(T2), file, line);
   endfunction  
   
@@ -89,4 +91,4 @@ endclass
 // A convenience macro for determineing if two types match.
 //----------------------------------------------------------------------
 
-`define check_is_derived_from(t1, t2) const local bit x_``t1``_``t2``_derived = type_match#(t1,t2)::is_derived_from(`__LIBNE__, `__FILE__)
+`define check_is_derived_from(t1, t2) const local bit x_``t1``_``t2``_derived = type_match#(t1,t2)::is_derived_from(`__LINE__, `__FILE__)

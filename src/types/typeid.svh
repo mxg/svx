@@ -164,7 +164,6 @@ class typeid #(type T=int);
   // test_two_state
   //--------------------------------------------------------------------
   local static function bit test_two_state();
-    type_handle_base th = type_handle#(T)::get_type();
     return(test_int() && !test_four_state());
   endfunction
   

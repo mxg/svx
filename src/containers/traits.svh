@@ -246,7 +246,7 @@ class integer_traits extends base_four_state_traits#(integer);
 
 endclass
 
-// reg_traits, lkogic_traits, and timne_traits are all the same.
+// reg_traits, logic_traits, and time_traits are all the same.
 
 class reg_traits extends base_four_state_traits#(reg);
 

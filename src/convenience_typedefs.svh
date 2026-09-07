@@ -141,6 +141,7 @@ typedef list_bkwd_iterator#(int8_t,    int8_traits   ) list_bkwd_int8_iterator;
 typedef list_bkwd_iterator#(uint16_t,  uint16_traits ) list_bkwd_uint16_iterator;
 typedef list_bkwd_iterator#(int16_t,   int16_traits  ) list_bkwd_int16_iterator;
 typedef list_bkwd_iterator#(uint32_t,  uint32_traits ) list_bkwd_uint32_iterator;
+typedef list_bkwd_iterator#(int32_t,   int32_traits  ) list_bkwd_int32_iterator;
 typedef list_bkwd_iterator#(int64_t,   int64_traits  ) list_bkwd_int64_iterator;
 typedef list_bkwd_iterator#(uint64_t,  uint64_traits ) list_bkwd_uint64_iterator;
 typedef list_bkwd_iterator#(int128_t,  int128_traits ) list_bkwd_int128_iterator;

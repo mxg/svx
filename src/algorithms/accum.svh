@@ -34,7 +34,7 @@ class accum#(type T=int, type P=void_traits, type A=int);
     void'(iter.first());
     while(!iter.at_end()) begin
       T t = iter.get();
-      fn.f(t, acc);;
+      fn.f(t, acc);
       void'(iter.next());
     end
 

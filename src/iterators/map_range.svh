@@ -26,6 +26,11 @@
 // permissions and limitations under the License.
 //======================================================================
 
+//----------------------------------------------------------------------
+// map_range
+//
+// Represents a range within a map container.
+//----------------------------------------------------------------------
 class map_range #(type KEY=int, type T=void_t, type P=void_traits)
   extends range #(T,P);
 
@@ -33,7 +38,7 @@ class map_range #(type KEY=int, type T=void_t, type P=void_traits)
   map_iter_t map_iter;
 
   function new(map_iter_t it, index_t lower_bound, index_t upper_bound);
-    super.new(it, lb, ub);
+    super.new(it, lower_bound, upper_bound);
     map_iter = it;
   endfunction
 

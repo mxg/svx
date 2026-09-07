@@ -68,7 +68,7 @@ interface class fwd_intf extends iterator_intf_base;
   // Move the iterator to the next item in the ordered container.  Next
   // means move forward.  A call to next() is semantically equivalent to
   // calling skip(1).  A call to next() can move the iterator the to end
-  // state, which is beyond the end of the list an dnot pointing to a
+  // state, which is beyond the end of the list and not pointing to a
   // valid item.  Return a 1 if the operation succeeds, a 0 otherwise.
   // The next() operation can fail if the iterator is not bound to a
   // container, the container is empty, or the iterator is in the end
@@ -119,11 +119,11 @@ interface class bkwd_intf extends iterator_intf_base;
   pure virtual function bit last();
 
   // Move the iterator to the previous item in the list, typically the
-  // one with the next smaller index.  Prev() is semantically equivalent
-  // to skip(-1).  Return 1 if the operation is successful, otherwise
-  // return 0.  The operation an fail if the iterator is not bound to a
-  // container, the container is empty, or the iterator is already at
-  // the beginning of the container.
+  // one with the next smaller index.  Prev() is semantically
+  // equivalent to skip(-1).  Return 1 if the operation is successful,
+  // otherwise return 0.  The operation can fail if the iterator is
+  // not bound to a container, the container is empty, or the iterator
+  // is already at the beginning of the container.
   pure virtual function bit prev();
 
   // Is_first() asks the question: "is the iterator pointing to the

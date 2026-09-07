@@ -18,7 +18,7 @@ package accum_utils;
       var_sum = 0.0;
       mean = 0.0;
       std_dev = 0.0;
-;
+
     endfunction
     
     uint32_t sum;
@@ -179,7 +179,7 @@ module accum_unit_test;
       // compute standard deviation
       void'(iter.first());
       while(!iter.at_end()) begin
-        variance = iter.get - mean;
+        variance = iter.get() - mean;
 	var_sum += (variance * variance);
 	void'(iter.next());
       end

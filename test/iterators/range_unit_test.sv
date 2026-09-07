@@ -116,8 +116,9 @@ module range_unit_test;
       size_t iter_count;
 
       // Generate randomized upper and lower bounds of the range.
+      `FAIL_IF(vector_size < 2);
       ub = index_t'($urandom()) % vector_size;
-      lb = index_t'($urandom()) % ub;
+      lb = (ub == 0) ? index_t'(0) : index_t'($urandom()) % ub;
       iter = new(vec);
       rg = new(iter, lb, ub);
   
