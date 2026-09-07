@@ -36,13 +36,68 @@ endclass
 // that implements this interface can be used as a predicate.
 //----------------------------------------------------------------------
 virtual class predicate #(type T=int) extends predicate_base;
+  
+  pure virtual function bit is_true(T t); 
+  
+  virtual function bit is_false(T t);
+    return !is_true(t);
+  endfunction
+  
+endclass
 
-   pure virtual function bit is_true(T t); 
+//----------------------------------------------------------------------
+// and_pred
+//----------------------------------------------------------------------
+class and_pred #(type T=int) extends predicate#(T);
 
-   virtual function bit is_false(T t);
-     return !is_true(t);
-   endfunction
-   
+  predicate#(T) a;
+  predicate#(T) b;
+
+  function new(predicate#(T) _a, predicate#(T) _b);
+    a = _a;
+    b = _b;
+  endfunction
+
+  virtual function is_true(T t);
+    return (a.is_true(t) && b.is_true(t));
+  endfunction
+
+endclass
+
+//----------------------------------------------------------------------
+// or_pred
+//----------------------------------------------------------------------
+class or_pred #(type T=int) extends predicate#(T);
+
+  predicate#(T) a;
+  predicate#(T) b;
+
+  function new(predicate#(T) _a, predicate#(T) _b);
+    a = _a;
+    b = _b;
+  endfunction
+
+  virtual function is_true(T t);
+    return (a.is_true(t) || b.is_true(t));
+  endfunction
+
+endclass
+
+//----------------------------------------------------------------------
+// not_pred
+//----------------------------------------------------------------------
+class not_pred #(type T=int) extends predicate#(T);
+
+  predicate#(T) p;
+
+  function new(predicate#(T) _p);
+    p = _p;
+  endfunction
+
+  virtual function is_true(T t);
+    return p.is_false(t);
+  endfunction
+
 endclass
 
 //----------------------------------------------------------------------

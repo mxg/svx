@@ -185,14 +185,13 @@ module accum_unit_test;
       end
       std_dev = $sqrt(var_sum / $itor(count));      
   
-  
       // compute mean
       accum#(uint32_t, uint32_traits, stats)::accumulate(iter, f_mean, s);
       // compute standard deviation
       accum#(uint32_t, uint32_traits, stats)::accumulate(iter, f_std_dev, s);
 
-      `FAIL_UNLESS(mean == s.mean);
-      `FAIL_UNLESS(std_dev == s.std_dev);
+      `FAIL_UNLESS(real_traits::equal(mean,s.mean) == 1);
+      `FAIL_UNLESS(real_traits::equal(std_dev, s.std_dev) == 1);
 
       // $display("count   = %0d", s.count);
       // $display("sum     = %0d", s.sum);

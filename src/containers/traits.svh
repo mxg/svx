@@ -289,7 +289,7 @@ class real_base_traits #(type T=int) extends void_traits;
 
   typedef T empty_t;
   localparam empty_t empty = T'(0.0);
-  localparam T epsilon = T'(1.0e-28);
+  localparam T epsilon = T'(2.2e-16);
 
   localparam bit is_void	= false;
   localparam bit is_integral	= false;
@@ -301,7 +301,7 @@ class real_base_traits #(type T=int) extends void_traits;
 
   static function bit equal(T a, T b);
     T diff = (a - b);
-    return (diff >= -epsilon && diff <= epsilon);
+    return ((diff >= -epsilon) && (diff <= epsilon));
   endfunction
 
   static function int32_t compare(T a, T b);
@@ -321,7 +321,11 @@ class real_base_traits #(type T=int) extends void_traits;
 endclass
 
 typedef real_base_traits#(real) real_traits;
-//typedef real_base_traits#(shortreal) shortreal_traits;
+
+// For some reason, this makes the Verilator compiler unhappy.					    
+//class shortreal_traits extends real_base_traits#(shortreal);
+//  localparam shortreal epsilon = shortreal'(1.2e-7);
+//endclass
 
 //----------------------------------------------------------------------
 // string_traits

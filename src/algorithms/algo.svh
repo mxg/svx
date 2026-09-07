@@ -32,6 +32,7 @@
 class algo#(type T=int, type P=void_traits);
 
   static function uint32_t count(bidir_iterator_base#(T,P) iter, predicate#(T) p);
+    
     uint32_t n = 0;
     void'(iter.first());
     while(!iter.at_end()) begin
@@ -39,7 +40,9 @@ class algo#(type T=int, type P=void_traits);
 	n++;
       void'(iter.next());
     end
+    
     return n;
+    
   endfunction
 
   //--------------------------------------------------------------------
@@ -49,13 +52,17 @@ class algo#(type T=int, type P=void_traits);
   // elements in the list
   //--------------------------------------------------------------------
   static function bit all_of(bidir_iterator_base#(T,P) iter, predicate#(T) p);
+    
     bit ok = 1;
+    
     void'(iter.first());
     while(ok && !iter.at_end()) begin
       ok &= p.is_true(iter.get());
       void'(iter.next());
     end
+    
     return ok;
+    
   endfunction
 
   //--------------------------------------------------------------------
@@ -65,13 +72,17 @@ class algo#(type T=int, type P=void_traits);
   // the elements in the list.
   //--------------------------------------------------------------------
   static function bit none_of(bidir_iterator_base#(T,P) iter, predicate#(T) p);
+    
     bit ok = 0;
+    
     void'(iter.first());
     while(!ok && !iter.at_end()) begin
       ok |= p.is_true(iter.get());
       void'(iter.next());
     end
+    
     return !ok;
+    
   endfunction
 
   //--------------------------------------------------------------------
@@ -85,6 +96,50 @@ class algo#(type T=int, type P=void_traits);
   endfunction
 
   //--------------------------------------------------------------------
+  // min
+  //
+  // Find the minimum element in the container bound to the iterator.
+  //--------------------------------------------------------------------
+  static function T min(bidir_iterator_base#(T,P) iter);
+
+    T m;
+    
+    void'(iter.first());
+    m = iter.get();
+    while(!iter.at_end()) begin
+      T t = iter.get();
+      if(P::compare(t, m) < 0)
+	m = t;
+      void'(iter.next());
+    end
+
+    return m;
+    
+  endfunction
+  
+  //--------------------------------------------------------------------
+  // max
+  //
+  // Find the maximum element in the container bound to the iterator.
+  //--------------------------------------------------------------------
+  static function T max(bidir_iterator_base#(T,P) iter);
+
+    T m;
+    
+    void'(iter.first());
+    m = iter.get();
+    while(!iter.at_end()) begin
+      T t = iter.get();
+      if(P::compare(t, m) > 0)
+	m = t;
+      void'(iter.next());
+    end
+
+    return m;
+    
+  endfunction
+
+  //--------------------------------------------------------------------
   // find
   //
   // Locate the first element in the list for which the predicate
@@ -92,14 +147,18 @@ class algo#(type T=int, type P=void_traits);
   // the first element for which the predicate is true.
   //--------------------------------------------------------------------
   static function bidir_iterator_base#(T,P) find(bidir_iterator_base#(T,P) iter, predicate#(T) p);
+    
     bit found = 0;
+    
     void'(iter.first());
     while(!found && !iter.at_end()) begin
       found = p.is_true(iter.get());
       if(!found)
 	void'(iter.next());
     end
+    
     return iter;
+    
   endfunction
 
   //--------------------------------------------------------------------

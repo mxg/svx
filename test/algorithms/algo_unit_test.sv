@@ -25,6 +25,12 @@ package algo_utils;
     endfunction
   endclass
 
+  class is_even extends predicate#(uint8_t);
+    function bit is_true(uint8_t t);
+      return ((t & 'h01) == 'h00);
+    endfunction
+  endclass
+
   class print extends fcn#(uint64_t);
     function void f(uint64_t t);
       $write(" %16x", t);
@@ -182,6 +188,7 @@ module algo_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(for_each)
 
+
       vector_uint64 vec = new();
       list_bidir_uint64_iterator iter = new(vec);
       print p = new();
@@ -203,6 +210,80 @@ module algo_unit_test;
       for(index_t ix = 0; ix < vec.size() - 1; ix++) begin
 	`FAIL_UNLESS(vec.read(ix) <= vec.read(ix+1));
       end
+    `SVTEST_END
+
+  //--------------------------------------------------------------------
+  // minimum
+  //--------------------------------------------------------------------
+    `SVTEST(minimum)
+      vector_int32 vec;
+      list_bidir_int32_iterator iter;
+      int32_t min;
+
+      vec = vector_int32::create('{-19, 111, 32, 1064, 9, -666, 27, 1012});
+      iter = new(vec);
+
+      min = algo#(int32_t, int32_traits)::min(iter);
+
+      `FAIL_UNLESS(min == -666);
+
+      vec = vector_int32::create('{-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5});
+      iter = new(vec);
+
+      min = algo#(int32_t, int32_traits)::min(iter);
+
+      `FAIL_UNLESS(min == -5);  
+
+    `SVTEST_END
+
+  //--------------------------------------------------------------------
+  // maximum
+  //--------------------------------------------------------------------
+    `SVTEST(maximum)
+      vector_int32 vec;
+      list_bidir_int32_iterator iter;
+      int32_t max;
+
+      vec = vector_int32::create('{144, 2022, -37, -988, 101, 17, 0, 3333, 98, 7});
+      iter = new(vec);
+
+      max = algo#(int32_t, int32_traits)::max(iter);
+
+      `FAIL_UNLESS(max == 3333);
+
+      vec = vector_int32::create('{-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5});
+      iter = new(vec);
+
+      max = algo#(int32_t, int32_traits)::max(iter);
+
+      `FAIL_UNLESS(max == 5);
+  
+    `SVTEST_END
+
+  //--------------------------------------------------------------------
+  // combined_pred
+  //--------------------------------------------------------------------
+    `SVTEST(combined_pred)
+      vector_uint8 vec = vector_uint8::create('{'h00, 'h55, 'hf2, 'h01, 'hc4, 'h16});
+      list_bidir_uint8_iterator iter = new(vec);
+
+      gt_0 p1 = new();
+      is_even p2 = new();
+      eq_0 p3 = new();
+      and_pred#(uint8_t) p4 = new(p1, p2); // x > 0 && x is even
+      or_pred#(uint8_t) p5 = new(p2, p3);  // x is even || x == 0
+      not_pred#(uint8_t) p6 = new(p2);     // !(x is even)
+
+      uint32_t count;
+
+      count = algo#(uint8_t, uint8_traits)::count(iter, p4);
+      `FAIL_UNLESS(count == 3);
+
+      count = algo#(uint8_t, uint8_traits)::count(iter, p5);
+      `FAIL_UNLESS(count == 4);
+
+      count = algo#(uint8_t, uint8_traits)::count(iter, p6);
+      `FAIL_UNLESS(count == 2);
     `SVTEST_END
 
   `SVUNIT_TESTS_END
