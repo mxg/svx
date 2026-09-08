@@ -19,6 +19,7 @@ module containers_testsuite;
   deque_unit_test deque_ut();
   stack_unit_test stack_ut();
   sorter_unit_test sorter_ut();
+  circ_buf_unit_test circ_buf_ut();
 
 
   //===================================
@@ -45,6 +46,8 @@ module containers_testsuite;
     stack_ut.__register_tests();
     sorter_ut.build();
     sorter_ut.__register_tests();
+    circ_buf_ut.build();
+    circ_buf_ut.__register_tests();
     svunit_ts = new(name);
     svunit_ts.add_testcase(traits_ut.svunit_ut);
     svunit_ts.add_testcase(container_ut.svunit_ut);
@@ -56,6 +59,7 @@ module containers_testsuite;
     svunit_ts.add_testcase(deque_ut.svunit_ut);
     svunit_ts.add_testcase(stack_ut.svunit_ut);
     svunit_ts.add_testcase(sorter_ut.svunit_ut);
+    svunit_ts.add_testcase(circ_buf_ut.svunit_ut);
   endfunction
 
 
@@ -74,6 +78,7 @@ module containers_testsuite;
     deque_ut.run();
     stack_ut.run();
     sorter_ut.run();
+    circ_buf_ut.run();
     svunit_ts.report();
   endtask
 
