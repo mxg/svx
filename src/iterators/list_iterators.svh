@@ -33,8 +33,7 @@
 // over vectors or any class derived from vector#(), including stack,
 // queue, and deque.
 // ----------------------------------------------------------------------
-virtual class list_iterator_base#(type T=int, type P=void_traits)
-  implements typed_iterator#(T,P);
+virtual class list_iterator_base#(type T=int, type P=void_traits);
   
   typedef vector#(T,P) list_t;
   // Vector over which we will be iterating
@@ -52,7 +51,6 @@ virtual class list_iterator_base#(type T=int, type P=void_traits)
   // vector.
   //--------------------------------------------------------------------
   function new(list_t list = null);
-    super.new();
     bind_list(list);
   endfunction
 
@@ -142,7 +140,7 @@ endclass
 //----------------------------------------------------------------------
 class list_fwd_iterator#(type T=int, type P=void_traits)
   extends list_iterator_base#(T,P)
-  implements fwd_iterator_base#(T,P);
+  implements fwd_intf#(T,P);
 
   //--------------------------------------------------------------------
   // constructor
@@ -245,7 +243,7 @@ endclass
 //----------------------------------------------------------------------
 class list_bkwd_iterator#(type T=int, type P=void_traits)
   extends list_iterator_base#(T,P)
-  implements bkwd_iterator_base#(T,P);
+  implements bkwd_intf#(T,P);
 
   //--------------------------------------------------------------------
   // constructor
@@ -345,7 +343,7 @@ endclass
 //----------------------------------------------------------------------
 class list_random_iterator#(type T=int, type P=void_traits)
   extends list_iterator_base#(T,P)
-  implements random_iterator_base#(T,P);
+  implements random_intf #(T,P);
 
   local const int default_seed = 1;
 
@@ -433,7 +431,7 @@ endclass
 //----------------------------------------------------------------------
 class list_bidir_iterator#(type T=int, type P=void_traits)
   extends list_iterator_base#(T,P)
-  implements bidir_iterator_base#(T,P);
+  implements bidir_intf#(T,P);
 
   //--------------------------------------------------------------------
   // constrtuctor

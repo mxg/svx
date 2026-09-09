@@ -31,7 +31,6 @@
 // iterators
 //----------------------------------------------------------------------
 `include "iterators/iterator_intf.svh"
-`include "iterators/iterator_base.svh"
 `include "iterators/map_iterators.svh"
 `include "iterators/list_iterators.svh"
 `include "iterators/permute_iterators.svh"

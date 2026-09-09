@@ -31,7 +31,7 @@
 //----------------------------------------------------------------------
 class algo#(type T=int, type P=void_traits);
 
-  static function uint32_t count(bidir_iterator_base#(T,P) iter, predicate#(T) p);
+  static function uint32_t count(bidir_intf#(T,P) iter, predicate#(T) p);
     
     uint32_t n = 0;
     void'(iter.first());
@@ -51,7 +51,7 @@ class algo#(type T=int, type P=void_traits);
   // Return true if the predicate holds (is true) for all of the
   // elements in the list
   //--------------------------------------------------------------------
-  static function bit all_of(bidir_iterator_base#(T,P) iter, predicate#(T) p);
+  static function bit all_of(bidir_intf#(T,P) iter, predicate#(T) p);
     
     bit ok = 1;
     
@@ -71,7 +71,7 @@ class algo#(type T=int, type P=void_traits);
   // Return true if the predicate does not hold (is false) for all of
   // the elements in the list.
   //--------------------------------------------------------------------
-  static function bit none_of(bidir_iterator_base#(T,P) iter, predicate#(T) p);
+  static function bit none_of(bidir_intf#(T,P) iter, predicate#(T) p);
     
     bit ok = 0;
     
@@ -91,7 +91,7 @@ class algo#(type T=int, type P=void_traits);
   // Return true if the predicate holds (is true) for at least one
   // element in the list.
   //--------------------------------------------------------------------
-  static function bit any_of(bidir_iterator_base#(T,P) iter, predicate#(T) p);
+  static function bit any_of(bidir_intf#(T,P) iter, predicate#(T) p);
     return !none_of(iter, p);
   endfunction
 
@@ -100,7 +100,7 @@ class algo#(type T=int, type P=void_traits);
   //
   // Find the minimum element in the container bound to the iterator.
   //--------------------------------------------------------------------
-  static function T min(bidir_iterator_base#(T,P) iter);
+  static function T min(bidir_intf#(T,P) iter);
 
     T m;
     
@@ -122,7 +122,7 @@ class algo#(type T=int, type P=void_traits);
   //
   // Find the maximum element in the container bound to the iterator.
   //--------------------------------------------------------------------
-  static function T max(bidir_iterator_base#(T,P) iter);
+  static function T max(bidir_intf#(T,P) iter);
 
     T m;
     
@@ -146,7 +146,7 @@ class algo#(type T=int, type P=void_traits);
   // holds (is true).  Return the iterator whose current element is
   // the first element for which the predicate is true.
   //--------------------------------------------------------------------
-  static function bidir_iterator_base#(T,P) find(bidir_iterator_base#(T,P) iter, predicate#(T) p);
+  static function bidir_intf#(T,P) find(bidir_intf#(T,P) iter, predicate#(T) p);
     
     bit found = 0;
     
@@ -166,7 +166,7 @@ class algo#(type T=int, type P=void_traits);
   //
   // Traverse all the items in a bidirectional iterator or a range
   //--------------------------------------------------------------------
-  static function void for_each(bidir_iterator_base#(T,P) iter, fcn#(T) fn);
+  static function void for_each(bidir_intf#(T,P) iter, fcn#(T) fn);
 
     void'(iter.first());
     while(!iter.at_end()) begin

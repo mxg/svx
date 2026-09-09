@@ -27,9 +27,29 @@
 //======================================================================
 
 //----------------------------------------------------------------------
+// typed_iterator
+//
+// The base class for all iterators. It specifies the type of the
+// objects in the container bound to the iterator.  It also contains
+// the empty element.
+//----------------------------------------------------------------------
+interface class typed_iterator #(type T=int, type P=void_traits);
+
+  /* verilator lint_off UNUSEDPARAM */
+  localparam P::empty_t m_empty = P::empty;
+  /* verilator lint_on UNUSEDPARAM */
+
+  // Set the value of the item at the current index
+  pure virtual function void set(T t);
+
+  // Retrieve the iterm at the current index
+  pure virtual function T get();
+
+endclass
+//----------------------------------------------------------------------
 // class: iterator_intf_base
 //----------------------------------------------------------------------
-interface class iterator_intf_base;
+interface class iterator_intf_base #(type T=int, type P=void_traits);
 
   // Skip forward or backward in an ordered container. Skip forward if
   // distance is greater than zero; skip backward if the distance is
@@ -56,7 +76,8 @@ endclass
 // the beginning of the ordered container or move the index in the
 // foward direction -- e.g. increasing the index.
 //----------------------------------------------------------------------
-interface class fwd_intf extends iterator_intf_base;
+interface class fwd_intf #(type T=int, type P=void_traits) 
+  implements iterator_intf_base #(T,P);
 
   // Move the iterator to the first item in the ordered container --
   // typically the one with the smallest index.  Return 1 if the
@@ -109,7 +130,8 @@ endclass
 //----------------------------------------------------------------------
 // bkwd_intf
 //----------------------------------------------------------------------
-interface class bkwd_intf extends iterator_intf_base;
+interface class bkwd_intf #(type T=int, type P=void_traits) 
+  implements iterator_intf_base #(T,P);
 
   // Move the iterator to the last item in the ordered container --
   // typically the one with the highest index.  Return 1 if the
@@ -140,14 +162,18 @@ endclass
 //----------------------------------------------------------------------
 // bidir_intf
 //----------------------------------------------------------------------
-interface class bidir_intf extends fwd_intf, bkwd_intf;
+interface class bidir_intf #(type T=int, type P=void_traits)
+  implements fwd_intf #(T,P), bkwd_intf #(T,P);
   pure virtual function bit prev();
+  pure virtual function void set(T t);
+  pure virtual function T get();
 endclass
 
 //----------------------------------------------------------------------
 // random_intf
 //----------------------------------------------------------------------
-interface class random_intf extends iterator_intf_base;
+interface class random_intf #(type T=int, type P=void_traits)   
+ implements iterator_intf_base #(T,P);
 
   // Randomly select a valid element in the bound container.  The
   // function will return 1 if it succeeds, otherwise it wil return a 0.

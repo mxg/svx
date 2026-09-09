@@ -29,8 +29,7 @@
 //----------------------------------------------------------------------
 // tree_iterator
 //----------------------------------------------------------------------
-virtual class tree_iterator_base
-  implements typed_iterator#(tree, void_traits);
+virtual class tree_iterator_base #(type T=int, type P=void_traits);
 
   typedef enum {PREORDER, POSTORDER} order_t;
 
@@ -40,7 +39,6 @@ virtual class tree_iterator_base
   protected list_t m_list;
 
   function new(tree t=null, order_t order=PREORDER);
-    super.new();
     bind_tree(t, order);
   endfunction
 
@@ -127,8 +125,9 @@ endclass
 //----------------------------------------------------------------------
 // tree_fwd_iterator
 //----------------------------------------------------------------------
-class tree_fwd_iterator extends tree_iterator_base
-  implements fwd_intf;
+class tree_fwd_iterator #(type T=int, type P=void_traits)
+  extends tree_iterator_base #(T,P)
+  implements fwd_intf#(T,P);
 
   list_fwd_iterator#(tree, class_traits#(tree)) iter;
 
@@ -183,8 +182,9 @@ endclass
 //----------------------------------------------------------------------
 // class: tree_bkwd_iterator
 //----------------------------------------------------------------------
-class tree_bkwd_iterator extends tree_iterator_base
-  implements bkwd_intf;
+class tree_bkwd_iterator #(type T=int, type P=void_traits)
+  extends tree_iterator_base #(T,P)
+  implements bkwd_intf#(T,P);
 
   list_bkwd_iterator#(tree, class_traits#(tree)) iter;
 
@@ -241,8 +241,9 @@ endclass
 //----------------------------------------------------------------------
 // tree_random_iterator
 //----------------------------------------------------------------------
-class tree_random_iterator extends tree_iterator_base
-  implements random_intf;
+class tree_random_iterator #(type T=int, type P=void_traits)
+  extends tree_iterator_base #(T,P)
+  implements random_intf#(T,P);
 
   list_random_iterator#(tree, class_traits#(tree)) iter;
 
@@ -299,8 +300,9 @@ endclass
 //----------------------------------------------------------------------
 // tree_bidir_iterator
 //----------------------------------------------------------------------
-class tree_bidir_iterator extends tree_iterator_base
-  implements bidir_intf;
+class tree_bidir_iterator #(type T=int, type P=void_traits)
+  extends tree_iterator_base #(T,P)
+  implements bidir_intf#(T,P);
 
   list_bidir_iterator#(tree, class_traits#(tree)) iter;
 

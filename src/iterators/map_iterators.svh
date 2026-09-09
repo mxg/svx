@@ -35,8 +35,7 @@
 // ----------------------------------------------------------------------
 virtual class map_iterator_base#(type KEY=int,
                                  type T=int,
-                                 type P=void_traits)
-  implements typed_iterator#(T,P);
+                                 type P=void_traits);
 
   // The Verilator compiler does not find this in the base class, so
   // we provide a hint.
@@ -55,7 +54,6 @@ virtual class map_iterator_base#(type KEY=int,
   // Optionally, bind a map to the iterator
   //--------------------------------------------------------------------
   function new(map_t map_inst = null);
-    super.new();
     bind_map(map_inst);
     state = INVALID;
   endfunction
@@ -124,7 +122,7 @@ endclass
 //----------------------------------------------------------------------
 class map_fwd_iterator#(type KEY=int, type T=int, type P=void_traits)
   extends map_iterator_base#(KEY,T,P)
-  implements fwd_iterator_base#(T,P);
+  implements fwd_intf#(T,P);
 
   //--------------------------------------------------------------------
   // constructor
@@ -263,8 +261,7 @@ endclass
 //----------------------------------------------------------------------
 class map_bkwd_iterator#(type KEY=int, type T=int, type P=void_traits)
   extends map_iterator_base#(KEY,T,P)
-  implements bkwd_iterator_base#(T,P);
-  
+  implements bkwd_intf#(T,P);  
   // constructor
   //
   // Optionally, bind a map to the iterator
@@ -406,8 +403,8 @@ endclass
 // bidir_iterator classes.
 //----------------------------------------------------------------------
 class map_random_iterator#(type KEY=int, type T=int, type P=void_traits)
-  extends map_fwd_iterator#(KEY,T,P)
-  implements random_intf;
+  extends map_iterator_base#(KEY,T,P)
+  implements random_intf#(T,P);
 
   local const int default_seed = 1;
 
@@ -476,7 +473,7 @@ class map_random_iterator#(type KEY=int, type T=int, type P=void_traits)
   // skip
   //--------------------------------------------------------------------
   virtual function bit skip(signed_index_t distance);
-    return super.skip(distance);
+    // no implementation
   endfunction
   
   // The Verilator compiler doesn't seem to be able to find the
@@ -491,7 +488,6 @@ class map_random_iterator#(type KEY=int, type T=int, type P=void_traits)
     
 endclass
 
-
 //----------------------------------------------------------------------
 // class: map_bidir_iterator
 //
@@ -503,7 +499,7 @@ endclass
 // ----------------------------------------------------------------------
 class map_bidir_iterator#(type KEY=int, type T=int, type P=void_traits)
   extends map_iterator_base#(KEY,T,P)
-  implements bidir_iterator_base#(T,P);
+  implements bidir_intf#(T,P);
 
   function new(map_t map_inst = null);
     super.new(map_inst);

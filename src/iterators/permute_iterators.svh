@@ -88,8 +88,7 @@
 //
 // Base class for permutation iterators.
 //----------------------------------------------------------------------
-class permute_iterator_base#(type T=int, type P=void_traits)
-  implements typed_iterator#(T,P);
+class permute_iterator_base#(type T=int, type P=void_traits);
 
   localparam T m_empty = P::empty;
 
@@ -125,7 +124,6 @@ class permute_iterator_base#(type T=int, type P=void_traits)
   // bind_vector to bind a vector.
 
   function new(vec_t v = null);
-    super.new();
     bind_vector(v);
   endfunction
 
@@ -408,7 +406,7 @@ endclass
 //----------------------------------------------------------------------
 class permute_fwd_iterator#(type T=int, type P=void_traits)
   extends permute_iterator_base#(T,P)
-  implements fwd_intf;
+  implements fwd_intf#(T,P);
 
   // constructor
   //
@@ -485,7 +483,7 @@ endclass
 // ----------------------------------------------------------------------
 class permute_bkwd_iterator#(type T=int, type P=void_traits)
   extends permute_iterator_base#(T,P)
-  implements bkwd_intf;
+  implements bkwd_intf#(T,P);
 
   // constructor
   //
@@ -565,7 +563,7 @@ endclass
 //----------------------------------------------------------------------
 class permute_random_iterator#(type T=int, type P=void_traits)
   extends permute_iterator_base#(T,P)
-  implements random_intf;
+  implements random_intf#(T,P);
 
   local const int default_seed = 1;
 
@@ -624,7 +622,6 @@ class permute_random_iterator#(type T=int, type P=void_traits)
   virtual function bit skip(signed_index_t distance);
     return super.skip(distance);    
   endfunction
-    
 
 endclass
 
@@ -635,7 +632,7 @@ endclass
 // ----------------------------------------------------------------------
 class permute_bidir_iterator#(type T=int, type P=void_traits)
   extends permute_iterator_base#(T,P)
-  implements bidir_intf;
+  implements bidir_intf#(T,P);
 
   function new(vec_t vec = null);
     super.new(vec);
@@ -651,6 +648,15 @@ class permute_bidir_iterator#(type T=int, type P=void_traits)
     return super.is_empty();
   endfunction
 
+  virtual function void set(T t);
+    // intentionally not implemented
+  endfunction
+
+  virtual function T get();
+    // intentionally not implemented
+    return m_empty;
+  endfunction
+  
   virtual function bit first();
     if((m_vec == null) || (m_vec.size() == 0))
       return 0;
@@ -700,8 +706,6 @@ class permute_bidir_iterator#(type T=int, type P=void_traits)
       return 1;
     return (pix < 0);
   endfunction
-
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   // skip
   //

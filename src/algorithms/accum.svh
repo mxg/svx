@@ -28,7 +28,7 @@
 
 class accum#(type T=int, type P=void_traits, type A=int);
 
-  static function void accumulate(bidir_iterator_base#(T,P) iter, 
+  static function void accumulate(bidir_intf#(T,P) iter, 
 				  accum_fcn#(T,A) fn, ref A acc);
 
     void'(iter.first());

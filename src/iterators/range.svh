@@ -71,9 +71,9 @@ endclass
 //----------------------------------------------------------------------
 class range#(type T=int, type P=void_traits)
   extends range_base
-  implements bidir_iterator_base#(T,P);
+  implements bidir_intf #(T,P);
 
-  typedef bidir_iterator_base #(T,P) iter_t;
+  typedef bidir_intf#(T,P) iter_t;
   
   protected iter_t iter;
 

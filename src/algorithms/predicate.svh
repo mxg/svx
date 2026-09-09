@@ -58,7 +58,7 @@ class and_pred #(type T=int) extends predicate#(T);
     b = _b;
   endfunction
 
-  virtual function is_true(T t);
+  virtual function bit is_true(T t);
     return (a.is_true(t) && b.is_true(t));
   endfunction
 
@@ -77,7 +77,7 @@ class or_pred #(type T=int) extends predicate#(T);
     b = _b;
   endfunction
 
-  virtual function is_true(T t);
+  virtual function bit is_true(T t);
     return (a.is_true(t) || b.is_true(t));
   endfunction
 
@@ -94,7 +94,7 @@ class not_pred #(type T=int) extends predicate#(T);
     p = _p;
   endfunction
 
-  virtual function is_true(T t);
+  virtual function bit is_true(T t);
     return p.is_false(t);
   endfunction
 
