@@ -122,121 +122,121 @@ virtual class tree_iterator_base #(type T=int, type P=void_traits);
 
 endclass
 
-//----------------------------------------------------------------------
-// tree_fwd_iterator
-//----------------------------------------------------------------------
-class tree_fwd_iterator #(type T=int, type P=void_traits)
-  extends tree_iterator_base #(T,P)
-  implements fwd_intf#(T,P);
+// //----------------------------------------------------------------------
+// // tree_fwd_iterator
+// //----------------------------------------------------------------------
+// class tree_fwd_iterator #(type T=int, type P=void_traits)
+//   extends tree_iterator_base #(T,P)
+//   implements fwd_intf#(T,P);
 
-  list_fwd_iterator#(tree, class_traits#(tree)) iter;
+//   list_fwd_iterator#(tree, class_traits#(tree)) iter;
 
-  function new(tree t=null);
-    super.new(t);
-    iter = new(m_list);
-  endfunction
+//   function new(tree t=null);
+//     super.new(t);
+//     iter = new(m_list);
+//   endfunction
 
-  // The Verilator compiler doesn't seem to be able to find the
-  // implementations in the base class, so we give it a hint.
-  virtual function size_t size();
-    return super.size();
-  endfunction
+//   // The Verilator compiler doesn't seem to be able to find the
+//   // implementations in the base class, so we give it a hint.
+//   virtual function size_t size();
+//     return super.size();
+//   endfunction
     
-  virtual function bit is_empty();
-    return super.is_empty();
-  endfunction
+//   virtual function bit is_empty();
+//     return super.is_empty();
+//   endfunction
 
-  virtual function void bind_tree(tree t=null, order_t order=PREORDER);
-    super.bind_tree(t, order);
-    iter = new(m_list);
-  endfunction  
+//   virtual function void bind_tree(tree t=null, order_t order=PREORDER);
+//     super.bind_tree(t, order);
+//     iter = new(m_list);
+//   endfunction  
 
-  virtual function tree get();
-    return iter.get();
-  endfunction
+//   virtual function tree get();
+//     return iter.get();
+//   endfunction
 
-  virtual function bit skip(signed_index_t distance);
-    return iter.skip(distance);
-  endfunction
+//   virtual function bit skip(signed_index_t distance);
+//     return iter.skip(distance);
+//   endfunction
   
-  virtual function bit first();
-    if(iter == null)
-      return 0;
-    return iter.first();
-  endfunction
+//   virtual function bit first();
+//     if(iter == null)
+//       return 0;
+//     return iter.first();
+//   endfunction
 
-  virtual function bit next();
-    return iter.next();
-  endfunction
+//   virtual function bit next();
+//     return iter.next();
+//   endfunction
 
-  virtual function bit is_last();
-    return iter.is_last();
-  endfunction
+//   virtual function bit is_last();
+//     return iter.is_last();
+//   endfunction
 
-  virtual function bit at_end();
-    return iter.at_end();
-  endfunction
+//   virtual function bit at_end();
+//     return iter.at_end();
+//   endfunction
 
-endclass  
+// endclass  
 
-//----------------------------------------------------------------------
-// class: tree_bkwd_iterator
-//----------------------------------------------------------------------
-class tree_bkwd_iterator #(type T=int, type P=void_traits)
-  extends tree_iterator_base #(T,P)
-  implements bkwd_intf#(T,P);
+// //----------------------------------------------------------------------
+// // class: tree_bkwd_iterator
+// //----------------------------------------------------------------------
+// class tree_bkwd_iterator #(type T=int, type P=void_traits)
+//   extends tree_iterator_base #(T,P)
+//   implements bkwd_intf#(T,P);
 
-  list_bkwd_iterator#(tree, class_traits#(tree)) iter;
+//   list_bkwd_iterator#(tree, class_traits#(tree)) iter;
 
-  function new(tree t=null);
-    super.new(t);
-    iter = new(m_list);
-  endfunction
+//   function new(tree t=null);
+//     super.new(t);
+//     iter = new(m_list);
+//   endfunction
 
-  // The Verilator compiler doesn't seem to be able to find the
-  // implementations in the base class, so we give it a hint.
-  virtual function size_t size();
-    return super.size();
-  endfunction
+//   // The Verilator compiler doesn't seem to be able to find the
+//   // implementations in the base class, so we give it a hint.
+//   virtual function size_t size();
+//     return super.size();
+//   endfunction
     
-  virtual function bit is_empty();
-    return super.is_empty();
-  endfunction
+//   virtual function bit is_empty();
+//     return super.is_empty();
+//   endfunction
 
-  virtual function void bind_tree(tree t=null, order_t order=PREORDER);
-    super.bind_tree(t, order);
-    iter = new(m_list);
-  endfunction  
+//   virtual function void bind_tree(tree t=null, order_t order=PREORDER);
+//     super.bind_tree(t, order);
+//     iter = new(m_list);
+//   endfunction  
 
-  virtual function tree get();
-    return iter.get();
-  endfunction
+//   virtual function tree get();
+//     return iter.get();
+//   endfunction
 
-  //--------------------------------------------------------------------
-  // bkwd_iterator interface functions
-  //--------------------------------------------------------------------
+//   //--------------------------------------------------------------------
+//   // bkwd_iterator interface functions
+//   //--------------------------------------------------------------------
 
-  virtual function bit skip(signed_index_t distance);
-    return iter.skip(distance);
-  endfunction
+//   virtual function bit skip(signed_index_t distance);
+//     return iter.skip(distance);
+//   endfunction
 
-  virtual function bit last();
-    return iter.last();
-  endfunction
+//   virtual function bit last();
+//     return iter.last();
+//   endfunction
 
-  virtual function bit prev();
-    return iter.prev();
-  endfunction
+//   virtual function bit prev();
+//     return iter.prev();
+//   endfunction
   
-  virtual function bit is_first();
-    return iter.is_first();
-  endfunction
+//   virtual function bit is_first();
+//     return iter.is_first();
+//   endfunction
 
-  virtual function bit at_beginning();
-    return iter.at_beginning();
-  endfunction
+//   virtual function bit at_beginning();
+//     return iter.at_beginning();
+//   endfunction
 
-endclass
+// endclass
 
 //----------------------------------------------------------------------
 // tree_random_iterator
@@ -298,13 +298,13 @@ class tree_random_iterator #(type T=int, type P=void_traits)
 endclass
 
 //----------------------------------------------------------------------
-// tree_bidir_iterator
+// tree_iterator
 //----------------------------------------------------------------------
-class tree_bidir_iterator #(type T=int, type P=void_traits)
+class tree_iterator #(type T=int, type P=void_traits)
   extends tree_iterator_base #(T,P)
-  implements bidir_intf#(T,P);
+  implements fwd_intf#(T,P), bkwd_intf#(T,P);
 
-  list_bidir_iterator#(tree, class_traits#(tree)) iter;
+  list_iterator#(tree, class_traits#(tree)) iter;
 
   function new(tree t=null);
     super.new(t);

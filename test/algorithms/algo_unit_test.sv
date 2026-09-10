@@ -149,7 +149,7 @@ module algo_unit_test;
   // basic_algo
   //--------------------------------------------------------------------
     `SVTEST(basic_algo)
-      list_bidir_uint32_iterator iter;
+      list_uint32_iterator iter;
       uint32_t count;
       uint32_t actual_count;
 
@@ -195,7 +195,7 @@ module algo_unit_test;
       vector#(uint8_t, uint8_traits) v = 
 	 vector#(uint8_t, uint8_traits)::create({8'h1, 8'h2, 8'h3, 8'h4, 
                                                  8'h5, 8'h6, 8'h7, 8'h8});
-      list_bidir_uint8_iterator iter = new(v);
+      list_uint8_iterator iter = new(v);
 
       // How many elements in the vector are greater than 0?
       count = algo#(uint8_t, uint8_traits)::count(iter, p0);
@@ -222,7 +222,7 @@ module algo_unit_test;
 
 
       vector_uint64 vec = new();
-      list_bidir_uint64_iterator iter = new(vec);
+      list_uint64_iterator iter = new(vec);
       print p = new();
       size_t vector_size = size_t'($urandom()) % 25;
 	
@@ -249,7 +249,7 @@ module algo_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(minimum)
       vector_int32 vec;
-      list_bidir_int32_iterator iter;
+      list_int32_iterator iter;
       int32_t min;
 
       vec = vector_int32::create('{-19, 111, 32, 1064, 9, -666, 27, 1012});
@@ -273,7 +273,7 @@ module algo_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(maximum)
       vector_int32 vec;
-      list_bidir_int32_iterator iter;
+      list_int32_iterator iter;
       int32_t max;
 
       vec = vector_int32::create('{144, 2022, -37, -988, 101, 17, 0, 3333, 98, 7});
@@ -297,7 +297,7 @@ module algo_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(combined_pred)
       vector_uint8 vec = vector_uint8::create('{'h00, 'h55, 'hf2, 'h01, 'hc4, 'h16});
-      list_bidir_uint8_iterator iter = new(vec);
+      list_uint8_iterator iter = new(vec);
 
       gt_0 p1 = new();
       is_even p2 = new();

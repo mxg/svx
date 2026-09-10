@@ -132,7 +132,7 @@ module permute_iterator_unit_test;
 
       index_t i;
       uint64_t iter_count;
-      permute_fwd_iterator#(string, string_traits) iter;
+      permute_iterator#(string, string_traits) iter;
       string permutation;
       index_t perm_map[string];
 
@@ -194,7 +194,7 @@ module permute_iterator_unit_test;
       string permutation;
       index_t perm_map[string];
 
-      permute_bkwd_iterator#(string, string_traits) iter = new();
+      permute_iterator#(string, string_traits) iter = new();
       iter.bind_vector(vec);
 
       // The vector was filled with random numbers in the last test, so
@@ -293,11 +293,11 @@ module permute_iterator_unit_test;
     `SVTEST_END
 
   //--------------------------------------------------------------------
-  // bidir_fwd_bkwd
+  // fwd_bkwd
   //--------------------------------------------------------------------
-    `SVTEST(bidir_fwd_bkwd)
+    `SVTEST(fwd_bkwd)
 
-      permute_bidir_iterator#(string, string_traits) iter;
+      permute_iterator#(string, string_traits) iter;
       index_t iter_count;
       index_t i;
 
@@ -394,65 +394,38 @@ module permute_iterator_unit_test;
 
       vector#(string, string_traits) one_list;
 
-      permute_fwd_iterator#(string, string_traits) fwd_iter;
-      permute_bkwd_iterator#(string, string_traits) bkwd_iter;
-      permute_bidir_iterator#(string, string_traits) bidir_iter;
+      permute_iterator#(string, string_traits) iter;
 
       // create a list with a single element in it.
       one_list = new();
       one_list.write(0, "A");
 
-      // create the iterators and bind them to the list
-      fwd_iter = new(one_list);
-      bkwd_iter = new(one_list);
-      bidir_iter = new(one_list);
+      // create the iterator and bind it to the list
+      iter = new(one_list);
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // First and last should be the same element
-      void'(fwd_iter.first());
-      void'(bkwd_iter.last());
+      void'(iter.first());
+      `FAIL_IF(!iter.is_last())
 
-      `FAIL_IF(!fwd_iter.is_last())
-      `FAIL_IF(!bkwd_iter.is_first())
-      `FAIL_IF(fwd_iter.get() != bkwd_iter.get())
-
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // Iterate through the list in the foward direction
-      iter_count = 0;
-      void'(fwd_iter.first());
-      while(!fwd_iter.at_end()) begin
-        void'(fwd_iter.next());
-        iter_count++;
-      end
-
-      `FAIL_IF(iter_count != 1)
-
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // Iterate through the list in the backward direction
-      iter_count = 0;
-      void'(bkwd_iter.last());
-      while(!bkwd_iter.at_beginning()) begin
-        void'(bkwd_iter.prev());
-        iter_count++;
-      end
-
-      `FAIL_IF(iter_count != 1)
+      void'(iter.last());
+      `FAIL_IF(!iter.is_first())
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // First and last should be the same element
-      void'(bidir_iter.first());
-      t = bidir_iter.get();
-      void'(bidir_iter.last());
+      void'(iter.first());
+      t = iter.get();
+      void'(iter.last());
 
-      `FAIL_IF(t != bidir_iter.get())
+      `FAIL_IF(t != iter.get())
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // Iterate through the list in the foward direction using the
       // bidirectional iterator
       iter_count = 0;
-      void'(bidir_iter.first());
-      while(!bidir_iter.at_end()) begin
-        void'(bidir_iter.next());
+      void'(iter.first());
+      while(!iter.at_end()) begin
+        void'(iter.next());
         iter_count++;
       end
 
@@ -462,9 +435,9 @@ module permute_iterator_unit_test;
       // Iterate through the list in the backward direction using the
       // bidirectional iterator
       iter_count = 0;
-      void'(bidir_iter.last());
-      while(!bidir_iter.at_beginning()) begin
-        void'(bidir_iter.prev());
+      void'(iter.last());
+      while(!iter.at_beginning()) begin
+        void'(iter.prev());
         iter_count++;
       end
 

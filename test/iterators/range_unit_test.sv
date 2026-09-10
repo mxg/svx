@@ -48,7 +48,7 @@ module range_unit_test;
   //===================================
   vector_uint32 vec;
   index_t vector_size;
-  list_bidir_uint32_iterator iter;
+  list_uint32_iterator iter;
 
   //===================================
   // Build
@@ -112,7 +112,7 @@ module range_unit_test;
       index_t ub;
       index_t lb;
       range#(uint32_t, uint32_traits) rg;
-      list_bidir_uint32_iterator iter;
+      list_uint32_iterator iter;
       size_t iter_count;
 
       // Generate randomized upper and lower bounds of the range.
@@ -157,7 +157,7 @@ module range_unit_test;
       index_t ub;
       index_t lb;
       range#(uint32_t, uint32_traits) rg;
-      list_bidir_uint32_iterator iter;
+      list_uint32_iterator iter;
   
       ub = index_t'($urandom()) % vector_size;
       lb = index_t'($urandom()) % ub;
@@ -196,7 +196,7 @@ module range_unit_test;
       size_t iter_count;
       map_range#(string, uint32_t, uint32_traits) rg;
       map#(string, uint32_t, uint32_traits) m = new();
-      map_bidir_iterator#(string, uint32_t, uint32_traits) iter = new(m);
+      map_iterator#(string, uint32_t, uint32_traits) iter = new(m);
   
       // populate the map
       void'(m.insert("a", 100));

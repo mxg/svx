@@ -177,7 +177,7 @@ module sorter_unit_test;
   
 
       vector#(coordinate, coordinate_traits) v = new();
-      list_fwd_iterator#(coordinate, coordinate_traits) iter = new(v);
+      list_iterator#(coordinate, coordinate_traits) iter = new(v);
       const index_t N = 20;
 
       for(i = 0; i < N; i++) begin
@@ -213,7 +213,7 @@ module sorter_unit_test;
   
 
       vector#(coordinate, coordinate_traits) v = new();
-      list_fwd_iterator#(coordinate, coordinate_traits) iter = new(v);
+      list_iterator#(coordinate, coordinate_traits) iter = new(v);
       const index_t N = 20;
 
       for(i = 0; i < N; i++) begin
@@ -240,7 +240,7 @@ module sorter_unit_test;
       index_t i;
       rand_string r = new();
       vector#(string, string_traits) v = new();
-      list_fwd_iterator#(string, string_traits) iter = new(v);
+      list_iterator#(string, string_traits) iter = new(v);
       const index_t N = 20;
 
       for(i = 0; i < N; i++) begin

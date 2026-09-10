@@ -88,7 +88,7 @@
 //
 // Base class for permutation iterators.
 //----------------------------------------------------------------------
-class permute_iterator_base#(type T=int, type P=void_traits);
+class permute_iterator_base #(type T=int, type P=void_traits);
 
   localparam T m_empty = P::empty;
 
@@ -400,163 +400,6 @@ class permute_iterator_base#(type T=int, type P=void_traits);
 endclass
 
 //----------------------------------------------------------------------
-// permute_fwd_iterator
-//
-// Traverse the set of iterations in the forward direction.
-//----------------------------------------------------------------------
-class permute_fwd_iterator#(type T=int, type P=void_traits)
-  extends permute_iterator_base#(T,P)
-  implements fwd_intf#(T,P);
-
-  // constructor
-  //
-  // Optionally, bind a vector to the iterator
-  function new(vec_t v=null);
-    super.new(v);
-  endfunction
-
-  // The Verilator compiler doesn't seem to be able to find the
-  // implementations in the base class, so we give it a hint.
-  virtual function size_t size();
-    return super.size();
-  endfunction
-  
-  virtual function bit is_empty();
-    return super.is_empty();
-  endfunction
-
-  // first
-  //
-  // Reset the permutation index to 0, the first permutation.
-  virtual function bit first();
-    if((m_vec == null) || (m_vec.size() == 0))
-      return 0;
-    initialize();
-    void'(set_permutation(0));
-    return 1;
-  endfunction
-
-  // next
-  //
-  // Advance the permutation index to the next permutation.
-  virtual function bit next();
-    if((m_vec == null) || !initialized)
-      return 0;
-    return next_permutation();
-  endfunction
-
-  // is_last
-  //
-  // Answer the question: Is the current iteration the last one
-  // possible?
-  virtual function bit is_last();
-    return ((m_vec != null) && (m_vec.size() > 0) && (pix >= max_pix - 1));
-  endfunction
-
-  // at_end
-  //
-  // Answer the question: Have we run out of permutations in the forward
-  // direction?
-  virtual function bit at_end();
-    if(m_vec == null || m_vec.size() == 0)
-      return 1;
-    return (pix >= max_pix);
-  endfunction
-
-  // skip
-  //
-  // Skip ahead in the set of permutations.  This being a forward
-  // iterator, we can only move in the forward direction.
-  virtual function bit skip(signed_index_t distance);
-    if(distance < 0)
-      return 0;
-    return super.skip(distance);
-  endfunction
-
-endclass
-
-//----------------------------------------------------------------------
-// permute_bkwd_iterator
-//
-// Traverse the set of permutations in the reverse order, starting at
-// N-1 and going toward 0.
-// ----------------------------------------------------------------------
-class permute_bkwd_iterator#(type T=int, type P=void_traits)
-  extends permute_iterator_base#(T,P)
-  implements bkwd_intf#(T,P);
-
-  // constructor
-  //
-  // Optionally, bind a vector to the iterator.
-  function new(vec_t vec = null);
-    super.new(vec);
-  endfunction
-
-  // The Verilator compiler doesn't seem to be able to find the
-  // implementations in the base class, so we give it a hint.
-  virtual function size_t size();
-    return super.size();
-  endfunction
-    
-  virtual function bit is_empty();
-    return super.is_empty();
-  endfunction
-  
-  // last
-  //
-  // Set the current permutation to the last permutation, N-1.
-  virtual function bit last();
-    if(m_vec == null)
-      return 0;
-    initialize();
-    pix = max_pix - 1;
-    void'(set_permutation(pix));
-    return 1;
-  endfunction
-
-  // prev
-  //
-  // Set the current permutation to the current permutation - 1.
-  virtual function bit prev();
-    if(m_vec == null || m_vec.size() == 0 || pix < 0)
-      return 0;
-    pix--;
-    void'(set_permutation(pix));
-    return 1;
-  endfunction
-
-  // is_first
-  //
-  // Answer the question: Is the current permutation the first
-  // permutation, i.e. 0?
-  virtual function bit is_first();
-    return ((m_vec != null) && ((m_vec.size() > 0) && (pix == 0)));
-  endfunction
-
-  // at_beginning
-  //
-  // Answer the question: Have we run out of permutations in the reverse
-  // direction?
-  virtual function bit at_beginning();
-    if(m_vec == null || m_vec.size() == 0)
-      return 1;
-    return (pix < 0);
-  endfunction
-
-  // skip
-  //
-  // skip backwards one or more permutations.  This being a backward
-  // iterator we can only skip in the backwards direction --
-  // i.e. distance must be negative.
-  virtual function bit skip(signed_index_t distance);
-    if(distance > 0)
-      return 0;
-    return super.skip(distance);
-  endfunction
-
-endclass
-
-//----------------------------------------------------------------------
 // permute_random_iterator
 //
 // Jump to a randomly chosen iterator.
@@ -626,13 +469,13 @@ class permute_random_iterator#(type T=int, type P=void_traits)
 endclass
 
 //----------------------------------------------------------------------
-// permute_bidir_iterator
+// permute_iterator
 //
 // Traverse the set of permutations both forwards and backwards.
 // ----------------------------------------------------------------------
-class permute_bidir_iterator#(type T=int, type P=void_traits)
+class permute_iterator#(type T=int, type P=void_traits)
   extends permute_iterator_base#(T,P)
-  implements bidir_intf#(T,P);
+  implements fwd_intf#(T,P), bkwd_intf#(T,P);
 
   function new(vec_t vec = null);
     super.new(vec);

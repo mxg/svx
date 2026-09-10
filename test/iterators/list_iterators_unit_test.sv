@@ -101,7 +101,7 @@ module list_iterators_unit_test;
       uint32_t i;
       int32_t last_item;
   
-      list_fwd_iterator#(int32_t, int32_traits) iter = new();
+      list_iterator#(int32_t, int32_traits) iter = new();
 
       // We could bind the vector using the iterator constructor.  We do
       // it here using bind_list() to ensure that function works
@@ -161,7 +161,7 @@ module list_iterators_unit_test;
       uint32_t iter_count;
       uint32_t i;
       int32_t first_item;
-      list_bkwd_iterator#(int32_t, int32_traits) iter = new();
+      list_iterator#(int32_t, int32_traits) iter = new();
       iter.bind_list(vec);
 
       // The vector was filled with random numbers in the last test, so
@@ -215,18 +215,17 @@ module list_iterators_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(begin_and_end)
 
-      list_fwd_iterator#(int32_t, int32_traits) fwd_iter = new(vec);
-      list_bkwd_iterator#(int32_t, int32_traits) bkwd_iter = new(vec);
+      list_iterator#(int32_t, int32_traits) iter = new(vec);
 
       // beginning...
-      `FAIL_IF(!fwd_iter.first())
-      `FAIL_IF(fwd_iter.get() !=  vec.read(0))
-      `FAIL_IF(!fwd_iter.next())
+      `FAIL_IF(!iter.first())
+      `FAIL_IF(iter.get() !=  vec.read(0))
+      `FAIL_IF(!iter.next())
 
       // ending...
-      `FAIL_IF(!bkwd_iter.last())
-      `FAIL_IF(bkwd_iter.get() != vec.read(vec.size() - 1))
-      `FAIL_IF(!bkwd_iter.prev())
+      `FAIL_IF(!iter.last())
+      `FAIL_IF(iter.get() != vec.read(vec.size() - 1))
+      `FAIL_IF(!iter.prev())
 
     `SVTEST_END
 
@@ -235,9 +234,7 @@ module list_iterators_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(zero_length)
   
-      list_fwd_iterator#(int32_t, int32_traits) fwd_iter = new(vec);
-      list_bkwd_iterator#(int32_t, int32_traits) bkwd_iter = new(vec);
-      list_bidir_iterator#(int32_t, int32_traits) bidir_iter = new(vec);
+      list_iterator#(int32_t, int32_traits) iter = new(vec);
       list_random_iterator#(int32_t, int32_traits) random_iter = new(vec);
 
       // empty the vector
@@ -245,34 +242,17 @@ module list_iterators_unit_test;
       `FAIL_IF(vec.size() != 0)
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      `FAIL_IF(fwd_iter.first())
-      `FAIL_IF(fwd_iter.next())
-      `FAIL_IF(fwd_iter.is_last()) 
-      `FAIL_IF(!fwd_iter.at_end())
-
-      `FAIL_IF(fwd_iter.get() != int32_traits::empty)
-  
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      `FAIL_IF(bkwd_iter.last())
-      `FAIL_IF(bkwd_iter.prev())
-      `FAIL_IF(bkwd_iter.is_first())
-      `FAIL_IF(!bkwd_iter.at_beginning())
+      `FAIL_IF(iter.first())
+      `FAIL_IF(iter.next())
+      `FAIL_IF(iter.is_last()) 
+      `FAIL_IF(!iter.at_end())
+      `FAIL_IF(iter.last())
+      `FAIL_IF(iter.prev())
+      `FAIL_IF(iter.is_first())
+      `FAIL_IF(!iter.at_beginning())
 
       // There is no current item
-      `FAIL_IF(bkwd_iter.get() != int32_traits::empty)
-
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      `FAIL_IF(bidir_iter.first())
-      `FAIL_IF(bidir_iter.next())
-      `FAIL_IF(bidir_iter.is_last()) 
-      `FAIL_IF(!bidir_iter.at_end())
-      `FAIL_IF(bidir_iter.last())
-      `FAIL_IF(bidir_iter.prev())
-      `FAIL_IF(bidir_iter.is_first())
-      `FAIL_IF(!bidir_iter.at_beginning())
-
-      // There is no current item
-      `FAIL_IF(bidir_iter.get() != int32_traits::empty)      
+      `FAIL_IF(iter.get() != int32_traits::empty)      
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       `FAIL_IF(random_iter.random())
@@ -292,33 +272,24 @@ module list_iterators_unit_test;
     `SVTEST(unbound)
 
       // create an iterator that is not bound to a list
-      list_fwd_iterator#(int32_t, int32_traits) fwd_iter = new(null);
-      list_bkwd_iterator#(int32_t, int32_traits) bkwd_iter = new(null);
+      list_iterator#(int32_t, int32_traits) iter = new(null);
 
-      `FAIL_IF(fwd_iter.first())
-      `FAIL_IF(fwd_iter.next())
-      `FAIL_IF(fwd_iter.is_last()) 
-      `FAIL_IF(!fwd_iter.at_end()) 
+      `FAIL_IF(iter.first())
+      `FAIL_IF(iter.next())
+      `FAIL_IF(iter.is_last()) 
+      `FAIL_IF(!iter.at_end()) 
 
       // There is no current item
-      `FAIL_IF(fwd_iter.get() != int32_traits::empty)
+      `FAIL_IF(iter.get() != int32_traits::empty)
   
-      `FAIL_IF(bkwd_iter.last())
-      `FAIL_IF(bkwd_iter.prev())
-      `FAIL_IF(bkwd_iter.is_first())
-      `FAIL_IF(!bkwd_iter.at_beginning())
-
-      // There is no current item
-      `FAIL_IF(bkwd_iter.get() != int32_traits::empty)
-      
     `SVTEST_END
 
   //--------------------------------------------------------------------
-  // bidir_fwd_bkwd
+  // fwd_bkwd
   //--------------------------------------------------------------------
-    `SVTEST(bidir_fwd_bkwd)
+    `SVTEST(fwd_bkwd)
 
-      list_bidir_iterator#(int32_t, int32_traits) iter;
+      list_iterator#(int32_t, int32_traits) iter;
       uint32_t iter_count;
       uint32_t i;
 
@@ -477,34 +448,29 @@ module list_iterators_unit_test;
 
       vector#(int32_t, int32_traits) one_list;
 
-      list_fwd_iterator#(int32_t, int32_traits) fwd_iter;
-      list_bkwd_iterator#(int32_t, int32_traits) bkwd_iter;
-      list_bidir_iterator#(int32_t, int32_traits) bidir_iter;
+      list_iterator#(int32_t, int32_traits) iter;
 
       // create a list with a single element in it.
       one_list = new();
       one_list.write(0, $random());
 
-      // create the iterators and bind them to the list
-      fwd_iter = new(one_list);
-      bkwd_iter = new(one_list);
-      bidir_iter = new(one_list);
+      // create the iterator and bind it to the list
+      iter = new(one_list);
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // First and last should be the same element
-      void'(fwd_iter.first());
-      void'(bkwd_iter.last());
+      void'(iter.first());
+      `FAIL_IF(!iter.is_first())
 
-      `FAIL_IF(!fwd_iter.is_last())
-      `FAIL_IF(!bkwd_iter.is_first())
-      `FAIL_IF(fwd_iter.get() != bkwd_iter.get())
-
+      void'(iter.last());
+      `FAIL_IF(!iter.is_last())
+  
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // Iterate through the list in the foward direction
       iter_count = 0;
-      void'(fwd_iter.first());
-      while(!fwd_iter.at_end()) begin
-        void'(fwd_iter.next());
+      void'(iter.first());
+      while(!iter.at_end()) begin
+        void'(iter.next());
         iter_count++;
       end
 
@@ -513,9 +479,9 @@ module list_iterators_unit_test;
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // Iterate through the list in the backward direction
       iter_count = 0;
-      void'(bkwd_iter.last());
-      while(!bkwd_iter.at_beginning()) begin
-        void'(bkwd_iter.prev());
+      void'(iter.last());
+      while(!iter.at_beginning()) begin
+        void'(iter.prev());
         iter_count++;
       end
 
@@ -523,35 +489,11 @@ module list_iterators_unit_test;
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // First and last should be the same element
-      void'(bidir_iter.first());
-      t = bidir_iter.get();
-      void'(bidir_iter.last());
+      void'(iter.first());
+      t = iter.get();
+      void'(iter.last());
 
-      `FAIL_IF(t != bidir_iter.get())
-
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // Iterate through the list in the foward direction using the
-      // bidirectional iterator
-      iter_count = 0;
-      void'(bidir_iter.first());
-      while(!bidir_iter.at_end()) begin
-        void'(bidir_iter.next());
-        iter_count++;
-      end
-
-      `FAIL_IF(iter_count != 1)
-
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // Iterate through the list in the backward direction using the
-      // bidirectional iterator
-      iter_count = 0;
-      void'(bidir_iter.last());
-      while(!bidir_iter.at_beginning()) begin
-        void'(bidir_iter.prev());
-        iter_count++;
-      end
-
-      `FAIL_IF(iter_count != 1)
+      `FAIL_IF(t != iter.get())
 
     `SVTEST_END
 

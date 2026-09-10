@@ -117,7 +117,7 @@ module accum_unit_test;
       uint32_t a;
       uint32_t b;
       vector_uint32 v = new();
-      list_bidir_uint32_iterator iter = new(v);
+      list_uint32_iterator iter = new(v);
       add f = new();
 
       // populate vector with
@@ -155,7 +155,7 @@ module accum_unit_test;
   
       stats s = new();
       vector_uint32 v = new();
-      list_bidir_uint32_iterator iter = new(v);
+      list_uint32_iterator iter = new(v);
       mean f_mean = new();
       std_dev f_std_dev = new();
 

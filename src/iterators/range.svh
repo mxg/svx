@@ -30,6 +30,7 @@
 // range_base
 //----------------------------------------------------------------------
 virtual class range_base;
+
   protected index_t ub; // upper bound
   protected index_t lb; // lower bound
   protected signed_index_t idx;
@@ -71,18 +72,27 @@ endclass
 //----------------------------------------------------------------------
 class range#(type T=int, type P=void_traits)
   extends range_base
-  implements bidir_intf #(T,P);
+  implements fwd_intf #(T,P);
 
-  typedef bidir_intf#(T,P) iter_t;
+  typedef iterator_intf_base#(T,P) base_iter_t;
+  typedef fwd_intf#(T,P) fwd_iter_t;
+  typedef bkwd_intf#(T,P) bkwd_iter_t;
   
-  protected iter_t iter;
+  protected fwd_iter_t fwd_iter;
+  protected bkwd_iter_t bkwd_iter;
 
   //--------------------------------------------------------------------
   // constructor
   //--------------------------------------------------------------------
-  function new(iter_t it, index_t lower_bound, index_t upper_bound);
+  function new(base_iter_t it, index_t lower_bound, index_t upper_bound);
     super.new(it.size(), lower_bound, upper_bound);
-    iter = it;
+    // do we have fwd access?
+    if(!$cast(fwd_iter, it))
+      $fatal(1, "iteration type failure");
+
+    // do we have backward access?
+    if(!$cast(bkwd_iter, it))
+      bkwd_iter = null;
   endfunction
   
   //--------------------------------------------------------------------
@@ -92,7 +102,7 @@ class range#(type T=int, type P=void_traits)
   //--------------------------------------------------------------------
   virtual function void set(T t);
     if(!is_empty()) begin
-      iter.set(t);
+      fwd_iter.set(t);
     end
   endfunction
 
@@ -105,7 +115,7 @@ class range#(type T=int, type P=void_traits)
     if(is_empty())
       return P::empty;
     else
-      return iter.get();
+      return fwd_iter.get();
   endfunction
 
   //--------------------------------------------------------------------
@@ -119,7 +129,7 @@ class range#(type T=int, type P=void_traits)
   // is_empty
   //--------------------------------------------------------------------
   virtual function bit is_empty();
-    return iter == null || iter.is_empty();
+    return fwd_iter == null || fwd_iter.is_empty();
   endfunction
 
   //--------------------------------------------------------------------
@@ -129,8 +139,8 @@ class range#(type T=int, type P=void_traits)
     idx = lb;
     if(is_empty())
       return 0;
-    void'(iter.first());
-    void'(iter.skip(lb));
+    void'(fwd_iter.first());
+    void'(fwd_iter.skip(lb));
     return 1;
   endfunction
 
@@ -142,7 +152,7 @@ class range#(type T=int, type P=void_traits)
       return 0;
     if(idx <= ub) begin
       idx++;
-      return iter.next();
+      return fwd_iter.next();
     end
     return 1;
   endfunction    
@@ -165,23 +175,27 @@ class range#(type T=int, type P=void_traits)
   // last
   //--------------------------------------------------------------------
   virtual function bit last();
+    if(bkwd_iter == null)
+      return 0;
     idx = ub;
     if(is_empty())
       return 0;
-    void'(iter.first());
-    void'(iter.skip(ub));
-    return (iter.size() > 0);
+    void'(fwd_iter.first());
+    void'(bkwd_iter.skip(ub));
+    return (bkwd_iter.size() > 0);
   endfunction
 
   //--------------------------------------------------------------------
   // prev
   //--------------------------------------------------------------------
   virtual function bit prev();
+    if(bkwd_iter == null)
+      return 0;
     if(is_empty())
       return 0;
     if(idx >= lb && idx >= 0) begin
       idx--;
-      return iter.prev();
+      return bkwd_iter.prev();
     end
     return 1;
   endfunction
@@ -204,7 +218,7 @@ class range#(type T=int, type P=void_traits)
   // skip
   //--------------------------------------------------------------------
   virtual function bit skip(signed_index_t distance);
-    return iter.skip(distance);
+    return fwd_iter.skip(distance);
   endfunction
 
 endclass

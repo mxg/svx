@@ -46,7 +46,7 @@ endclass
 class algo_example extends example;
 
   vector#(uint8_t, uint8_traits) vec;
-  list_bidir_iterator#(uint8_t, uint8_traits) iter;
+  list_iterator#(uint8_t, uint8_traits) iter;
 
   uint32_t count;
   bit all;

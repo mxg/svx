@@ -134,209 +134,6 @@ virtual class list_iterator_base#(type T=int, type P=void_traits);
 endclass
 
 //----------------------------------------------------------------------
-// class list_fwd_iterator
-//
-// Traverse the vector in the forward direction.
-//----------------------------------------------------------------------
-class list_fwd_iterator#(type T=int, type P=void_traits)
-  extends list_iterator_base#(T,P)
-  implements fwd_intf#(T,P);
-
-  //--------------------------------------------------------------------
-  // constructor
-  //
-  // Optionally bind the iterator to a vector.
-  //--------------------------------------------------------------------
-  function new(list_t list_inst = null);
-    super.new(list_inst);
-  endfunction
-
-  //--------------------------------------------------------------------
-  // The Verilator compiler doesn't seem to be able to find the
-  // implementations in the base class, so we give it a hint.
-  virtual function size_t size();
-    return super.size();
-  endfunction
-
-  // The compiler should automatically find this in the base class.
-  virtual function void set(T t);
-   super.set(t);
-  endfunction  
-
-  // The compiler should automatically find this in the base class.
-  virtual function T get();
-    return super.get();
-  endfunction
-  
-  virtual function bit is_empty();
-    return super.is_empty();
-  endfunction
-    
-  //--------------------------------------------------------------------
-  // first
-  //
-  // Move the current position of the iterator to the first item in the
-  // vector -- i.e. the 0th position.
-  //--------------------------------------------------------------------
-  virtual function bit first();
-    idx = 0;
-    return (m_list != null && m_list.size() > 0);
-  endfunction
-
-  //--------------------------------------------------------------------
-  // next
-  //
-  // Advance the current position to the next item, the one whose index
-  // is one greater than the current index.  If the next() position is
-  // beyond the end of the vector then the iterator is in the at_end()
-  // condition.
-  //--------------------------------------------------------------------
-  virtual function bit next();
-    if((m_list == null) || (m_list.size() == 0) ||
-       (idx > 0 && (idx >= m_list.size())))
-      return 0;
-    idx++;
-    return 1;
-  endfunction
-
-  //--------------------------------------------------------------------
-  // is_last()
-  //
-  // Answer the question: is the current position the last item in the
-  // vector?
-  //--------------------------------------------------------------------
-  virtual function bit is_last();
-    return ((m_list != null) && (m_list.size() > 0) && (idx >= m_list.size() - 1));
-  endfunction
-
-  //--------------------------------------------------------------------
-  // at_end
-  //
-  // Answer the question: is the current position at the end of the
-  // list?  Note that is_last() and at_end() are two different
-  // conditions. At_end() is the condition where the current postion is
-  // past the end of the list and not referring to a valid location.
-  //--------------------------------------------------------------------
-  virtual function bit at_end();
-    if(m_list == null || m_list.size() == 0)
-      return 1;
-    return (idx >= m_list.size());
-  endfunction
-
-  //--------------------------------------------------------------------
-  // skip
-  //
-  // The Verilator compiler could not find the skip() implementation
-  // in the base class, so we gave it a hint.
-  //--------------------------------------------------------------------
-  virtual function bit skip(signed_index_t distance);
-    return super.skip(distance);
-  endfunction
-
-endclass
-
-
-//----------------------------------------------------------------------
-// class: list_bkwd_iterator
-//
-// Traverse the vector in the backward direction.
-//----------------------------------------------------------------------
-class list_bkwd_iterator#(type T=int, type P=void_traits)
-  extends list_iterator_base#(T,P)
-  implements bkwd_intf#(T,P);
-
-  //--------------------------------------------------------------------
-  // constructor
-  //
-  // Optionally bind a vector to the iterator. 
-  //--------------------------------------------------------------------
-  function new(list_t list_inst = null);
-    super.new(list_inst);
-  endfunction
-
-  // The compiler should automatically find this in the base class.
-  virtual function void set(T t);
-   super.set(t);
-  endfunction  
-
-  // The compiler should automatically find this in the base class.
-  virtual function T get();
-    return super.get();
-  endfunction
-  
-  // The Verilator compiler doesn't seem to be able to find the
-  // implementations in the base class, so we give it a hint.
-  virtual function size_t size();
-    return super.size();
-  endfunction
-    
-  virtual function bit is_empty();
-    return super.is_empty();
-  endfunction
-    
-  //--------------------------------------------------------------------
-  // last
-  //
-  // Most the current position to the last item in the vector -- i.e. to
-  // position N-1.
-  //--------------------------------------------------------------------
-  virtual function bit last();
-    if(m_list == null)
-      return 0;
-    idx = m_list.size() - 1;
-    return (m_list.size() > 0);
-  endfunction
-
-  //--------------------------------------------------------------------
-  // prev
-  //
-  // Move the current postion to the item whose index is one less than
-  // the current one.  If the current position becomes negative, that
-  // is, goes beyond the beginning of the vector, then the iterator is
-  // in the condition at_beginning().
-  //--------------------------------------------------------------------
-  virtual function bit prev();
-    if(m_list == null || m_list.size() == 0 || idx < 0)
-      return 0;
-    idx--;
-    return 1;
-  endfunction
-
-  //--------------------------------------------------------------------
-  // is_first
-  //
-  // Answer the question: Is the current position the first item in the
-  // vector, the 0th position?
-  //--------------------------------------------------------------------
-  virtual function bit is_first();
-    return ((m_list != null) && ((m_list.size() > 0) && (idx == 0)));
-  endfunction
-
-  //--------------------------------------------------------------------
-  // at_beginning
-  //
-  // Answer the question: Is the current position of the iterator beyond
-  // the first item.
-  //--------------------------------------------------------------------
-  virtual function bit at_beginning();
-    if(m_list == null || m_list.size() == 0)
-      return 1;
-    return (idx < 0);
-  endfunction
-
-  //--------------------------------------------------------------------
-  // skip
-  //
-  // The Verilator compiler could not find the skip() implementation
-  // in the base class, so we gave it a hint.
-  //--------------------------------------------------------------------
-  virtual function bit skip(signed_index_t distance);
-    return super.skip(distance);
-  endfunction
-
-endclass
-
-//----------------------------------------------------------------------
 // class: list_random_iterator
 //
 // Choose a random item in the vector.
@@ -425,16 +222,16 @@ class list_random_iterator#(type T=int, type P=void_traits)
 endclass
 
 //----------------------------------------------------------------------
-// class: list_bidir_iterator
+// class: list_iterator
 //
 // Traverse the vector in either the foward or backward direction.
 //----------------------------------------------------------------------
-class list_bidir_iterator#(type T=int, type P=void_traits)
+class list_iterator#(type T=int, type P=void_traits)
   extends list_iterator_base#(T,P)
-  implements bidir_intf#(T,P);
+  implements fwd_intf#(T,P), bkwd_intf#(T,P);
 
   //--------------------------------------------------------------------
-  // constrtuctor
+  // constructor
   //--------------------------------------------------------------------
   function new(list_t list_inst = null);
     super.new(list_inst);
@@ -442,7 +239,7 @@ class list_bidir_iterator#(type T=int, type P=void_traits)
 
   // The compiler should automatically find this in the base class.
   virtual function void set(T t);
-   super.set(t);
+    super.set(t);
   endfunction  
 
   // The compiler should automatically find this in the base class.

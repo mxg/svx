@@ -27,13 +27,9 @@
 //======================================================================
 
 //----------------------------------------------------------------------
-// typed_iterator
-//
-// The base class for all iterators. It specifies the type of the
-// objects in the container bound to the iterator.  It also contains
-// the empty element.
+// class: iterator_intf_base
 //----------------------------------------------------------------------
-interface class typed_iterator #(type T=int, type P=void_traits);
+interface class iterator_intf_base #(type T=int, type P=void_traits);
 
   /* verilator lint_off UNUSEDPARAM */
   localparam P::empty_t m_empty = P::empty;
@@ -44,13 +40,7 @@ interface class typed_iterator #(type T=int, type P=void_traits);
 
   // Retrieve the iterm at the current index
   pure virtual function T get();
-
-endclass
-//----------------------------------------------------------------------
-// class: iterator_intf_base
-//----------------------------------------------------------------------
-interface class iterator_intf_base #(type T=int, type P=void_traits);
-
+  
   // Skip forward or backward in an ordered container. Skip forward if
   // distance is greater than zero; skip backward if the distance is
   // less than zero; don't move the index at all if distance is zero.

@@ -34,7 +34,7 @@
 class map_range #(type KEY=int, type T=void_t, type P=void_traits)
   extends range #(T,P);
 
-  typedef map_bidir_iterator#(KEY,T,P) map_iter_t;
+  typedef map_iterator#(KEY,T,P) map_iter_t;
   map_iter_t map_iter;
 
   function new(map_iter_t it, index_t lower_bound, index_t upper_bound);

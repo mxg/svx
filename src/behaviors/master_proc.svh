@@ -101,7 +101,7 @@ class master_control;
 
   function void show_available();
 
-    list_fwd_uint32_iterator iter = new(available);
+    list_uint32_iterator iter = new(available);
 
     if(!iter.first()) begin
       $display("none available");
@@ -123,7 +123,7 @@ class master_control;
   function void show_active();
 
     process_base p;
-    map_fwd_iterator#(process_base, pid_t, int32_traits) iter = new(active_processes);
+    map_iterator#(process_base, pid_t, int32_traits) iter = new(active_processes);
 
     $write("active :");
     void'(iter.first());

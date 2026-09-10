@@ -247,7 +247,7 @@ class test;
   function void lookup_addrs();
     space_t::addr_t addrs[$] = {'h00000000, 'h8, 'hf0, 'hff00, 'hff01, 'hff04};
     space_t::list_t list;
-    space_t::fwd_iterator_t iter;
+    space_t::iterator_t iter;
     space_t space;
 
     $display("\n--- lookup addrs ---");

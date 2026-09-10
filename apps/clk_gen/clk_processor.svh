@@ -82,7 +82,7 @@ endclass
 class clk_processor#(uint32_t N=1) implements process_if;
   
   typedef vector#(clk_descriptor#(N), class_traits#(clk_descriptor#(N))) clk_vec_t;
-  typedef list_fwd_iterator#(clk_descriptor#(N), class_traits#(clk_descriptor#(N))) iter_t;
+  typedef list_iterator#(clk_descriptor#(N), class_traits#(clk_descriptor#(N))) iter_t;
   
   clk_behavior#(N) beh;
   clk_vec_t clk_vector;

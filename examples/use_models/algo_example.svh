@@ -47,7 +47,7 @@ endclass
 class algo_example;
 
   vector_uint16 vec = new();
-  list_bidir_uint16_iterator iter = new(vec);
+  list_uint16_iterator iter = new(vec);
   greater_equal_50 ge50 = new();
   print p = new();
   range_uint16 rg;

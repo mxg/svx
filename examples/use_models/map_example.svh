@@ -101,7 +101,7 @@ class map_example;
   // --------------------------------------------------------------------
   function void basic_example();
     map#(string, physical_constant, class_traits#(physical_constant)) tbl;
-    map_fwd_iterator#(string, physical_constant, class_traits#(physical_constant)) iter;
+    map_iterator#(string, physical_constant, class_traits#(physical_constant)) iter;
     physical_constant pc;
     string key;
 
@@ -200,7 +200,7 @@ class map_example;
     map#(string, type_container_base, class_traits#(type_container_base)) poly_map;
 
     // declare an iterator for the polymorphic map
-    map_fwd_iterator#(string, type_container_base, class_traits#(type_container_base)) iter;
+    map_iterator#(string, type_container_base, class_traits#(type_container_base)) iter;
     
     int_container ic;
     real_container rc;

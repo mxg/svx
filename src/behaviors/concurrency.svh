@@ -45,7 +45,7 @@
 class process_group extends process_base;
 
   protected deque#(process_base, process_traits) processes;
-  typedef list_fwd_iterator#(process_base, process_traits) iterator_t;
+  typedef list_iterator#(process_base, process_traits) iterator_t;
 
   function new();
     processes = new();

@@ -54,7 +54,7 @@ class pri_queue #(type T=int, type P=void_traits);
   // queues. Each entry in the map is a queue.
   map#(pri_t, queue#(T, P), class_traits#(queue#(T, P))) qmap;
   // Declare an iterator that goes with our map of queues.
-  map_bidir_iterator#(pri_t, queue#(T,P),
+  map_iterator#(pri_t, queue#(T,P),
 		      class_traits#(queue#(T,P))) iter;
 
 

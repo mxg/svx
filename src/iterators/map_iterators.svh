@@ -37,10 +37,6 @@ virtual class map_iterator_base#(type KEY=int,
                                  type T=int,
                                  type P=void_traits);
 
-  // The Verilator compiler does not find this in the base class, so
-  // we provide a hint.
-  localparam P::empty_t m_empty = typed_iterator#(T,P)::m_empty;
-
   typedef map#(KEY,T,P) map_t;
   protected map_t m_map;
   protected KEY index;  // current iterator state
@@ -68,28 +64,6 @@ virtual class map_iterator_base#(type KEY=int,
    endfunction
 
   //--------------------------------------------------------------------
-  // set
-  //
-  // Set the value of the item at the current position
-  //--------------------------------------------------------------------
-  virtual function void set(T t);
-    if(m_map == null)
-      return;
-    void'(m_map.insert(index, t));
-  endfunction
-  
-  //--------------------------------------------------------------------
-  // get
-  //
-  // Retrieve the item at the current position
-  //--------------------------------------------------------------------
-  virtual function T get();
-    if(m_map == null)
-      return m_empty;
-    return m_map.get(index);
-  endfunction
-
-  //--------------------------------------------------------------------
   // get_index
   //
   // Reteive the index (key) associated with the item at the current
@@ -113,281 +87,6 @@ virtual class map_iterator_base#(type KEY=int,
     return (m_map == null) || (size() == 0);
   endfunction
   
-endclass
-
-//----------------------------------------------------------------------
-// class: map_fwd_iterator
-//
-// Traverse the map in the forward direction.
-//----------------------------------------------------------------------
-class map_fwd_iterator#(type KEY=int, type T=int, type P=void_traits)
-  extends map_iterator_base#(KEY,T,P)
-  implements fwd_intf#(T,P);
-
-  //--------------------------------------------------------------------
-  // constructor
-  //
-  // Optionally, bind a map to the iterator.
-  //--------------------------------------------------------------------
-  function new(map_t map_inst = null);
-    super.new(map_inst);
-  endfunction
-
-  // Sometimes Verilator cannot find things in a base class.  We
-  // provide a hint for set() and get().
-  virtual function void set(T t);
-    super.set(t);
-  endfunction
-
-  //--------------------------------------------------------------------
-  // get
-  //--------------------------------------------------------------------
-  virtual function T get();
-    return super.get();
-  endfunction  
-
-  //--------------------------------------------------------------------
-  // first
-  //
-  // move the current position to the first item in the map.  the item
-  // that is chosen as the first one is based on the underlying
-  // associative array.
-  //--------------------------------------------------------------------
-  virtual function bit first();
-    state = FIRST;
-    if(is_empty())
-      return 0;
-    return m_map.first(index);
-  endfunction
-  
-  //--------------------------------------------------------------------
-  // next
-  //
-  // Move the current position to the next item item in the map.  The
-  // item defined as the next one is based on the underlying associative
-  // array.
-  //--------------------------------------------------------------------
-  virtual function bit next();
-
-    // check for error conditions
-    if(is_empty() || (state == INVALID) || (state == LAST))
-      return 0;
-
-    // Are we at the last item?  If so, change state to LAST.
-    if((state == VALID || state == FIRST) && is_last()) begin
-      state = LAST;
-      return 1;
-    end
-
-    state = VALID;
-    void'(m_map.next(index));
-    return 1;
-
-  endfunction
-
-  //--------------------------------------------------------------------
-  // is_last
-  //
-  // Answer the question: Is the current item the last one in the map?
-  //--------------------------------------------------------------------
-  virtual function bit is_last();
-
-    KEY last_key;
-
-    // check for error conditions
-    if(is_empty() || (state == INVALID))
-      return 0;
-
-    // Reteive the last key from the associative array and see if the
-    // index is pointing to that item.
-    void'(m_map.last(last_key));
-    return (index == last_key);
-
-  endfunction
-    
-  //--------------------------------------------------------------------
-  // at_end
-  //
-  // Answer the question: Are we at the end of the map -- past the lsat
-  // item?
-  //--------------------------------------------------------------------
-  virtual function bit at_end();
-    return ((m_map != null) &&
-	    ((size() == 0) || ((size() > 0) && (state == LAST))));
-  endfunction
-
-  //--------------------------------------------------------------------
-  // skip
-  //
-  // Skip forward the number of places specified by distance.  Since
-  // this is a forward iterator we can only skip in the forward
-  // direction.
-  //--------------------------------------------------------------------
-  virtual function bit skip(signed_index_t distance);
-    index_t ix;
-    bit ok;
-
-    // check for error conditions
-    if(is_empty() || (state == INVALID) || (distance < 0))
-      return 0;
-
-    // Use the next() operation to advance the current position.
-    ok = 1;
-    for(ix = 0; (ix < distance) && ok; ix++) begin
-     ok = next();
-    end
-
-    return 1;
-    
-  endfunction
-
-  //--------------------------------------------------------------------
-  // The Verilator compiler doesn't seem to be able to find the
-  // implementations in the base class, so we give it a hint.
-  virtual function size_t size();
-    return super.size();
-  endfunction
-    
-  function bit is_empty();
-    return super.is_empty();
-  endfunction
-    
-endclass
-
-//----------------------------------------------------------------------
-// class: map_bkwd_iterator
-//
-// Traverse the map in the backward direction
-//----------------------------------------------------------------------
-class map_bkwd_iterator#(type KEY=int, type T=int, type P=void_traits)
-  extends map_iterator_base#(KEY,T,P)
-  implements bkwd_intf#(T,P);  
-  // constructor
-  //
-  // Optionally, bind a map to the iterator
-  function new(map_t map_inst = null);
-    super.new(map_inst);
-  endfunction  
- 
-  // Sometimes Verilator cannot find things in a base class.  We
-  // provide a hint for set() and get().
-  virtual function void set(T t);
-    super.set(t);
-  endfunction
-
-  virtual function T get();
-    return super.get();
-  endfunction  
- 
-  //--------------------------------------------------------------------
-  // last
-  //
-  // Move the current position to the last item in the map
-  //--------------------------------------------------------------------
-  virtual function bit last();
-
-    // check for error conditions
-    if(is_empty())
-      return 0;
-    
-    state = LAST;
-    return m_map.last(index);
-    
-  endfunction
-    
-  //--------------------------------------------------------------------
-  // prev
-  //
-  // Move the current position to the previous item in the map[
-  //--------------------------------------------------------------------
-  virtual function bit prev();
-
-    // check for error conditions
-    if(is_empty() || (state == FIRST) || (state == INVALID))
-      return 0;
-
-    // Is the current position already pointing to the first item in the
-    // map?
-    if((state == VALID || state == LAST) && is_first()) begin
-      state = FIRST;
-      return 1;
-    end
-
-    state = VALID;
-    void'(m_map.prev(index));
-    return 1;
-
-  endfunction
-
-  //--------------------------------------------------------------------
-  // is_first()
-  //
-  // Answer the question: Is the current position pointing to the first
-  // item in the map?
-  //--------------------------------------------------------------------
-  virtual function bit is_first();
-
-    KEY k;
-    T t;
-
-    // chgeck for error conditions
-    if(is_empty()  || (state == INVALID))
-      return 0;
-
-    if(!m_map.first(k))
-      return 0;
-
-    t = get();
-    return (index == k);
-
-  endfunction
-    
-  //--------------------------------------------------------------------
-  // at_beginning
-  //
-  // Answer the question: Is the current position at the beginning of
-  // the map -- before the first item?
-  //--------------------------------------------------------------------
-  virtual function bit at_beginning();
-    return ((m_map != null) &&
-	    ((size() == 0) || ((size() > 0) && (state == FIRST))));
-  endfunction
-
-  //--------------------------------------------------------------------
-  // skip
-  //
-  // Move the current position one or more places.  Since this is a
-  // backward iterator we can only move backward -- that is, distance
-  // can only be negative.
-  //--------------------------------------------------------------------
-  virtual function bit skip(signed_index_t distance);
-    index_t ix;
-    bit ok;
-
-    // check for error conditions    
-    if(is_empty() || (distance > 0))
-      return 0;
-
-    ok = 1;
-    for(ix = 0; (ix < -distance) && ok; ix++) begin
-     ok = prev();
-    end
-
-    return 1;
-    
-  endfunction
-    
-  //--------------------------------------------------------------------
-  // The Verilator compiler doesn't seem to be able to find the
-  // implementations in the base class, so we give it a hint.
-  virtual function size_t size();
-    return super.size();
-  endfunction
-    
-  virtual function bit is_empty();
-    return super.is_empty();
-  endfunction
-    
 endclass
 
 //----------------------------------------------------------------------
@@ -419,15 +118,26 @@ class map_random_iterator#(type KEY=int, type T=int, type P=void_traits)
   endfunction
 
   //--------------------------------------------------------------------
-  // Sometimes Verilator cannot find things in a base class.  We
-  // provide a hint for set() and get().
+  // set
+  //
+  // Set the value of the item at the current position
+  //--------------------------------------------------------------------
   virtual function void set(T t);
-    super.set(t);
+    if(m_map == null)
+      return;
+    void'(m_map.insert(index, t));
   endfunction
-
+  
+  //--------------------------------------------------------------------
+  // get
+  //
+  // Retrieve the item at the current position
+  //--------------------------------------------------------------------
   virtual function T get();
-    return super.get();
-  endfunction  
+    if(m_map == null)
+      return P::empty;
+    return m_map.get(index);
+  endfunction
 
   //--------------------------------------------------------------------
   // set_seed
@@ -489,7 +199,7 @@ class map_random_iterator#(type KEY=int, type T=int, type P=void_traits)
 endclass
 
 //----------------------------------------------------------------------
-// class: map_bidir_iterator
+// class: map_iterator
 //
 // Traverse either forwards or backward through a map.  Becuase
 // SystemVerilog does not allow multiple inheritance we had to duplicate
@@ -497,23 +207,35 @@ endclass
 // is different is the skip function which, in the bidirectional
 // iterator, allows you to skip either forwards or backwards.1
 // ----------------------------------------------------------------------
-class map_bidir_iterator#(type KEY=int, type T=int, type P=void_traits)
+class map_iterator#(type KEY=int, type T=int, type P=void_traits)
   extends map_iterator_base#(KEY,T,P)
-  implements bidir_intf#(T,P);
+  implements fwd_intf#(T,P), bkwd_intf#(T,P);
 
   function new(map_t map_inst = null);
     super.new(map_inst);
   endfunction
 
-  // Sometimes Verilator cannot find things in a base class.  We
-  // provide a hint for set() and get().
+  //--------------------------------------------------------------------
+  // set
+  //
+  // Set the value of the item at the current position
+  //--------------------------------------------------------------------
   virtual function void set(T t);
-    super.set(t);
+    if(m_map == null)
+      return;
+    void'(m_map.insert(index, t));
   endfunction
-
+  
+  //--------------------------------------------------------------------
+  // get
+  //
+  // Retrieve the item at the current position
+  //--------------------------------------------------------------------
   virtual function T get();
-    return super.get();
-  endfunction  
+    if(m_map == null)
+      return P::empty;
+    return m_map.get(index);
+  endfunction
 
   virtual function KEY get_index();
     return super.get_index();

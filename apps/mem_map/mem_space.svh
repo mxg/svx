@@ -54,7 +54,7 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
   // in their own code to save a bit of typing.  For example,
   //
   //    mem_space#(16)::list_t list;
-  //    mem_space#(16)::fwd_iterator_t iter;
+  //    mem_space#(16)::iterator_t iter;
   //
   //    list = top.find_addr_all(addr);
   //    iter = new(list);
@@ -66,7 +66,7 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
 
   // A typedef for an iterator for traversing the lists returned from
   // searches.
-  typedef list_fwd_iterator#(mem_space_t, class_traits#(mem_space_t)) fwd_iterator_t;
+  typedef list_iterator#(mem_space_t, class_traits#(mem_space_t)) iterator_t;
 
 
   //====================================================================
@@ -270,7 +270,7 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
   function void calculate(addr_t base_addr = 0);
     
     deque#(tree, class_traits#(tree)) children;
-    list_fwd_iterator#(tree, class_traits#(tree)) iter;
+    list_iterator#(tree, class_traits#(tree)) iter;
     mem_space_t child;
 
     // The address is calcluated differently depending on the type of
@@ -307,7 +307,7 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
   //--------------------------------------------------------------------
   function bit check();
     deque#(tree, class_traits#(tree)) children;
-    list_fwd_iterator#(tree, class_traits#(tree)) iter;
+    list_iterator#(tree, class_traits#(tree)) iter;
     mem_space_t child;
 
     bit ok = 1;
@@ -349,8 +349,8 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
   function bit check_overlap();
 
     deque#(tree, class_traits#(tree)) children;
-    list_fwd_iterator#(tree, class_traits#(tree)) outer_iter;
-    list_fwd_iterator#(tree, class_traits#(tree)) inner_iter;
+    list_iterator#(tree, class_traits#(tree)) outer_iter;
+    list_iterator#(tree, class_traits#(tree)) inner_iter;
 
     mem_space_t outer_space;
     mem_space_t inner_space;
@@ -481,7 +481,7 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
   function void find_addr_recurse(addr_t search_addr, ref list_t list,
 				  input bit all = 0);
     deque#(tree, class_traits#(tree)) deq;
-    list_fwd_iterator#(tree, class_traits#(tree)) iter;
+    list_iterator#(tree, class_traits#(tree)) iter;
     mem_space_t space;
     tree t;
     bit is_in_space = 0;
@@ -526,7 +526,7 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
 
   function void dump();
     
-    tree_fwd_iterator iter = new(this);
+    tree_iterator iter = new(this);
 
     $display("--- Memory Map Dump for: %s ---", get_full_name());
     

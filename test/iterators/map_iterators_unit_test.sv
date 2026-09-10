@@ -158,7 +158,7 @@ module map_iterators_unit_test;
       index_t iter_count;
       index_t i;
   
-      map_fwd_iterator#(string, symbol, symbol_traits) iter = new();
+      map_iterator#(string, symbol, symbol_traits) iter = new();
 
       // We could bind the map using the iterator constructor.  We do
       // it here using bind_map() to ensure that function works
@@ -208,7 +208,7 @@ module map_iterators_unit_test;
 
       index_t iter_count;
       index_t i;
-      map_bkwd_iterator#(string, symbol, symbol_traits) iter;
+      map_iterator#(string, symbol, symbol_traits) iter;
 
       iter = new();
       iter.bind_map(symbol_table);
@@ -257,16 +257,15 @@ module map_iterators_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(begin_and_end)
 
-      map_fwd_iterator#(string, symbol, symbol_traits) fwd_iter = new(symbol_table);
-      map_bkwd_iterator#(string, symbol, symbol_traits) bkwd_iter = new(symbol_table);
+      map_iterator#(string, symbol, symbol_traits) iter = new(symbol_table);
 
       // beginning...
-      `FAIL_IF(!fwd_iter.first())
-      `FAIL_IF(!fwd_iter.next())
+      `FAIL_IF(!iter.first())
+      `FAIL_IF(!iter.next())
 
       // ending...
-      `FAIL_IF(!bkwd_iter.last())
-      `FAIL_IF(!bkwd_iter.prev())
+      `FAIL_IF(!iter.last())
+      `FAIL_IF(!iter.prev())
 
     `SVTEST_END
 
@@ -279,43 +278,21 @@ module map_iterators_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(invalid)
 
-      map_fwd_iterator#(string, symbol, symbol_traits) fwd_iter;
-      map_bkwd_iterator#(string, symbol, symbol_traits) bkwd_iter;
-      map_bidir_iterator#(string, symbol, symbol_traits) bidir_iter;
+      map_iterator#(string, symbol, symbol_traits) iter;
 
-      fwd_iter = new(symbol_table);
-      bkwd_iter = new(symbol_table);
-      bidir_iter = new(symbol_table);
+      iter = new(symbol_table);
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      `FAIL_IF(fwd_iter.next())
-      `FAIL_IF(fwd_iter.at_end())
-      `FAIL_IF(fwd_iter.is_last())
+      `FAIL_IF(iter.next())
+      `FAIL_IF(iter.at_end())
+      `FAIL_IF(iter.is_last())
+      `FAIL_IF(iter.prev())
+      `FAIL_IF(iter.at_beginning())
+      `FAIL_IF(iter.is_first())
 
       // Now, make the iterator valid
-      `FAIL_IF(!fwd_iter.first())
-      `FAIL_IF(!fwd_iter.next())
-
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      `FAIL_IF(bkwd_iter.prev())
-      `FAIL_IF(bkwd_iter.at_beginning())
-      `FAIL_IF(bkwd_iter.is_first())
-
-      // Now, make the iterator valid
-      `FAIL_IF(!bkwd_iter.last())
-      `FAIL_IF(!bkwd_iter.prev())
-
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      `FAIL_IF(bidir_iter.next())
-      `FAIL_IF(bidir_iter.at_end())
-      `FAIL_IF(bidir_iter.is_last())
-      `FAIL_IF(bidir_iter.prev())
-      `FAIL_IF(bidir_iter.at_beginning())
-      `FAIL_IF(bidir_iter.is_first())
-
-      // Now, make the iterator valid
-      `FAIL_IF(!bidir_iter.first())
-      `FAIL_IF(!bidir_iter.next())
+      `FAIL_IF(!iter.first())
+      `FAIL_IF(!iter.next())
 
     `SVTEST_END
 
@@ -324,46 +301,25 @@ module map_iterators_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(zero_length)
   
-      map_fwd_iterator#(string, symbol, symbol_traits) fwd_iter;
-      map_bkwd_iterator#(string, symbol, symbol_traits) bkwd_iter;
-      map_bidir_iterator#(string, symbol, symbol_traits) bidir_iter;
+      map_iterator#(string, symbol, symbol_traits) iter;
       map#(string, symbol, symbol_traits) empty_map;
 
       empty_map = new();
-      fwd_iter = new(empty_map);
-      bkwd_iter = new(empty_map);
-      bidir_iter = new(empty_map);
+      iter = new(empty_map);
 
       `FAIL_IF(empty_map.size() != 0)
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      `FAIL_IF(fwd_iter.first())
-      `FAIL_IF(fwd_iter.next())
-      `FAIL_IF(fwd_iter.is_last()) 
-      `FAIL_IF(!fwd_iter.at_end())
+      `FAIL_IF(iter.first())
+      `FAIL_IF(iter.next())
+      `FAIL_IF(iter.is_last()) 
+      `FAIL_IF(!iter.at_end())
+      `FAIL_IF(iter.last())
+      `FAIL_IF(iter.prev())
+      `FAIL_IF(iter.is_first())
+      `FAIL_IF(!iter.at_beginning())
 
-      `FAIL_IF(bkwd_iter.get() != symbol_traits::empty)
-  
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      `FAIL_IF(bkwd_iter.last())
-      `FAIL_IF(bkwd_iter.prev())
-      `FAIL_IF(bkwd_iter.is_first())
-      `FAIL_IF(!bkwd_iter.at_beginning())
-
-      // There is no current item
-      `FAIL_IF(bkwd_iter.get() != symbol_traits::empty)
-      
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      `FAIL_IF(bidir_iter.first())
-      `FAIL_IF(bidir_iter.next())
-      `FAIL_IF(bidir_iter.is_last()) 
-      `FAIL_IF(!bidir_iter.at_end())
-      `FAIL_IF(bidir_iter.last())
-      `FAIL_IF(bidir_iter.prev())
-      `FAIL_IF(bidir_iter.is_first())
-      `FAIL_IF(!bidir_iter.at_beginning())
-
-      `FAIL_IF(bidir_iter.get() != symbol_traits::empty)
+      `FAIL_IF(iter.get() != symbol_traits::empty)
 
     `SVTEST_END
 
@@ -379,52 +335,28 @@ module map_iterators_unit_test;
     `SVTEST(unbound)
 
       // create an iterator that is not bound to a map
-      map_fwd_iterator#(string, symbol, symbol_traits) fwd_iter = new(null);
-      map_bkwd_iterator#(string, symbol, symbol_traits) bkwd_iter = new(null);
-      map_bidir_iterator#(string, symbol, symbol_traits) bidir_iter = new(null);
+      map_iterator#(string, symbol, symbol_traits) iter = new(null);
 
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // Forward iterator
-      `FAIL_IF(fwd_iter.first())
-      `FAIL_IF(fwd_iter.next())
-      `FAIL_IF(fwd_iter.is_last()) 
-      `FAIL_IF(fwd_iter.at_end()) 
-
-      // There is no current item
-      `FAIL_IF(fwd_iter.get() != symbol_traits::empty)
-  
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // Backward iterator
-      `FAIL_IF(bkwd_iter.last())
-      `FAIL_IF(bkwd_iter.prev())
-      `FAIL_IF(bkwd_iter.is_first())
-      `FAIL_IF(bkwd_iter.at_beginning())
-
-      // There is no current item
-      `FAIL_IF(bkwd_iter.get() != symbol_traits::empty)
-
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // Bidirectional iterator
-      `FAIL_IF(bidir_iter.first())
-      `FAIL_IF(bidir_iter.next())
-      `FAIL_IF(bidir_iter.is_last()) 
-      `FAIL_IF(bidir_iter.at_end()) 
-      `FAIL_IF(bidir_iter.last())
-      `FAIL_IF(bidir_iter.prev())
-      `FAIL_IF(bidir_iter.is_first())
-      `FAIL_IF(bidir_iter.at_beginning())
+      `FAIL_IF(iter.first())
+      `FAIL_IF(iter.next())
+      `FAIL_IF(iter.is_last()) 
+      `FAIL_IF(iter.at_end()) 
+      `FAIL_IF(iter.last())
+      `FAIL_IF(iter.prev())
+      `FAIL_IF(iter.is_first())
+      `FAIL_IF(iter.at_beginning())
       
       // There is no current item
-      `FAIL_IF(bidir_iter.get() != symbol_traits::empty)
+      `FAIL_IF(iter.get() != symbol_traits::empty)
       
     `SVTEST_END
 
   //--------------------------------------------------------------------
-  // bidir_fwd_bkwd
+  // fwd_bkwd
   //--------------------------------------------------------------------
-    `SVTEST(bidir_fwd_bkwd)
+    `SVTEST(fwd_bkwd)
 
-      map_bidir_iterator#(string, symbol, symbol_traits) iter;
+      map_iterator#(string, symbol, symbol_traits) iter;
       index_t iter_count;
 
       iter = new(symbol_table);
@@ -576,61 +508,26 @@ module map_iterators_unit_test;
       uint32_t iter_count;
       symbol t;
 
-      map_fwd_iterator#(string, symbol, symbol_traits) fwd_iter;
-      map_bkwd_iterator#(string, symbol, symbol_traits) bkwd_iter;
-      map_bidir_iterator#(string, symbol, symbol_traits) bidir_iter;
+      map_iterator#(string, symbol, symbol_traits) iter;
 
-      // create the iterators and bind them to the symbol table
-      fwd_iter = new(one_map);
-      bkwd_iter = new(one_map);
-      bidir_iter = new(one_map);
+      // create the iterator and bind it to the symbol table
+      iter = new(one_map);
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // First and last should be the same element
-      void'(fwd_iter.first());
-      void'(bkwd_iter.last());
+      void'(iter.first());
+      t = iter.get();
+      void'(iter.last());
 
-      `FAIL_IF(!fwd_iter.is_last())
-      `FAIL_IF(!bkwd_iter.is_first())
-      `FAIL_IF(fwd_iter.get() != bkwd_iter.get())
-
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // Iterate through the map in the foward direction
-      iter_count = 0;
-      void'(fwd_iter.first());
-      while(!fwd_iter.at_end()) begin
-        void'(fwd_iter.next());
-        iter_count++;
-      end
-
-      `FAIL_IF(iter_count != 1)
-
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // Iterate through the map in the backward direction
-      iter_count = 0;
-      void'(bkwd_iter.last());
-      while(!bkwd_iter.at_beginning()) begin
-        void'(bkwd_iter.prev());
-        iter_count++;
-      end
-
-      `FAIL_IF(iter_count != 1)
-
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // First and last should be the same element
-      void'(bidir_iter.first());
-      t = bidir_iter.get();
-      void'(bidir_iter.last());
-
-      `FAIL_IF(t != bidir_iter.get())
+      `FAIL_IF(t != iter.get())
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // Iterate through the map in the foward direction using the
       // bidirectional iterator
       iter_count = 0;
-      void'(bidir_iter.first());
-      while(!bidir_iter.at_end()) begin
-        void'(bidir_iter.next());
+      void'(iter.first());
+      while(!iter.at_end()) begin
+        void'(iter.next());
         iter_count++;
       end
 
@@ -640,9 +537,9 @@ module map_iterators_unit_test;
       // Iterate through the map in the backward direction using the
       // bidirectional iterator
       iter_count = 0;
-      void'(bidir_iter.last());
-      while(!bidir_iter.at_beginning()) begin
-        void'(bidir_iter.prev());
+      void'(iter.last());
+      while(!iter.at_beginning()) begin
+        void'(iter.prev());
         iter_count++;
       end
 

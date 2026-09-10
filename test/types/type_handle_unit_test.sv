@@ -181,7 +181,7 @@ module type_handle_unit_test;
   //--------------------------------------------------------------------
     `SVTEST(get)
 
-      map_fwd_iterator#(type_handle_base, base, base_traits) iter = new(type_map);
+      map_iterator#(type_handle_base, base, base_traits) iter = new(type_map);
       base b;
       uint32_t iter_count = 0;
 

@@ -214,8 +214,8 @@ class mem_page#(uint32_t ADDR_BITS = 32,
 
   function void dump_security(addr_t addr = 0);
 
-    map_fwd_iterator#(addr_t, restrict_t, restrict_traits) iter;
-    map_fwd_iterator#(block_addr_t, block_t, class_traits#(block_t)) block_iter;
+    map_iterator#(addr_t, restrict_t, restrict_traits) iter;
+    map_iterator#(block_addr_t, block_t, class_traits#(block_t)) block_iter;
     block_addr_t block_addr;
     block_t block;
     page_key_t page_key;
@@ -247,7 +247,7 @@ class mem_page#(uint32_t ADDR_BITS = 32,
   //--------------------------------------------------------------------
   function void dump(addr_t addr=0);
 
-    map_fwd_iterator#(block_addr_t, block_t, class_traits#(block_t)) block_iter;
+    map_iterator#(block_addr_t, block_t, class_traits#(block_t)) block_iter;
     block_t block;
     page_key_t page_key;
 

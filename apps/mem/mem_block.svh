@@ -165,7 +165,7 @@ class mem_block#(uint32_t ADDR_BITS = 32,
 
   function void dump_security(addr_t addr = 0);
 
-    map_fwd_iterator#(addr_t, restrict_t, restrict_traits) iter;
+    map_iterator#(addr_t, restrict_t, restrict_traits) iter;
     byte_addr_t word_addr;
 
     iter = new(security_map);
@@ -186,7 +186,7 @@ class mem_block#(uint32_t ADDR_BITS = 32,
   //--------------------------------------------------------------------
   function void dump(addr_t addr=0);
 
-    list_fwd_iterator#(byte_t, byte_unsigned_traits) byte_iter;
+    list_iterator#(byte_t, byte_unsigned_traits) byte_iter;
     byte b;
     index_t count;
 

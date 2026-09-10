@@ -119,48 +119,15 @@ typedef range#(string,    string_traits ) range_string;
 //----------------------------------------------------------------------
 // Common iterator types
 //
-// Forward iterators
-typedef list_fwd_iterator#(int8_t,    int8_traits    ) list_fwd_int8_iterator;
-typedef list_fwd_iterator#(uint8_t,   uint8_traits   ) list_fwd_uint8_iterator;
-typedef list_fwd_iterator#(int16_t,   int16_traits   ) list_fwd_int16_iterator;
-typedef list_fwd_iterator#(uint16_t,  uint16_traits  ) list_fwd_uint16_iterator;
-typedef list_fwd_iterator#(int32_t,   int32_traits   ) list_fwd_int32_iterator;
-typedef list_fwd_iterator#(uint32_t,  uint32_traits  ) list_fwd_uint32_iterator;
-typedef list_fwd_iterator#(int64_t,   int64_traits   ) list_fwd_int64_iterator;
-typedef list_fwd_iterator#(uint64_t,  uint64_traits  ) list_fwd_uint64_iterator;
-typedef list_fwd_iterator#(int128_t,  int128_traits  ) list_fwd_int128_iterator;
-typedef list_fwd_iterator#(uint128_t, uint128_traits ) list_fwd_uint128_iterator;
-typedef list_fwd_iterator#(real,      real_traits    ) list_fwd_real_iterator;
-typedef list_fwd_iterator#(string,    string_traits  ) list_fwd_string_iterator;
-
-//
-// Backward iterators
-//
-typedef list_bkwd_iterator#(uint8_t,   uint8_traits  ) list_bkwd_uint8_iterator;
-typedef list_bkwd_iterator#(int8_t,    int8_traits   ) list_bkwd_int8_iterator;
-typedef list_bkwd_iterator#(uint16_t,  uint16_traits ) list_bkwd_uint16_iterator;
-typedef list_bkwd_iterator#(int16_t,   int16_traits  ) list_bkwd_int16_iterator;
-typedef list_bkwd_iterator#(uint32_t,  uint32_traits ) list_bkwd_uint32_iterator;
-typedef list_bkwd_iterator#(int32_t,   int32_traits  ) list_bkwd_int32_iterator;
-typedef list_bkwd_iterator#(int64_t,   int64_traits  ) list_bkwd_int64_iterator;
-typedef list_bkwd_iterator#(uint64_t,  uint64_traits ) list_bkwd_uint64_iterator;
-typedef list_bkwd_iterator#(int128_t,  int128_traits ) list_bkwd_int128_iterator;
-typedef list_bkwd_iterator#(uint128_t, uint128_traits) list_bkwd_uint128_iterator;
-typedef list_bkwd_iterator#(real,      real_traits   ) list_bkwd_real_iterator;
-typedef list_bkwd_iterator#(string,    string_traits ) list_bkwd_string_iterator;
-
-//
-// Bidirectional iterators
-//
-typedef list_bidir_iterator#(int8_t,    int8_traits   ) list_bidir_int8_iterator;
-typedef list_bidir_iterator#(uint8_t,   uint8_traits  ) list_bidir_uint8_iterator;
-typedef list_bidir_iterator#(int16_t,   int16_traits  ) list_bidir_int16_iterator;
-typedef list_bidir_iterator#(uint16_t,  uint16_traits ) list_bidir_uint16_iterator;
-typedef list_bidir_iterator#(int32_t,   int32_traits  ) list_bidir_int32_iterator;
-typedef list_bidir_iterator#(uint32_t,  uint32_traits ) list_bidir_uint32_iterator;
-typedef list_bidir_iterator#(int64_t,   int64_traits  ) list_bidir_int64_iterator;
-typedef list_bidir_iterator#(uint64_t,  uint64_traits ) list_bidir_uint64_iterator;
-typedef list_bidir_iterator#(int128_t,  int128_traits ) list_bidir_int128_iterator;
-typedef list_bidir_iterator#(uint128_t, uint128_traits) list_bidir_uint128_iterator;
-typedef list_bidir_iterator#(real,      real_traits   ) list_bidir_real_iterator;
-typedef list_bidir_iterator#(string,    string_traits ) list_bidir_string_iterator;
+typedef list_iterator#(int8_t,    int8_traits   ) list_int8_iterator;
+typedef list_iterator#(uint8_t,   uint8_traits  ) list_uint8_iterator;
+typedef list_iterator#(int16_t,   int16_traits  ) list_int16_iterator;
+typedef list_iterator#(uint16_t,  uint16_traits ) list_uint16_iterator;
+typedef list_iterator#(int32_t,   int32_traits  ) list_int32_iterator;
+typedef list_iterator#(uint32_t,  uint32_traits ) list_uint32_iterator;
+typedef list_iterator#(int64_t,   int64_traits  ) list_int64_iterator;
+typedef list_iterator#(uint64_t,  uint64_traits ) list_uint64_iterator;
+typedef list_iterator#(int128_t,  int128_traits ) list_int128_iterator;
+typedef list_iterator#(uint128_t, uint128_traits) list_uint128_iterator;
+typedef list_iterator#(real,      real_traits   ) list_real_iterator;
+typedef list_iterator#(string,    string_traits ) list_string_iterator;

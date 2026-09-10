@@ -51,7 +51,7 @@ class map_task#(type T=int,
   static task map(vector#(T,P) v);
 
     B beh;
-    list_fwd_iterator#(T,P) iter;
+    list_iterator#(T,P) iter;
     
     if(v == null)
       return;
@@ -84,7 +84,7 @@ class map_fcn#(type T=int,
   static function void map(vector#(T,P) v);
 
     B beh;
-    list_fwd_iterator#(T,P) iter;
+    list_iterator#(T,P) iter;
     
     if(v == null)
       return;
@@ -115,7 +115,7 @@ class map_concurrent#(type T=int,
   static task map(vector#(T,P) v);
     
     B beh;
-    list_fwd_iterator#(T,P) iter;
+    list_iterator#(T,P) iter;
     process_behavior#(T) p;
     process_group pg;
     
@@ -166,7 +166,7 @@ class reduce #(type T=int,
   static function R reduce(vector#(T,P) v);
 
     B beh;
-    list_fwd_iterator#(T,P) iter;
+    list_iterator#(T,P) iter;
     R accum;
     
     if(v == null)

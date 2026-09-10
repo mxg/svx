@@ -51,7 +51,7 @@ class list_example;
     
     // An iterator for our list of integers.  Note that the parameters
     // for the iterator are the same as for the vector.
-    list_fwd_uint32_iterator iter;
+    list_uint32_iterator iter;
 
     // create the vector container
     v = new();

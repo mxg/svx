@@ -2,6 +2,21 @@
 
 RELEASE NOTES
 
+Version svx-2.1 <beta 0>
+
+September 2026
+
+----------------------------------------------------------------------
+
+* Refactored iterator base classes to make them simpler.
+
+* Removed fwd, bkwd, and bidir iterators.  Replaced them with just
+  "iterator."  Iterators support both forward and backward access.
+
+----------------------------------------------------------------------
+
+RELEASE NOTES
+
 Version svx-2.0 <beta 1>
 
 August 2026
