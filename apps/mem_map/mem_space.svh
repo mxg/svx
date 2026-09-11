@@ -529,7 +529,7 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
     tree_iterator iter = new(this);
 
     $display("--- Memory Map Dump for: %s ---", get_full_name());
-    
+
     void'(iter.first());
     while(!iter.at_end()) begin
       mem_space ms;

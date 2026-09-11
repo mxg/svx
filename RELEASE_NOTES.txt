@@ -11,7 +11,15 @@ September 2026
 * Refactored iterator base classes to make them simpler.
 
 * Removed fwd, bkwd, and bidir iterators.  Replaced them with just
-  "iterator."  Iterators support both forward and backward access.
+  "iterator."  Iterators support both forward and backward
+  access. Iterators still use fwd and bkwd interfaces, but that is not
+  visible to iterator users.
+
+* Tree_iterator now uses a proper DFS algorithm instead of pre-loading
+  a vector.  The vector is gone.
+
+* FIXED: Tree::get_children() now returns an empty deque instead of a
+  null handle when there are zero children.
 
 ----------------------------------------------------------------------
 

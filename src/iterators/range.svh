@@ -175,8 +175,11 @@ class range#(type T=int, type P=void_traits)
   // last
   //--------------------------------------------------------------------
   virtual function bit last();
-    if(bkwd_iter == null)
+    if(bkwd_iter == null) begin
+      $display("** ERROR: no backward access for iterator (last)");
       return 0;
+    end
+    
     idx = ub;
     if(is_empty())
       return 0;
@@ -189,8 +192,11 @@ class range#(type T=int, type P=void_traits)
   // prev
   //--------------------------------------------------------------------
   virtual function bit prev();
-    if(bkwd_iter == null)
+    if(bkwd_iter == null) begin
+      $display("** ERROR: no backward access for iterator (prev)");
       return 0;
+    end
+    
     if(is_empty())
       return 0;
     if(idx >= lb && idx >= 0) begin

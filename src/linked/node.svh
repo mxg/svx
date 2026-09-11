@@ -63,5 +63,9 @@ class node extends object;
     return m_mark;
   endfunction
 
+  virtual function is_marked();
+    return m_mark;
+  endfunction
+
 endclass
 

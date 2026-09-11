@@ -184,10 +184,10 @@ class tree extends node;
     tree t;
     string nm;
 
-    if(!first_child(nm))
-      return null;
-
     deq = new();
+
+    if(!first_child(nm))
+      return deq;
 
     do begin
       deq.push_back(get_child(nm));

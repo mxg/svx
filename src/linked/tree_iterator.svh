@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,110 +27,14 @@
 // permissions and limitations under the License.
 //======================================================================
 
-//----------------------------------------------------------------------
-// tree_iterator
-//----------------------------------------------------------------------
-virtual class tree_iterator_base #(type T=int, type P=void_traits);
-
-  typedef enum {PREORDER, POSTORDER} order_t;
-
-  typedef deque#(tree, class_traits#(tree)) list_t;
-
-  protected tree m_tree;
-  protected list_t m_list;
-
-  function new(tree t=null, order_t order=PREORDER);
-    bind_tree(t, order);
-  endfunction
-
-  virtual function void bind_tree(tree t=null, order_t order=PREORDER);
-    m_tree = t;
-    generate_list(order);
-  endfunction
-
-  virtual function tree get();
-    return null;
-  endfunction
-
-  virtual function void set(tree t);
-    // set is not implemented for tree iterators.  It's required here to
-    // satisfy the iterator interface.
-  endfunction
-
-  virtual function size_t size();
-    return m_tree.size();
-  endfunction
-
-  virtual function bit is_empty();
-    return (m_tree == null) || (size() == 0);
-  endfunction
-
-  virtual function bit skip(signed_index_t distance);
-    return 0;
-  endfunction
-
-  //--------------------------------------------------------------------
-  // generate_list
-  //--------------------------------------------------------------------
-  protected function void generate_list(order_t order);
-    
-    if(m_tree == null)
-      return;
-
-    m_list = new();
-
-    case(order)
-      PREORDER:    preorder_recurse(m_tree);
-      POSTORDER:   postorder_recurse(m_tree);
-    endcase
-
-  endfunction
-
-  protected function void preorder_recurse(tree t);
-
-    string name;
-    tree c;
-
-    m_list.push_back(t);
-
-    if(!t.first_child(name))
-      return;
-
-    do begin
-      c = t.get_child(name);
-      preorder_recurse(c);
-    end
-    while(t.next_child(name));
-
-  endfunction    
-
-  protected function void postorder_recurse(tree t);
-
-    string name;
-    tree c;
-
-    if(t.first_child(name)) begin
-      do begin
-        c = t.get_child(name);
-        postorder_recurse(c);
-      end
-      while(t.next_child(name));
-    end
-
-    m_list.push_back(t); 
-
-  endfunction
-
-endclass
-
 // //----------------------------------------------------------------------
-// // tree_fwd_iterator
+// // tree_random_iterator
 // //----------------------------------------------------------------------
-// class tree_fwd_iterator #(type T=int, type P=void_traits)
+// class tree_random_iterator #(type T=int, type P=void_traits)
 //   extends tree_iterator_base #(T,P)
-//   implements fwd_intf#(T,P);
+//   implements random_intf#(T,P);
 
-//   list_fwd_iterator#(tree, class_traits#(tree)) iter;
+//   list_random_iterator#(tree, class_traits#(tree)) iter;
 
 //   function new(tree t=null);
 //     super.new(t);
@@ -145,234 +50,197 @@ endclass
 //   virtual function bit is_empty();
 //     return super.is_empty();
 //   endfunction
-
-//   virtual function void bind_tree(tree t=null, order_t order=PREORDER);
-//     super.bind_tree(t, order);
-//     iter = new(m_list);
-//   endfunction  
-
-//   virtual function tree get();
-//     return iter.get();
-//   endfunction
-
-//   virtual function bit skip(signed_index_t distance);
-//     return iter.skip(distance);
-//   endfunction
   
-//   virtual function bit first();
-//     if(iter == null)
-//       return 0;
-//     return iter.first();
-//   endfunction
-
-//   virtual function bit next();
-//     return iter.next();
-//   endfunction
-
-//   virtual function bit is_last();
-//     return iter.is_last();
-//   endfunction
-
-//   virtual function bit at_end();
-//     return iter.at_end();
-//   endfunction
-
-// endclass  
-
-// //----------------------------------------------------------------------
-// // class: tree_bkwd_iterator
-// //----------------------------------------------------------------------
-// class tree_bkwd_iterator #(type T=int, type P=void_traits)
-//   extends tree_iterator_base #(T,P)
-//   implements bkwd_intf#(T,P);
-
-//   list_bkwd_iterator#(tree, class_traits#(tree)) iter;
-
-//   function new(tree t=null);
-//     super.new(t);
-//     iter = new(m_list);
-//   endfunction
-
-//   // The Verilator compiler doesn't seem to be able to find the
-//   // implementations in the base class, so we give it a hint.
-//   virtual function size_t size();
-//     return super.size();
-//   endfunction
-    
-//   virtual function bit is_empty();
-//     return super.is_empty();
-//   endfunction
-
 //   virtual function void bind_tree(tree t=null, order_t order=PREORDER);
 //     super.bind_tree(t, order);
 //     iter = new(m_list);
 //   endfunction  
+
+//   virtual function void set(tree t);
+//     // set is not implemented for tree iterators.  It's required here to
+//     // satisfy the iterator interface.
+//   endfunction
 
 //   virtual function tree get();
 //     return iter.get();
 //   endfunction
 
 //   //--------------------------------------------------------------------
-//   // bkwd_iterator interface functions
+//   // random_iterator interface functions
 //   //--------------------------------------------------------------------
 
+//   virtual function void set_seed(int seed);
+//     iter.set_seed(seed);
+//   endfunction
+
+//   virtual function void set_default_seed();
+//     iter.set_default_seed();
+//   endfunction
+
+//   virtual function bit random();
+//     return iter.random();
+//   endfunction
+
+//   // skip
+//   //
+//   // The Verilator compiler could not find the skip() implementation
+//   // in the base class, so we gave it a hint.
 //   virtual function bit skip(signed_index_t distance);
-//     return iter.skip(distance);
-//   endfunction
-
-//   virtual function bit last();
-//     return iter.last();
-//   endfunction
-
-//   virtual function bit prev();
-//     return iter.prev();
-//   endfunction
-  
-//   virtual function bit is_first();
-//     return iter.is_first();
-//   endfunction
-
-//   virtual function bit at_beginning();
-//     return iter.at_beginning();
+//     return super.skip(distance);
 //   endfunction
 
 // endclass
 
 //----------------------------------------------------------------------
-// tree_random_iterator
-//----------------------------------------------------------------------
-class tree_random_iterator #(type T=int, type P=void_traits)
-  extends tree_iterator_base #(T,P)
-  implements random_intf#(T,P);
-
-  list_random_iterator#(tree, class_traits#(tree)) iter;
-
-  function new(tree t=null);
-    super.new(t);
-    iter = new(m_list);
-  endfunction
-
-  // The Verilator compiler doesn't seem to be able to find the
-  // implementations in the base class, so we give it a hint.
-  virtual function size_t size();
-    return super.size();
-  endfunction
-    
-  virtual function bit is_empty();
-    return super.is_empty();
-  endfunction
-  
-  virtual function void bind_tree(tree t=null, order_t order=PREORDER);
-    super.bind_tree(t, order);
-    iter = new(m_list);
-  endfunction  
-
-  virtual function tree get();
-    return iter.get();
-  endfunction
-
-  //--------------------------------------------------------------------
-  // random_iterator interface functions
-  //--------------------------------------------------------------------
-
-  virtual function void set_seed(int seed);
-    iter.set_seed(seed);
-  endfunction
-
-  virtual function void set_default_seed();
-    iter.set_default_seed();
-  endfunction
-
-  virtual function bit random();
-    return iter.random();
-  endfunction
-
-  // skip
-  //
-  // The Verilator compiler could not find the skip() implementation
-  // in the base class, so we gave it a hint.
-  virtual function bit skip(signed_index_t distance);
-    return super.skip(distance);
-  endfunction
-
-endclass
-
-//----------------------------------------------------------------------
 // tree_iterator
 //----------------------------------------------------------------------
-class tree_iterator #(type T=int, type P=void_traits)
-  extends tree_iterator_base #(T,P)
-  implements fwd_intf#(T,P), bkwd_intf#(T,P);
+class tree_iterator 
+  implements fwd_intf#(tree, class_traits#(tree));
 
-  list_iterator#(tree, class_traits#(tree)) iter;
+  typedef enum {PREORDER, POSTORDER} order_t;
+
+  local tree m_tree;
+  stack#(tree, class_traits#(tree)) stk;
 
   function new(tree t=null);
-    super.new(t);
-    iter = new(m_list);
+    m_tree = t;
+    stk = new();
   endfunction
 
-  // The Verilator compiler doesn't seem to be able to find the
-  // implementations in the base class, so we give it a hint.
+  //--------------------------------------------------------------------
+  // size
+  //
+  // Traverse the tree to count the nodes. Note that this function has
+  // the side effect of changing the marks in the tree nodes.
+  //--------------------------------------------------------------------
   virtual function size_t size();
-    return super.size();
-  endfunction
+    size_t count = 0;
+    stack#(tree, class_traits#(tree)) s;
+    deque#(tree, class_traits#(tree)) q;
+    list_iterator#(tree, class_traits#(tree)) iter;
+
+    if(m_tree == null)
+      return 0;
+
+    m_tree.unmark_all();
+
+    s = new();
+    s.push(m_tree);
     
+    while(!s.is_empty()) begin
+      tree t = s.pop();
+
+      if(t.is_marked())
+	continue;
+
+      t.mark();
+      count++;
+      
+      // Get the set of children.
+      q = t.get_children();
+      iter = new(q);
+      
+      // Push all the children onto the stack.
+      void'(iter.first());
+      while(!iter.at_end()) begin
+	tree t = iter.get();
+	s.push(t);
+	void'(iter.next());
+      end
+    end
+
+    return count;
+    
+  endfunction
+  
+  //--------------------------------------------------------------------
+  // is_empty
+  //--------------------------------------------------------------------
   virtual function bit is_empty();
-    return super.is_empty();
+    return (m_tree == null) || (size() == 0);
   endfunction
   
-  virtual function void bind_tree(tree t=null, order_t order=PREORDER);
-    super.bind_tree(t, order);
-    iter = new(m_list);
-  endfunction  
-
+  //--------------------------------------------------------------------
+  // get
+  //
+  // Retrieve the current tree node
+  //--------------------------------------------------------------------
   virtual function tree get();
-    return iter.get();
+    if(is_empty())
+      return null;
+    return stk.peek();
   endfunction
 
-
   //--------------------------------------------------------------------
-  // fwd_iterator and bkwd_iterator interface functions
+  // first
+  //
+  // Reset the iterator for a new traversal
   //--------------------------------------------------------------------
-  
   virtual function bit first();
-    return iter.first();
+    if(is_empty())
+      return 0;
+    stk.clear();
+    m_tree.unmark_all();
+    stk.push(m_tree);
+    return 1;
   endfunction
 
+  //--------------------------------------------------------------------
+  // next
+  //
+  // Advance to the next node
+  //--------------------------------------------------------------------
   virtual function bit next();
-    return iter.next();
-  endfunction
+    tree t;
+    deque#(tree, class_traits#(tree)) q;
+    list_iterator#(tree, class_traits#(tree)) iter;
 
+    if(at_end())
+      return 0;
+
+    t = stk.pop();
+
+    // Get the set of children.
+    q = t.get_children();
+    iter = new(q);
+
+    // Push all the children onto the stack.
+    void'(iter.first());
+    while(!iter.at_end()) begin
+      tree c = iter.get();
+      stk.push(c);
+      void'(iter.next());
+    end
+
+    return 1;
+    
+  endfunction
+ 
+  //--------------------------------------------------------------------
+  // is_last
+  //--------------------------------------------------------------------
   virtual function bit is_last();
-    return iter.is_last();
+    return (stk.size() == 0);
   endfunction
 
+  //--------------------------------------------------------------------
+  // at_end
+  //--------------------------------------------------------------------
   virtual function bit at_end();
-    return iter.at_end();
+    return (stk.size() == 0);
   endfunction
   
-  virtual function bit last();
-    return iter.last();
-  endfunction
-
-  virtual function bit prev();
-    return iter.prev();
-  endfunction
-  
-  virtual function bit is_first();
-    return iter.is_first();
-  endfunction
-
-  virtual function bit at_beginning();
-    return iter.at_beginning();
-  endfunction
-
+  //--------------------------------------------------------------------
   // skip
   //
-  // The Verilator compiler could not find the skip() implementation
-  // in the base class, so we gave it a hint.
+  // Skip ahead in the traversal
+  //--------------------------------------------------------------------
   virtual function bit skip(signed_index_t distance);
-    return super.skip(distance);
+    if(is_empty())
+      return 0;
+    for(index_t i = 0; i < distance; i++)
+      void'(next());
+    return 1;
   endfunction
 
 endclass

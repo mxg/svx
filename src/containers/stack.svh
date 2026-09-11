@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +37,7 @@ class stack #(type T=int, type P=void_traits) extends vector#(T,P);
   typedef stack#(T,P) this_t;
 
   //--------------------------------------------------------------------
-  // function: pop
+  // pop
   //
   // Remove the item off the top of the stack and return it
   //--------------------------------------------------------------------
@@ -48,7 +49,7 @@ class stack #(type T=int, type P=void_traits) extends vector#(T,P);
   endfunction
 
   //--------------------------------------------------------------------
-  // function: push
+  // push
   //
   // Put an item on the top of the stack
   //--------------------------------------------------------------------
@@ -57,14 +58,23 @@ class stack #(type T=int, type P=void_traits) extends vector#(T,P);
   endfunction
 
   //--------------------------------------------------------------------
-  // function: is_empty
+  // peek
+  //--------------------------------------------------------------------
+  virtual function T peek();
+    if(is_empty())
+      return P::empty;
+    return m_vector[0];
+  endfunction
+
+  //--------------------------------------------------------------------
+  // is_empty
   //--------------------------------------------------------------------
   virtual function bit is_empty();
     return (size() == 0);
   endfunction
 
   //--------------------------------------------------------------------
-  // function: clone
+  // clone
   //
   // Clone a stack
   //--------------------------------------------------------------------
