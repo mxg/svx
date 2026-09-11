@@ -63,6 +63,12 @@ package algo_utils;
     endfunction
   endclass
 
+  class match_name extends predicate#(tree);
+    function bit is_true(tree t);
+      return (t.get_name() == "C");
+    endfunction
+  endclass
+
   class print extends fcn#(uint64_t);
     function void f(uint64_t t);
       $write(" %16x", t);
@@ -318,6 +324,11 @@ module algo_unit_test;
       `FAIL_UNLESS(count == 2);
     `SVTEST_END
 
+  //--------------------------------------------------------------------
+  // find
+  //
+  // find an item a vector
+  //--------------------------------------------------------------------
     `SVTEST(find)
       vector_uint32 vec = vector_uint32::create('{100, 0, 400, 38, 97, 308});
       list_uint32_iterator iter = new(vec);
@@ -326,6 +337,34 @@ module algo_unit_test;
       algo#(uint32_t, uint32_traits)::find(iter, p);
       `FAIL_UNLESS(iter.get() == 0);
       
+    `SVTEST_END
+
+  //--------------------------------------------------------------------
+  // find_tree
+  //
+  // Find a node in a tree using the tree iterator and algo#()
+  //--------------------------------------------------------------------
+    `SVTEST(find_tree)
+
+      match_name p;
+      tree_iterator iter;
+      tree t;
+
+      // create a small tree
+      tree t1 = new("A", null);
+      tree t2 = new("B", t1);
+      tree t3 = new("C", t1);
+      tree t4 = new("D", t3);
+      tree t5 = new("E", t3);
+
+      p = new();
+      iter = new(t1);
+  
+      algo#(tree, class_traits#(tree))::find(iter, p);
+
+      t = iter.get();
+      `FAIL_UNLESS_STR_EQUAL(t.get_name(), "C");
+  
     `SVTEST_END
 
   `SVUNIT_TESTS_END
