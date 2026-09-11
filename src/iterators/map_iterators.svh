@@ -348,6 +348,9 @@ class map_iterator#(type KEY=int, type T=int, type P=void_traits)
 	    ((size() == 0) || ((size() > 0) && (state == FIRST))));
   endfunction
 
+  //--------------------------------------------------------------------
+  // skip
+  //--------------------------------------------------------------------
   virtual function bit skip(signed_index_t distance);
     index_t ix;
     bit ok;

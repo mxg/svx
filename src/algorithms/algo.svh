@@ -103,6 +103,9 @@ class algo#(type T=int, type P=void_traits);
   static function T min(fwd_intf#(T,P) iter);
 
     T m;
+
+    if(iter.is_empty())
+      return P::empty;
     
     void'(iter.first());
     m = iter.get();
@@ -126,6 +129,9 @@ class algo#(type T=int, type P=void_traits);
 
     T m;
     
+    if(iter.is_empty())
+      return P::empty;
+
     void'(iter.first());
     m = iter.get();
     while(!iter.at_end()) begin
@@ -146,8 +152,8 @@ class algo#(type T=int, type P=void_traits);
   // holds (is true).  Return the iterator whose current element is
   // the first element for which the predicate is true.
   //--------------------------------------------------------------------
-  static function iterator_intf_base#(T,P) find(fwd_intf#(T,P) iter, predicate#(T) p);
-    
+  static function void find(fwd_intf#(T,P) iter, predicate#(T) p);
+
     bit found = 0;
     
     void'(iter.first());
@@ -156,8 +162,6 @@ class algo#(type T=int, type P=void_traits);
       if(!found)
 	void'(iter.next());
     end
-    
-    return iter;
     
   endfunction
 

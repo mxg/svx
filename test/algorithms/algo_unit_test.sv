@@ -318,6 +318,16 @@ module algo_unit_test;
       `FAIL_UNLESS(count == 2);
     `SVTEST_END
 
+    `SVTEST(find)
+      vector_uint32 vec = vector_uint32::create('{100, 0, 400, 38, 97, 308});
+      list_uint32_iterator iter = new(vec);
+      lt_100 p = new();
+      
+      algo#(uint32_t, uint32_traits)::find(iter, p);
+      `FAIL_UNLESS(iter.get() == 0);
+      
+    `SVTEST_END
+
   `SVUNIT_TESTS_END
 
 endmodule

@@ -72,7 +72,7 @@ endclass
 //----------------------------------------------------------------------
 class range#(type T=int, type P=void_traits)
   extends range_base
-  implements fwd_intf #(T,P);
+  implements fwd_intf #(T,P), bkwd_intf #(T,P);
 
   typedef iterator_intf_base#(T,P) base_iter_t;
   typedef fwd_intf#(T,P) fwd_iter_t;

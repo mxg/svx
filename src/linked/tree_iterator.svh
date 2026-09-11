@@ -27,70 +27,6 @@
 // permissions and limitations under the License.
 //======================================================================
 
-// //----------------------------------------------------------------------
-// // tree_random_iterator
-// //----------------------------------------------------------------------
-// class tree_random_iterator #(type T=int, type P=void_traits)
-//   extends tree_iterator_base #(T,P)
-//   implements random_intf#(T,P);
-
-//   list_random_iterator#(tree, class_traits#(tree)) iter;
-
-//   function new(tree t=null);
-//     super.new(t);
-//     iter = new(m_list);
-//   endfunction
-
-//   // The Verilator compiler doesn't seem to be able to find the
-//   // implementations in the base class, so we give it a hint.
-//   virtual function size_t size();
-//     return super.size();
-//   endfunction
-    
-//   virtual function bit is_empty();
-//     return super.is_empty();
-//   endfunction
-  
-//   virtual function void bind_tree(tree t=null, order_t order=PREORDER);
-//     super.bind_tree(t, order);
-//     iter = new(m_list);
-//   endfunction  
-
-//   virtual function void set(tree t);
-//     // set is not implemented for tree iterators.  It's required here to
-//     // satisfy the iterator interface.
-//   endfunction
-
-//   virtual function tree get();
-//     return iter.get();
-//   endfunction
-
-//   //--------------------------------------------------------------------
-//   // random_iterator interface functions
-//   //--------------------------------------------------------------------
-
-//   virtual function void set_seed(int seed);
-//     iter.set_seed(seed);
-//   endfunction
-
-//   virtual function void set_default_seed();
-//     iter.set_default_seed();
-//   endfunction
-
-//   virtual function bit random();
-//     return iter.random();
-//   endfunction
-
-//   // skip
-//   //
-//   // The Verilator compiler could not find the skip() implementation
-//   // in the base class, so we gave it a hint.
-//   virtual function bit skip(signed_index_t distance);
-//     return super.skip(distance);
-//   endfunction
-
-// endclass
-
 //----------------------------------------------------------------------
 // tree_iterator
 //----------------------------------------------------------------------
@@ -157,7 +93,15 @@ class tree_iterator
   // is_empty
   //--------------------------------------------------------------------
   virtual function bit is_empty();
-    return (m_tree == null) || (size() == 0);
+    return (m_tree == null);
+  endfunction
+
+  //--------------------------------------------------------------------
+  // set
+  //--------------------------------------------------------------------
+  virtual function void set(tree t);
+    // set is not implemented for tree iterators.  It's required here to
+    // satisfy the iterator interface.
   endfunction
   
   //--------------------------------------------------------------------
@@ -220,7 +164,7 @@ class tree_iterator
   // is_last
   //--------------------------------------------------------------------
   virtual function bit is_last();
-    return (stk.size() == 0);
+    return (stk.size() == 1);
   endfunction
 
   //--------------------------------------------------------------------
@@ -233,10 +177,10 @@ class tree_iterator
   //--------------------------------------------------------------------
   // skip
   //
-  // Skip ahead in the traversal
+  // Skip ahead in the traversal. Csannot skip bcakwards
   //--------------------------------------------------------------------
   virtual function bit skip(signed_index_t distance);
-    if(is_empty())
+    if(is_empty() || distance < 0)
       return 0;
     for(index_t i = 0; i < distance; i++)
       void'(next());

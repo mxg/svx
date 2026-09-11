@@ -150,16 +150,6 @@ interface class bkwd_intf #(type T=int, type P=void_traits)
 endclass
 
 //----------------------------------------------------------------------
-// bidir_intf
-//----------------------------------------------------------------------
-interface class bidir_intf #(type T=int, type P=void_traits)
-  implements fwd_intf #(T,P), bkwd_intf #(T,P);
-  pure virtual function bit prev();
-  pure virtual function void set(T t);
-  pure virtual function T get();
-endclass
-
-//----------------------------------------------------------------------
 // random_intf
 //----------------------------------------------------------------------
 interface class random_intf #(type T=int, type P=void_traits)   
