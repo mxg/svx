@@ -232,6 +232,7 @@ class tree extends node;
     lexer_core lex = new();
     token_t token;
     string id;
+    bit parse_error = 0;
     
     // parse path name. The path name must be a set of name elements
     // separated by dots.  A name element is a string that begins with a
@@ -241,15 +242,24 @@ class tree extends node;
     lex.start(path);
     do begin
       token = lex.get_token();
-      if(token != TOKEN_ID)
+      if(token != TOKEN_ID) begin
+	parse_error = 1;
 	break;
+      end
+      
       id = lex.get_lexeme();
       q.put(id);
       token = lex.get_token();
-      if(token != TOKEN_DOT && token != TOKEN_EOL)
+      if(token != TOKEN_DOT && token != TOKEN_EOL) begin
+	parse_error = 1;
 	break;
+      end
+      
     end while(token != TOKEN_EOL);
 
+    if(parse_error)
+      return null;
+    
     return find_recurse(this, q);
 
   endfunction
@@ -265,12 +275,19 @@ class tree extends node;
     if(t == null || q == null)
       return null;
 
+    // Confirm the tree node has the correct name
+    id = q.get();
+    if(t.get_name() != id)
+      return null;
+
+    // Are we done?
     if(q.is_empty())
       return t;
-    
-    id = q.get();
-    c = t.get_child(id);
 
+    // Continue the search with the child representing the next id in
+    // the queue.
+    id = q.peek();
+    c = t.get_child(id);
     return find_recurse(c, q);
 
   endfunction

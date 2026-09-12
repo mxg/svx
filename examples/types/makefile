@@ -26,31 +26,7 @@
 # permissions and limitations under the License.
 #=======================================================================
 
-EXAMPLES	:= algo calc containers mem mem_map pri_queue types use_models 
+TOP	:= ../..
+include ${TOP}/examples/makefile
 
-MAKE		:= /usr/bin/make -s
-
-phony: clean build run
-
-all: clean build run
-
-clean:
-	@for f in ${EXAMPLES}; do \
-	  cd $$f; \
-	  ${MAKE} clean; \
-	  cd ..; \
-	done
-
-build:
-	@for f in ${EXAMPLES}; do \
-	  cd $$f; \
-	  ${MAKE} build; \
-	  cd ..; \
-	done
-
-run:
-	@for f in ${EXAMPLES}; do \
-	  cd $$f; \
-	  ${MAKE} run; \
-	  cd ..; \
-	done
+EXAMPLES	:= type_check

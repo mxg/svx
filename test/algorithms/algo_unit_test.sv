@@ -65,7 +65,7 @@ package algo_utils;
 
   class match_name extends predicate#(tree);
     function bit is_true(tree t);
-      return (t.get_name() == "C");
+      return (t.get_name() == "D");
     endfunction
   endclass
 
@@ -342,13 +342,15 @@ module algo_unit_test;
   //--------------------------------------------------------------------
   // find_tree
   //
-  // Find a node in a tree using the tree iterator and algo#()
+  // Find a node in a tree using the tree iterator and algo#() This is
+  // both a tree test and an algo test.
   //--------------------------------------------------------------------
     `SVTEST(find_tree)
 
       match_name p;
       tree_iterator iter;
       tree t;
+      tree t_d;
 
       // create a small tree
       tree t1 = new("A", null);
@@ -363,7 +365,12 @@ module algo_unit_test;
       algo#(tree, class_traits#(tree))::find(iter, p);
 
       t = iter.get();
-      `FAIL_UNLESS_STR_EQUAL(t.get_name(), "C");
+      `FAIL_UNLESS_STR_EQUAL(t.get_name(), "D");
+
+      // Locate the node using an alternate technique -- search by
+      // path name.  Did the alternate search find the same node?
+      t_d = t1.find("A.C.D");
+      `FAIL_UNLESS(t == t_d);
   
     `SVTEST_END
 

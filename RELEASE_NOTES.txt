@@ -18,8 +18,13 @@ September 2026
 * Tree_iterator now uses a proper DFS algorithm instead of pre-loading
   a vector.  The vector is gone.
 
+* Now algorithms can use tree iterators.
+
 * FIXED: Tree::get_children() now returns an empty deque instead of a
   null handle when there are zero children.
+
+* FIXED: tree::find(), which finds a tree node by pathname was
+  non-functional.  It works now.
 
 ----------------------------------------------------------------------
 
