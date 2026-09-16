@@ -1,0 +1,1808 @@
+\documentclass[11pt,letterpaper]{report}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{xltabular}
+\usepackage{microtype}
+\usepackage{parskip}
+\usepackage[colorlinks=true, linkcolor=black, urlcolor=blue]{hyperref}
+
+%% tighter table row spacing
+\renewcommand{\arraystretch}{1.25}
+
+%% chapter style: no "Chapter N" heading, just the title
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\normalfont\Huge\bfseries}{}{0pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{10pt}{20pt}
+
+\title{\textbf{SVX Library Class Catalog}\\[0.5em]
+       \large SystemVerilog Extension Library --- Core Library (\texttt{src/})\\[0.3em]
+       \normalsize Version 2.0.1 beta}
+\author{Mark Glasser}
+\date{September 2026}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\chapter{Types}
+
+\section*{\texttt{svx\_types.svh}}
+\addcontentsline{toc}{section}{svx\_types.svh}
+
+\noindent This file defines primitive type aliases (\texttt{int8\_t}\,--\,\texttt{uint128\_t}, \texttt{size\_t}, \texttt{index\_t}, \texttt{signed\_index\_t}, \texttt{pid\_t}) and the boolean constants \texttt{true} and \texttt{false}. It contains no classes.
+
+\section{type\_handle\_base}
+\label{cls:typehandlebase}
+
+\noindent\textbf{Kind:} virtual class\\
+\noindent\textbf{Extends:} \texttt{object}\\
+\noindent Abstract base providing a virtual type-handle accessor
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{get\_type\_handle} & \texttt{type\_handle\_base} & --- & Return the type handle for this object (pure virtual) \\
+\end{xltabular}
+
+\section{type\_handle \#(T)}
+\label{cls:typehandleT}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{type\_handle\_base}\\
+\noindent Singleton type token; one instance per unique type T
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{get\_type} & \texttt{this\_t} & --- & Return (or create) the singleton type handle for T (static) \\
+\texttt{get\_type\_handle} & \texttt{type\_handle\_base} & --- & Return this singleton as a base-class handle \\
+\end{xltabular}
+
+\section{type\_container\_base}
+\label{cls:typecontainerbase}
+
+\noindent\textbf{Kind:} class\\
+\noindent Non-parameterized base for typed containers; provides convert2string and handle access
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{convert2string} & \texttt{string} & --- & Return a human-readable string for the stored object \\
+\texttt{get\_type\_handle} & \texttt{type\_handle\_base} & --- & Return the type handle (returns null in base) \\
+\end{xltabular}
+
+\section{type\_container \#(T)}
+\label{cls:typecontainerT}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{type\_container\_base}\\
+\noindent Wraps a single object of type T together with its type handle
+
+\noindent\textbf{Constructor:} \texttt{new()}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{get\_type\_handle} & \texttt{type\_handle\_base} & --- & Return the type handle for type T \\
+\texttt{set} & \texttt{void} & \texttt{x} & Store a new object, replacing the current one \\
+\texttt{get} & \texttt{T} & --- & Retrieve the stored object \\
+\end{xltabular}
+
+\section{type\_match \#(T1, T2)}
+\label{cls:typematchT1T2}
+
+\noindent\textbf{Kind:} class\\
+\noindent Static utility to test whether two type parameters match or one derives from the other
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{is\_match} & \texttt{bit} & \texttt{line}, \texttt{file} & Assert that T1 and T2 are the same type; fatal if not (static) \\
+\texttt{test\_is\_match} & \texttt{bit} & --- & Return 1 if T1 and T2 are the same type (static) \\
+\texttt{fail\_match} & \texttt{void} & \texttt{line}, \texttt{file} & Emit a fatal message that T1 and T2 do not match (static) \\
+\texttt{is\_derived\_from} & \texttt{bit} & \texttt{line}, \texttt{file} & Assert T1 is derived from T2; fatal if not (static) \\
+\texttt{test\_is\_derived\_from} & \texttt{bit} & --- & Return 1 if T1 is derived from T2 (static) \\
+\texttt{fail\_derived} & \texttt{void} & \texttt{line}, \texttt{file} & Emit a fatal message that T1 is not derived from T2 (static) \\
+\end{xltabular}
+
+\section{typeid \#(T)}
+\label{cls:typeidT}
+
+\noindent\textbf{Kind:} class\\
+\noindent Static utility to classify a type parameter (integral, two-state, four-state, real, string)
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{is\_int} & \texttt{bit} & --- & Return 1 if T is any integral type (static) \\
+\texttt{is\_int\_fail} & \texttt{bit} & --- & Return 1 if T is integral; print error and finish if not (static) \\
+\texttt{is\_two\_state} & \texttt{bit} & --- & Return 1 if T is a two-state integral type (static) \\
+\texttt{is\_two\_state\_fail} & \texttt{bit} & --- & Return 1 if T is two-state; print error and finish if not (static) \\
+\texttt{is\_four\_state} & \texttt{bit} & --- & Return 1 if T is a four-state integral type (static) \\
+\texttt{is\_four\_state\_fail} & \texttt{bit} & --- & Return 1 if T is four-state; print error and finish if not (static) \\
+\texttt{is\_string} & \texttt{bit} & --- & Return 1 if T is string (static) \\
+\texttt{is\_string\_fail} & \texttt{bit} & --- & Return 1 if T is string; print error and finish if not (static) \\
+\texttt{is\_real} & \texttt{bit} & --- & Return 1 if T is real (static) \\
+\texttt{is\_real\_fail} & \texttt{bit} & --- & Return 1 if T is real; print error and finish if not (static) \\
+\end{xltabular}
+
+\chapter{Traits}
+
+\section{void\_traits}
+\label{cls:voidtraits}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{void\_t}\\
+\noindent Root traits class; all traits classes must extend this; provides type flags and utility methods
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{equal} & \texttt{bit} & \texttt{a}, \texttt{b} & Return 1 (void objects are always equivalent) (static) \\
+\texttt{compare} & \texttt{int32\_t} & \texttt{a}, \texttt{b} & Return int cast of !equal(a,b) (static) \\
+\texttt{sort} & \texttt{void} & \texttt{vec} & No-op (static) \\
+\texttt{check\_trait} & \texttt{bit} & \texttt{trait}, \texttt{exp}, \texttt{line}, \texttt{file} & Assert trait==exp; call fail() if not (static) \\
+\texttt{fail} & \texttt{void} & \texttt{line}, \texttt{file} & Emit a fatal traits-failure message (static) \\
+\end{xltabular}
+
+\section{object\_traits}
+\label{cls:objecttraits}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{void\_traits}\\
+\noindent Traits for classes derived from object; delegates equal/compare to object::compare()
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{equal} & \texttt{bit} & \texttt{a}, \texttt{b} & Return 1 if a.compare(b)==0 (static) \\
+\texttt{compare} & \texttt{int32\_t} & \texttt{a}, \texttt{b} & Return a.compare(b) (static) \\
+\texttt{sort} & \texttt{void} & \texttt{vec} & No-op placeholder (static) \\
+\end{xltabular}
+
+\section{class\_traits \#(T)}
+\label{cls:classtraitsT}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{void\_traits}\\
+\noindent Traits for arbitrary class types; equality is pointer equality
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{equal} & \texttt{bit} & \texttt{a}, \texttt{b} & Return 1 if a==b (pointer equality) (static) \\
+\texttt{compare} & \texttt{int32\_t} & \texttt{a}, \texttt{b} & Return int cast of !equal(a,b) (static) \\
+\texttt{sort} & \texttt{void} & \texttt{vec} & No-op placeholder (static) \\
+\end{xltabular}
+
+\section{base\_int\_traits \#(T)}
+\label{cls:baseinttraitsT}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{void\_traits}\\
+\noindent Base traits for all integral types; equal/compare use native operators
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{equal} & \texttt{bit} & \texttt{a}, \texttt{b} & Return 1 if a==b (static) \\
+\texttt{compare} & \texttt{int32\_t} & \texttt{a}, \texttt{b} & Return 1 if a\textgreater{}b, -1 if a\textless{}b, 0 if equal (static) \\
+\texttt{sort} & \texttt{void} & \texttt{vec} & Sort queue in-place using built-in sort (static) \\
+\end{xltabular}
+
+\section{base\_unsigned\_int\_traits \#(T)}
+\label{cls:baseunsignedinttraitsT}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{base\_int\_traits \#(T)}\\
+\noindent Traits variant marking the type as unsigned (sets is\_unsigned=true, is\_signed=false)
+
+\noindent\textit{No public methods.}
+
+
+\section{base\_signed\_int\_traits \#(T)}
+\label{cls:basesignedinttraitsT}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{base\_int\_traits \#(T)}\\
+\noindent Traits variant marking the type as signed (sets is\_signed=true, is\_unsigned=false)
+
+\noindent\textit{No public methods.}
+
+
+\section{base\_four\_state\_traits \#(T)}
+\label{cls:basefourstatetraitsT}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{base\_int\_traits \#(T)}\\
+\noindent Traits base for four-state (logic/reg/integer/time) types
+
+\noindent\textit{No public methods.}
+
+
+\section{integer\_traits}
+\label{cls:integertraits}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{base\_four\_state\_traits \#(integer)}\\
+\noindent Traits specialisation for the four-state signed integer type
+
+\noindent\textit{No public methods.}
+
+
+\section{reg\_traits}
+\label{cls:regtraits}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{base\_four\_state\_traits \#(reg)}\\
+\noindent Traits specialisation for reg (also aliased as logic\_traits and time\_traits)
+
+\noindent\textit{No public methods.}
+
+
+\section{bit\_vector\_traits \#(N)}
+\label{cls:bitvectortraitsN}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{base\_int\_traits \#(bit[N-1:0])}\\
+\noindent Traits for packed bit-vector types of width N
+
+\noindent\textit{No public methods.}
+
+
+\section{real\_base\_traits \#(T)}
+\label{cls:realbasetraitsT}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{void\_traits}\\
+\noindent Base traits for floating-point types; equality uses epsilon comparison
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{equal} & \texttt{bit} & \texttt{a}, \texttt{b} & Return 1 if \\
+\texttt{compare} & \texttt{int32\_t} & \texttt{a}, \texttt{b} & Return 1 if a\textgreater{}b, -1 if a\textless{}b, 0 if within epsilon (static) \\
+\texttt{sort} & \texttt{void} & \texttt{vec} & Sort queue using built-in sort with (item) (static) \\
+\end{xltabular}
+
+\section{string\_traits}
+\label{cls:stringtraits}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{void\_traits}\\
+\noindent Traits for string type; comparison is lexicographic
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{equal} & \texttt{bit} & \texttt{a}, \texttt{b} & Return 1 if a==b (static) \\
+\texttt{compare} & \texttt{int32\_t} & \texttt{a}, \texttt{b} & Return 1 if a\textgreater{}b, -1 if a\textless{}b, 0 if equal (static) \\
+\texttt{sort} & \texttt{void} & \texttt{vec} & Sort queue lexicographically (static) \\
+\end{xltabular}
+
+\chapter{Containers}
+
+\section{void\_t}
+\label{cls:voidt}
+
+\noindent\textbf{Kind:} class\\
+\noindent The empty base class; root of the SVX class hierarchy
+
+\noindent\textit{No public methods.}
+
+
+\section{object}
+\label{cls:object}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{void\_t}\\
+\noindent Basic object providing to\_str, compare, and copy virtual interfaces
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{to\_str} & \texttt{string} & --- & Return a human-readable string representation \\
+\texttt{compare} & \texttt{int} & \texttt{obj} & Compare this object with another; return 0 if equal \\
+\texttt{copy} & \texttt{void} & \texttt{rhs} & Copy state from another object into this one \\
+\end{xltabular}
+
+\section{container}
+\label{cls:container}
+
+\noindent\textbf{Kind:} virtual class\\
+\noindent\textbf{Extends:} \texttt{void\_t}\\
+\noindent Abstract base for any container; specifies size, clear, and is\_empty interface
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{size} & \texttt{size\_t} & --- & Return the number of items in the container (pure virtual) \\
+\texttt{clear} & \texttt{void} & --- & Remove all items from the container (pure virtual) \\
+\texttt{is\_empty} & \texttt{bit} & --- & Return 1 if the container holds no items (pure virtual) \\
+\end{xltabular}
+
+\section{typed\_container \#(T, P)}
+\label{cls:typedcontainerTP}
+
+\noindent\textbf{Kind:} virtual class\\
+\noindent\textbf{Extends:} \texttt{container}\\
+\noindent Parameterized container base; adds element type T and traits class P
+
+\noindent\textbf{Constructor:} \texttt{new()}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{size} & \texttt{size\_t} & --- & Return 0 (override in subclasses) \\
+\texttt{is\_empty} & \texttt{bit} & --- & Return 0 (override in subclasses) \\
+\texttt{clear} & \texttt{void} & --- & No-op (override in subclasses) \\
+\end{xltabular}
+
+\section{vector \#(T, P)}
+\label{cls:vectorTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{typed\_container \#(T, P)}\\
+\noindent Dynamic array container backed by a SystemVerilog queue; supports indexed access and bulk append
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{create} & \texttt{this\_t} & \texttt{list} & Create a new vector pre-populated with a literal queue (static) \\
+\texttt{size} & \texttt{size\_t} & --- & Return the number of items in the vector \\
+\texttt{is\_empty} & \texttt{bit} & --- & Return 1 if the vector contains no elements \\
+\texttt{clear} & \texttt{void} & --- & Remove all elements, returning the vector to an empty state \\
+\texttt{extend} & \texttt{void} & \texttt{sz} & Extend the vector by sz empty elements \\
+\texttt{write} & \texttt{void} & \texttt{idx}, \texttt{t} & Write element t at index idx, extending if needed \\
+\texttt{read} & \texttt{T} & \texttt{idx} & Read element at idx; return empty element if out of range \\
+\texttt{copy} & \texttt{void} & \texttt{vec} & Shallow-copy vec into this vector \\
+\texttt{clone} & \texttt{this\_t} & --- & Return a new vector that is a shallow copy of this one \\
+\texttt{compare} & \texttt{int} & \texttt{v} & Return 0 if vectors are equal, 1 otherwise \\
+\texttt{equal} & \texttt{bit} & \texttt{v} & Return 1 if v has the same size and all elements are P::equal \\
+\texttt{sort} & \texttt{void} & --- & Sort in-place using the P::sort function \\
+\texttt{appendv} & \texttt{void} & \texttt{v} & Append a literal queue to the vector \\
+\texttt{appendc} & \texttt{void} & \texttt{t} & Append a single element to the vector \\
+\texttt{append} & \texttt{void} & \texttt{v} & Append another vector object to this vector \\
+\end{xltabular}
+
+\section{map \#(KEY, T, P)}
+\label{cls:mapKEYTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{typed\_container \#(T, P)}\\
+\noindent Class-based dynamic associative array; allows sparse allocation and pass-by-reference
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{get} & \texttt{T} & \texttt{key} & Return the item for key; return P::empty if not found \\
+\texttt{insert} & \texttt{bit} & \texttt{key}, \texttt{item} & Insert (key,item); return 1 if key is new, 0 if duplicate \\
+\texttt{size} & \texttt{size\_t} & --- & Return the number of entries in the map \\
+\texttt{is\_empty} & \texttt{bit} & --- & Return 1 if the map is empty \\
+\texttt{delete} & \texttt{bit} & \texttt{key} & Remove the entry with key; return 1 on success \\
+\texttt{clear} & \texttt{void} & --- & Remove all entries from the map \\
+\texttt{exists} & \texttt{bit} & \texttt{key} & Return 1 if key exists in the map \\
+\texttt{copy} & \texttt{void} & \texttt{rhs} & Shallow-copy rhs into this map \\
+\texttt{clone} & \texttt{this\_t} & --- & Return a new map that is a shallow copy of this one \\
+\texttt{compare} & \texttt{int32\_t} & \texttt{m} & Return 0 if maps are equal, 1 otherwise \\
+\texttt{equal} & \texttt{bit} & \texttt{m} & Return 1 if both maps have same keys and P::equal values \\
+\texttt{first} & \texttt{bit} & \texttt{index} & Set index to the first (smallest) key; for iterator use \\
+\texttt{last} & \texttt{bit} & \texttt{index} & Set index to the last (largest) key; for iterator use \\
+\texttt{next} & \texttt{bit} & \texttt{index} & Advance index to the next key; for iterator use \\
+\texttt{prev} & \texttt{bit} & \texttt{index} & Retreat index to the previous key; for iterator use \\
+\end{xltabular}
+
+\section{singleton\_map \#(KEY, T, P)}
+\label{cls:singletonmapKEYTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{map \#(KEY, T, P)}\\
+\noindent A map with exactly one global instance; obtain it via get\_inst()
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{get\_inst} & \texttt{this\_t} & --- & Return (or create) the singleton instance (static) \\
+\end{xltabular}
+
+\section{queue \#(T, P)}
+\label{cls:queueTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{vector \#(T, P)}\\
+\noindent FIFO queue; put() inserts at head, get() removes and returns from tail
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{put} & \texttt{void} & \texttt{t} & Insert item at the head of the queue \\
+\texttt{get} & \texttt{T} & --- & Remove and return the item at the tail; return P::empty if empty \\
+\texttt{peek} & \texttt{T} & --- & Return the tail item without removing it \\
+\texttt{is\_empty} & \texttt{bit} & --- & Return 1 if the queue contains no items \\
+\texttt{clone} & \texttt{this\_t} & --- & Return a new queue that is a copy of this one \\
+\end{xltabular}
+
+\section{fixed\_size\_queue \#(T, P)}
+\label{cls:fixedsizequeueTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{queue \#(T, P)}\\
+\noindent Queue with a configurable maximum capacity; put() silently drops items when full
+
+\noindent\textbf{Constructor:} \texttt{new(n)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{set\_max\_size} & \texttt{void} & \texttt{n} & Change the maximum number of entries allowed \\
+\texttt{get\_max\_size} & \texttt{size\_t} & --- & Return the current maximum size \\
+\texttt{put} & \texttt{void} & \texttt{t} & Insert item if queue is not full; update push\_ok flag \\
+\texttt{last\_push\_succeeded} & \texttt{bit} & --- & Return 1 if the most recent put() succeeded \\
+\texttt{is\_full} & \texttt{bit} & --- & Return 1 if the queue is at maximum capacity \\
+\texttt{copy} & \texttt{void} & \texttt{q} & Copy another fixed\_size\_queue into this one \\
+\texttt{clone} & \texttt{this\_t} & --- & Return a new fixed\_size\_queue that is a copy of this one \\
+\texttt{equal} & \texttt{bit} & \texttt{v} & Return 1 if both queues have equal contents and parameters \\
+\end{xltabular}
+
+\section{stack \#(T, P)}
+\label{cls:stackTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{vector \#(T, P)}\\
+\noindent LIFO stack built on vector; push/pop operate on the front of the underlying queue
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{pop} & \texttt{T} & --- & Remove and return the top-of-stack item; return P::empty if empty \\
+\texttt{push} & \texttt{void} & \texttt{t} & Push item onto the top of the stack \\
+\texttt{peek} & \texttt{T} & --- & Return the top item without removing it \\
+\texttt{is\_empty} & \texttt{bit} & --- & Return 1 if the stack contains no items \\
+\texttt{clone} & \texttt{this\_t} & --- & Return a new stack that is a copy of this one \\
+\end{xltabular}
+
+\section{deque \#(T, P)}
+\label{cls:dequeTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{vector \#(T, P)}\\
+\noindent Double-ended queue supporting push and pop at both ends, plus shuffle and reverse
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{pop\_front} & \texttt{T} & --- & Remove and return the item at the front \\
+\texttt{pop\_back} & \texttt{T} & --- & Remove and return the item at the back \\
+\texttt{push\_front} & \texttt{void} & \texttt{t} & Insert item at the front \\
+\texttt{push\_back} & \texttt{void} & \texttt{t} & Insert item at the back \\
+\texttt{shuffle} & \texttt{void} & --- & Randomly reorder all items in-place \\
+\texttt{reverse} & \texttt{void} & --- & Reverse the order of all items in-place \\
+\texttt{clone} & \texttt{this\_t} & --- & Return a new deque that is a copy of this one \\
+\end{xltabular}
+
+\section{circ\_buf \#(T, P, S)}
+\label{cls:circbufTPS}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{typed\_container \#(T, P)}\\
+\noindent Fixed-size circular buffer of capacity S; push\_tail/pop\_head operations
+
+\noindent\textbf{Constructor:} \texttt{new()}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{size} & \texttt{size\_t} & --- & Return the number of items currently in the buffer \\
+\texttt{is\_empty} & \texttt{bit} & --- & Return 1 if the buffer contains no items \\
+\texttt{clear} & \texttt{void} & --- & Reset head, tail, and count to zero \\
+\texttt{is\_full} & \texttt{bit} & --- & Return 1 if the buffer is at capacity S \\
+\texttt{push\_tail} & \texttt{void} & \texttt{t} & Add item at the tail; print error if full \\
+\texttt{pop\_head} & \texttt{T} & --- & Remove and return item from the head; print error if empty \\
+\end{xltabular}
+
+\section{pair \#(T1, T2)}
+\label{cls:pairT1T2}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{void\_t}\\
+\noindent Ordered pair holding two values of potentially different types
+
+\noindent\textbf{Constructor:} \texttt{new(a, b)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{first} & \texttt{T1} & --- & Return the first element \\
+\texttt{second} & \texttt{T2} & --- & Return the second element \\
+\texttt{set\_first} & \texttt{void} & \texttt{t} & Set the first element \\
+\texttt{set\_second} & \texttt{void} & \texttt{t} & Set the second element \\
+\end{xltabular}
+
+\section{triple \#(T1, T2, T3)}
+\label{cls:tripleT1T2T3}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{pair \#(T1, T2)}\\
+\noindent Ordered triple; extends pair with a third element
+
+\noindent\textbf{Constructor:} \texttt{new(a, b, c)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{third} & \texttt{T3} & --- & Return the third element \\
+\texttt{set\_third} & \texttt{void} & \texttt{t} & Set the third element \\
+\end{xltabular}
+
+\section{quadruple \#(T1, T2, T3, T4)}
+\label{cls:quadrupleT1T2T3T4}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{triple \#(T1, T2, T3)}\\
+\noindent Ordered quadruple; extends triple with a fourth element
+
+\noindent\textbf{Constructor:} \texttt{new(a, b, c, d)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{fourth} & \texttt{T4} & --- & Return the fourth element \\
+\texttt{set\_fourth} & \texttt{void} & \texttt{t} & Set the fourth element \\
+\end{xltabular}
+
+\section{sorter \#(T, P)}
+\label{cls:sorterTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent Quicksort implementation for queues of type T using P::compare for ordering
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{sort} & \texttt{void} & \texttt{vec} & Sort the queue in-place (static entry point) \\
+\texttt{qsort} & \texttt{void} & \texttt{vec}, \texttt{l}, \texttt{r} & Recursive quicksort over the slice [l, r] (static) \\
+\end{xltabular}
+
+\chapter{Iterators}
+
+\section{iterator\_intf\_base \#(T, P)}
+\label{cls:iteratorintfbaseTP}
+
+\noindent\textbf{Kind:} interface class\\
+\noindent Root iterator interface defining set, get, skip, size, and is\_empty
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{set} & \texttt{void} & \texttt{t} & Set the value of the item at the current index (pure virtual) \\
+\texttt{get} & \texttt{T} & --- & Retrieve the item at the current index (pure virtual) \\
+\texttt{skip} & \texttt{bit} & \texttt{distance} & Move the index forward (\textgreater{}0) or backward (\textless{}0) by distance (pure virtual) \\
+\texttt{size} & \texttt{size\_t} & --- & Return the number of elements in the bound container (pure virtual) \\
+\texttt{is\_empty} & \texttt{bit} & --- & Return 1 if not bound or the container is empty (pure virtual) \\
+\end{xltabular}
+
+\section{fwd\_intf \#(T, P)}
+\label{cls:fwdintfTP}
+
+\noindent\textbf{Kind:} interface class\\
+\noindent\textbf{Implements:} \texttt{iterator\_intf\_base \#(T}, \texttt{P)}\\
+\noindent Forward iterator interface; adds first, next, is\_last, and at\_end
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{first} & \texttt{bit} & --- & Move to the first item; return 1 on success (pure virtual) \\
+\texttt{next} & \texttt{bit} & --- & Advance to the next item; return 1 on success (pure virtual) \\
+\texttt{is\_last} & \texttt{bit} & --- & Return 1 if pointing at the last item (pure virtual) \\
+\texttt{at\_end} & \texttt{bit} & --- & Return 1 if the iterator is past the last item (pure virtual) \\
+\end{xltabular}
+
+\section{bkwd\_intf \#(T, P)}
+\label{cls:bkwdintfTP}
+
+\noindent\textbf{Kind:} interface class\\
+\noindent\textbf{Implements:} \texttt{iterator\_intf\_base \#(T}, \texttt{P)}\\
+\noindent Backward iterator interface; adds last, prev, is\_first, and at\_beginning
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{last} & \texttt{bit} & --- & Move to the last item; return 1 on success (pure virtual) \\
+\texttt{prev} & \texttt{bit} & --- & Move to the previous item; return 1 on success (pure virtual) \\
+\texttt{is\_first} & \texttt{bit} & --- & Return 1 if pointing at the first item (pure virtual) \\
+\texttt{at\_beginning} & \texttt{bit} & --- & Return 1 if the iterator is before the first item (pure virtual) \\
+\end{xltabular}
+
+\section{random\_intf \#(T, P)}
+\label{cls:randomintfTP}
+
+\noindent\textbf{Kind:} interface class\\
+\noindent\textbf{Implements:} \texttt{iterator\_intf\_base \#(T}, \texttt{P)}\\
+\noindent Random-access iterator interface; adds random selection and seed control
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{random} & \texttt{bit} & --- & Select a random valid element; return 1 on success (pure virtual) \\
+\texttt{set\_seed} & \texttt{void} & \texttt{seed} & Set the RNG seed (pure virtual) \\
+\texttt{set\_default\_seed} & \texttt{void} & --- & Reset to the default RNG seed (pure virtual) \\
+\end{xltabular}
+
+\section{list\_iterator\_base \#(T, P)}
+\label{cls:listiteratorbaseTP}
+
+\noindent\textbf{Kind:} virtual class\\
+\noindent Abstract base for iterators that traverse a vector (or vector-derived) container
+
+\noindent\textbf{Constructor:} \texttt{new(list)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{bind\_list} & \texttt{void} & \texttt{list} & Bind (or rebind) a vector to the iterator \\
+\texttt{set} & \texttt{void} & \texttt{t} & Write t to the item at the current index \\
+\texttt{get} & \texttt{T} & --- & Read the item at the current index \\
+\texttt{skip} & \texttt{bit} & \texttt{distance} & Move the index by distance (clamped to valid range) \\
+\texttt{size} & \texttt{size\_t} & --- & Return the size of the bound container \\
+\texttt{is\_empty} & \texttt{bit} & --- & Return 1 if unbound or the container is empty \\
+\end{xltabular}
+
+\section{list\_random\_iterator \#(T, P)}
+\label{cls:listrandomiteratorTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{list\_iterator\_base \#(T, P)}\\
+\noindent\textbf{Implements:} \texttt{random\_intf \#(T}, \texttt{P)}\\
+\noindent Randomly selects an item in a bound vector
+
+\noindent\textbf{Constructor:} \texttt{new(list\_inst)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{set} & \texttt{void} & \texttt{t} & Delegate to base-class set \\
+\texttt{get} & \texttt{T} & --- & Delegate to base-class get \\
+\texttt{size} & \texttt{size\_t} & --- & Delegate to base-class size \\
+\texttt{is\_empty} & \texttt{bit} & --- & Delegate to base-class is\_empty \\
+\texttt{set\_seed} & \texttt{void} & \texttt{seed} & Seed the RNG \\
+\texttt{set\_default\_seed} & \texttt{void} & --- & Reset RNG to the default seed \\
+\texttt{random} & \texttt{bit} & --- & Choose a random index in the bound vector \\
+\texttt{skip} & \texttt{bit} & \texttt{distance} & Delegate to base-class skip \\
+\end{xltabular}
+
+\section{list\_iterator \#(T, P)}
+\label{cls:listiteratorTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{list\_iterator\_base \#(T, P)}\\
+\noindent\textbf{Implements:} \texttt{fwd\_intf \#(T}, \texttt{P)}, \texttt{bkwd\_intf \#(T}, \texttt{P)}\\
+\noindent Bidirectional iterator over a vector; supports forward and backward traversal
+
+\noindent\textbf{Constructor:} \texttt{new(list\_inst)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{set} & \texttt{void} & \texttt{t} & Delegate to base-class set \\
+\texttt{get} & \texttt{T} & --- & Delegate to base-class get \\
+\texttt{size} & \texttt{size\_t} & --- & Delegate to base-class size \\
+\texttt{is\_empty} & \texttt{bit} & --- & Delegate to base-class is\_empty \\
+\texttt{first} & \texttt{bit} & --- & Move to index 0; return 1 if container is non-empty \\
+\texttt{next} & \texttt{bit} & --- & Advance index by 1; return 1 on success \\
+\texttt{is\_last} & \texttt{bit} & --- & Return 1 if at the last valid index \\
+\texttt{at\_end} & \texttt{bit} & --- & Return 1 if index is past the last element \\
+\texttt{last} & \texttt{bit} & --- & Move to the last valid index \\
+\texttt{prev} & \texttt{bit} & --- & Retreat index by 1; return 1 on success \\
+\texttt{is\_first} & \texttt{bit} & --- & Return 1 if at index 0 \\
+\texttt{at\_beginning} & \texttt{bit} & --- & Return 1 if index is before element 0 \\
+\texttt{skip} & \texttt{bit} & \texttt{distance} & Delegate to base-class skip \\
+\end{xltabular}
+
+\section{map\_iterator\_base \#(KEY, T, P)}
+\label{cls:mapiteratorbaseKEYTP}
+
+\noindent\textbf{Kind:} virtual class\\
+\noindent Abstract base for iterators that traverse a map container
+
+\noindent\textbf{Constructor:} \texttt{new(map\_inst)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{bind\_map} & \texttt{void} & \texttt{m} & Bind (or rebind) a map to the iterator \\
+\texttt{get\_index} & \texttt{KEY} & --- & Return the key (index) at the current position \\
+\texttt{size} & \texttt{size\_t} & --- & Return the number of entries in the bound map \\
+\texttt{is\_empty} & \texttt{bit} & --- & Return 1 if unbound or the map is empty \\
+\end{xltabular}
+
+\section{map\_random\_iterator \#(KEY, T, P)}
+\label{cls:maprandomiteratorKEYTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{map\_iterator\_base \#(KEY, T, P)}\\
+\noindent\textbf{Implements:} \texttt{random\_intf \#(T}, \texttt{P)}\\
+\noindent Randomly selects an entry in a bound map
+
+\noindent\textbf{Constructor:} \texttt{new(map\_inst)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{set} & \texttt{void} & \texttt{t} & Insert t at the current map key \\
+\texttt{get} & \texttt{T} & --- & Return the value at the current map key \\
+\texttt{set\_seed} & \texttt{void} & \texttt{seed} & Seed the RNG \\
+\texttt{set\_default\_seed} & \texttt{void} & --- & Reset RNG to the default seed \\
+\texttt{random} & \texttt{bit} & --- & Choose a random entry from the map \\
+\texttt{skip} & \texttt{bit} & \texttt{distance} & No-op placeholder (not implemented) \\
+\texttt{size} & \texttt{size\_t} & --- & Delegate to base-class size \\
+\texttt{is\_empty} & \texttt{bit} & --- & Delegate to base-class is\_empty \\
+\end{xltabular}
+
+\section{map\_iterator \#(KEY, T, P)}
+\label{cls:mapiteratorKEYTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{map\_iterator\_base \#(KEY, T, P)}\\
+\noindent\textbf{Implements:} \texttt{fwd\_intf \#(T}, \texttt{P)}, \texttt{bkwd\_intf \#(T}, \texttt{P)}\\
+\noindent Bidirectional iterator over a map; traverses in key order
+
+\noindent\textbf{Constructor:} \texttt{new(map\_inst)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{set} & \texttt{void} & \texttt{t} & Insert t at the current map key \\
+\texttt{get} & \texttt{T} & --- & Return the value at the current map key \\
+\texttt{get\_index} & \texttt{KEY} & --- & Return the current key \\
+\texttt{first} & \texttt{bit} & --- & Move to the smallest key; return 1 on success \\
+\texttt{next} & \texttt{bit} & --- & Advance to the next key; return 1 on success \\
+\texttt{is\_last} & \texttt{bit} & --- & Return 1 if at the largest key \\
+\texttt{at\_end} & \texttt{bit} & --- & Return 1 if past the last key \\
+\texttt{last} & \texttt{bit} & --- & Move to the largest key; return 1 on success \\
+\texttt{prev} & \texttt{bit} & --- & Retreat to the previous key; return 1 on success \\
+\texttt{is\_first} & \texttt{bit} & --- & Return 1 if at the smallest key \\
+\texttt{at\_beginning} & \texttt{bit} & --- & Return 1 if before the first key \\
+\texttt{skip} & \texttt{bit} & \texttt{distance} & Move forward or backward by distance steps \\
+\texttt{size} & \texttt{size\_t} & --- & Delegate to base-class size \\
+\texttt{is\_empty} & \texttt{bit} & --- & Delegate to base-class is\_empty \\
+\end{xltabular}
+
+\section{permute\_iterator\_base \#(T, P)}
+\label{cls:permuteiteratorbaseTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent Base for permutation iterators; manages the permutation vector and index arithmetic
+
+\noindent\textbf{Constructor:} \texttt{new(v)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{bind\_vector} & \texttt{void} & \texttt{v} & Bind a vector and initialize the permutation state \\
+\texttt{size} & \texttt{size\_t} & --- & Return the size of the bound vector \\
+\texttt{is\_empty} & \texttt{bit} & --- & Return 1 if unbound or empty \\
+\texttt{set} & \texttt{void} & \texttt{t} & Not implemented for permutation iterators \\
+\texttt{get} & \texttt{T} & --- & Not implemented for permutation iterators \\
+\texttt{get\_nth} & \texttt{T} & \texttt{n} & Return the nth element in the current permutation \\
+\texttt{get\_permutation\_index} & \texttt{longint} & --- & Return the current permutation index (pix) \\
+\texttt{get\_permutation\_vector} & \texttt{vector\#()} & --- & Return a copy of the current permutation vector \\
+\texttt{skip} & \texttt{bit} & \texttt{distance} & Move pix forward or backward by distance \\
+\texttt{print} & \texttt{void} & --- & Print the current permutation to stdout \\
+\end{xltabular}
+
+\section{permute\_random\_iterator \#(T, P)}
+\label{cls:permuterandomiteratorTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{permute\_iterator\_base \#(T, P)}\\
+\noindent\textbf{Implements:} \texttt{random\_intf \#(T}, \texttt{P)}\\
+\noindent Jumps to a randomly chosen permutation of the bound vector
+
+\noindent\textbf{Constructor:} \texttt{new(vec)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{size} & \texttt{size\_t} & --- & Delegate to base-class size \\
+\texttt{is\_empty} & \texttt{bit} & --- & Delegate to base-class is\_empty \\
+\texttt{set\_seed} & \texttt{void} & \texttt{seed} & Seed the RNG \\
+\texttt{set\_default\_seed} & \texttt{void} & --- & Reset RNG to the default seed \\
+\texttt{random} & \texttt{bit} & --- & Jump to a randomly chosen permutation \\
+\texttt{skip} & \texttt{bit} & \texttt{distance} & Delegate to base-class skip \\
+\end{xltabular}
+
+\section{permute\_iterator \#(T, P)}
+\label{cls:permuteiteratorTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{permute\_iterator\_base \#(T, P)}\\
+\noindent\textbf{Implements:} \texttt{fwd\_intf \#(T}, \texttt{P)}, \texttt{bkwd\_intf \#(T}, \texttt{P)}\\
+\noindent Traverses all permutations of a bound vector in lexicographic order, forward or backward
+
+\noindent\textbf{Constructor:} \texttt{new(vec)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{size} & \texttt{size\_t} & --- & Delegate to base-class size \\
+\texttt{is\_empty} & \texttt{bit} & --- & Delegate to base-class is\_empty \\
+\texttt{set} & \texttt{void} & \texttt{t} & Not implemented (satisfies interface) \\
+\texttt{get} & \texttt{T} & --- & Not implemented (satisfies interface) \\
+\texttt{first} & \texttt{bit} & --- & Reset to permutation 0 \\
+\texttt{next} & \texttt{bit} & --- & Advance to the next lexicographic permutation \\
+\texttt{is\_last} & \texttt{bit} & --- & Return 1 if at the last permutation \\
+\texttt{at\_end} & \texttt{bit} & --- & Return 1 if past the last permutation \\
+\texttt{last} & \texttt{bit} & --- & Jump to the last permutation \\
+\texttt{prev} & \texttt{bit} & --- & Retreat to the previous permutation \\
+\texttt{is\_first} & \texttt{bit} & --- & Return 1 if at permutation 0 \\
+\texttt{at\_beginning} & \texttt{bit} & --- & Return 1 if before permutation 0 \\
+\texttt{skip} & \texttt{bit} & \texttt{distance} & Delegate to base-class skip \\
+\end{xltabular}
+
+\section{range\_base}
+\label{cls:rangebase}
+
+\noindent\textbf{Kind:} virtual class\\
+\noindent Stores validated upper and lower bound indices for a range slice
+
+\noindent\textbf{Constructor:} \texttt{new(size, lower\_bound, upper\_bound)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{get\_lower\_bound} & \texttt{index\_t} & --- & Return the lower bound index \\
+\texttt{get\_upper\_bound} & \texttt{index\_t} & --- & Return the upper bound index \\
+\end{xltabular}
+
+\section{range \#(T, P)}
+\label{cls:rangeTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{range\_base}\\
+\noindent\textbf{Implements:} \texttt{fwd\_intf \#(T}, \texttt{P)}, \texttt{bkwd\_intf \#(T}, \texttt{P)}\\
+\noindent Wraps a bidirectional iterator to expose only a sub-range [lower\_bound, upper\_bound]
+
+\noindent\textbf{Constructor:} \texttt{new(it, lower\_bound, upper\_bound)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{set} & \texttt{void} & \texttt{t} & Set the value at the current index via the wrapped iterator \\
+\texttt{get} & \texttt{T} & --- & Get the value at the current index via the wrapped iterator \\
+\texttt{size} & \texttt{size\_t} & --- & Return ub - lb + 1 \\
+\texttt{is\_empty} & \texttt{bit} & --- & Return 1 if the wrapped forward iterator is null or empty \\
+\texttt{first} & \texttt{bit} & --- & Move to the lower-bound position \\
+\texttt{next} & \texttt{bit} & --- & Advance within the range \\
+\texttt{is\_last} & \texttt{bit} & --- & Return 1 if at the upper-bound position \\
+\texttt{at\_end} & \texttt{bit} & --- & Return 1 if past the upper bound \\
+\texttt{last} & \texttt{bit} & --- & Move to the upper-bound position \\
+\texttt{prev} & \texttt{bit} & --- & Retreat within the range \\
+\texttt{is\_first} & \texttt{bit} & --- & Return 1 if at the lower-bound position \\
+\texttt{at\_beginning} & \texttt{bit} & --- & Return 1 if before the lower bound \\
+\texttt{skip} & \texttt{bit} & \texttt{distance} & Delegate skip to the wrapped iterator \\
+\end{xltabular}
+
+\section{map\_range \#(KEY, T, P)}
+\label{cls:maprangeKEYTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{range \#(T, P)}\\
+\noindent A range slice over a map; adds get\_index() to expose the current map key
+
+\noindent\textbf{Constructor:} \texttt{new(it, lower\_bound, upper\_bound)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{get\_index} & \texttt{KEY} & --- & Return the map key at the current iterator position \\
+\end{xltabular}
+
+\chapter{Algorithms}
+
+\section{algo \#(T, P)}
+\label{cls:algoTP}
+
+\noindent\textbf{Kind:} class\\
+\noindent Collection of static algorithm functions that operate on forward iterators and predicates
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{count} & \texttt{uint32\_t} & \texttt{iter}, \texttt{p} & Count elements for which predicate p is true (static) \\
+\texttt{all\_of} & \texttt{bit} & \texttt{iter}, \texttt{p} & Return 1 if p is true for all elements (static) \\
+\texttt{none\_of} & \texttt{bit} & \texttt{iter}, \texttt{p} & Return 1 if p is false for all elements (static) \\
+\texttt{any\_of} & \texttt{bit} & \texttt{iter}, \texttt{p} & Return 1 if p is true for at least one element (static) \\
+\texttt{min} & \texttt{T} & \texttt{iter} & Return the minimum element according to P::compare (static) \\
+\texttt{max} & \texttt{T} & \texttt{iter} & Return the maximum element according to P::compare (static) \\
+\texttt{find} & \texttt{void} & \texttt{iter}, \texttt{p} & Advance iter to the first element for which p is true (static) \\
+\texttt{for\_each} & \texttt{void} & \texttt{iter}, \texttt{fn} & Apply fn.f() to every element in the iteration (static) \\
+\end{xltabular}
+
+\section{accum \#(T, P, A)}
+\label{cls:accumTPA}
+
+\noindent\textbf{Kind:} class\\
+\noindent Accumulation algorithm; applies an accumulator function to all elements of an iteration
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{accumulate} & \texttt{void} & \texttt{iter}, \texttt{fn}, \texttt{acc} & Apply fn.f(t, acc) to every element, updating acc (static) \\
+\end{xltabular}
+
+\section{fcn\_base}
+\label{cls:fcnbase}
+
+\noindent\textbf{Kind:} virtual class\\
+\noindent Non-parameterized root base for function-object classes
+
+\noindent\textit{No public methods.}
+
+
+\section{fcn \#(T)}
+\label{cls:fcnT}
+
+\noindent\textbf{Kind:} virtual class\\
+\noindent\textbf{Extends:} \texttt{fcn\_base}\\
+\noindent Abstract single-argument function object; implement f() to define a per-element operation
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{f} & \texttt{void} & \texttt{t} & Apply the function to item t (pure virtual) \\
+\end{xltabular}
+
+\section{accum\_fcn \#(T, A)}
+\label{cls:accumfcnTA}
+
+\noindent\textbf{Kind:} virtual class\\
+\noindent\textbf{Extends:} \texttt{fcn\_base}\\
+\noindent Abstract accumulator function object; implement f() to fold an item into an accumulator
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{f} & \texttt{void} & \texttt{t}, \texttt{a} & Apply the accumulation function: update accumulator a using item t (pure virtual) \\
+\end{xltabular}
+
+\section{predicate\_base}
+\label{cls:predicatebase}
+
+\noindent\textbf{Kind:} virtual class\\
+\noindent Non-parameterized root base for predicate classes
+
+\noindent\textit{No public methods.}
+
+
+\section{predicate \#(T)}
+\label{cls:predicateT}
+
+\noindent\textbf{Kind:} virtual class\\
+\noindent\textbf{Extends:} \texttt{predicate\_base}\\
+\noindent Abstract predicate; implement is\_true() to define a boolean test on elements of type T
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{is\_true} & \texttt{bit} & \texttt{t} & Return 1 if the predicate holds for t (pure virtual) \\
+\texttt{is\_false} & \texttt{bit} & \texttt{t} & Return !is\_true(t) \\
+\end{xltabular}
+
+\section{and\_pred \#(T)}
+\label{cls:andpredT}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{predicate \#(T)}\\
+\noindent Composite predicate that is true only when both sub-predicates are true
+
+\noindent\textbf{Constructor:} \texttt{new(\_a, \_b)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{is\_true} & \texttt{bit} & \texttt{t} & Return a.is\_true(t) \&\& b.is\_true(t) \\
+\end{xltabular}
+
+\section{or\_pred \#(T)}
+\label{cls:orpredT}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{predicate \#(T)}\\
+\noindent Composite predicate that is true when either sub-predicate is true
+
+\noindent\textbf{Constructor:} \texttt{new(\_a, \_b)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{is\_true} & \texttt{bit} & \texttt{t} & Return a.is\_true(t) \\
+\end{xltabular}
+
+\section{not\_pred \#(T)}
+\label{cls:notpredT}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{predicate \#(T)}\\
+\noindent Negating predicate; is\_true returns the inverse of the wrapped predicate
+
+\noindent\textbf{Constructor:} \texttt{new(\_p)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{is\_true} & \texttt{bit} & \texttt{t} & Return p.is\_false(t) \\
+\end{xltabular}
+
+\section{always\_true \#(T)}
+\label{cls:alwaystrueT}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{predicate \#(T)}\\
+\noindent Constant predicate that is always true regardless of the element value
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{is\_true} & \texttt{bit} & \texttt{t} & Always returns 1 \\
+\end{xltabular}
+
+\section{always\_false \#(T)}
+\label{cls:alwaysfalseT}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{predicate \#(T)}\\
+\noindent Constant predicate that is always false regardless of the element value
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{is\_true} & \texttt{bit} & \texttt{t} & Always returns 0 \\
+\end{xltabular}
+
+\chapter{Linked Structures}
+
+\section{node}
+\label{cls:node}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{object}\\
+\noindent Named, markable object; provides naming service and a mark bit for graph traversals
+
+\noindent\textbf{Constructor:} \texttt{new(nm)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{set\_name} & \texttt{void} & \texttt{nm} & Set the node's name \\
+\texttt{get\_name} & \texttt{string} & --- & Return the node's name \\
+\texttt{mark} & \texttt{void} & --- & Set the mark bit to 1 \\
+\texttt{unmark} & \texttt{void} & --- & Clear the mark bit to 0 \\
+\texttt{get\_mark} & \texttt{bit} & --- & Return the current value of the mark bit \\
+\texttt{is\_marked} & \texttt{(bit)} & --- & Return the mark bit (alias for get\_mark) \\
+\end{xltabular}
+
+\section{tree}
+\label{cls:tree}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{node}\\
+\noindent Classic named tree; each node has one parent and zero or more named children; supports hierarchical path lookup
+
+\noindent\textbf{Constructor:} \texttt{new(nm, p)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{insert} & \texttt{void} & \texttt{t} & Insert tree node t as a child of this node \\
+\texttt{get\_parent} & \texttt{tree} & --- & Return a handle to this node's parent \\
+\texttt{get\_full\_name} & \texttt{string} & --- & Return the full dot-separated hierarchical path name \\
+\texttt{first\_child} & \texttt{bit} & \texttt{nm} & Set nm to the name of the first child; return 1 on success \\
+\texttt{next\_child} & \texttt{bit} & \texttt{nm} & Set nm to the name of the next child; return 1 on success \\
+\texttt{num\_children} & \texttt{size\_t} & --- & Return the number of direct children \\
+\texttt{size} & \texttt{size\_t} & --- & Return the number of children (via deque) \\
+\texttt{get\_children} & \texttt{deque\#()} & --- & Return a deque containing all direct children \\
+\texttt{get\_child} & \texttt{tree} & \texttt{nm} & Return the child with the given name, or null \\
+\texttt{find} & \texttt{tree} & \texttt{path} & Find a descendant by dot-separated hierarchical path \\
+\texttt{mark\_all} & \texttt{void} & --- & Recursively mark this node and all descendants \\
+\texttt{unmark\_all} & \texttt{void} & --- & Recursively unmark this node and all descendants \\
+\end{xltabular}
+
+\section{tree\_iterator}
+\label{cls:treeiterator}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Implements:} \texttt{fwd\_intf \#(tree}, \texttt{class\_traits\#(tree))}\\
+\noindent Pre-order depth-first iterator over a tree; uses an internal stack for traversal
+
+\noindent\textbf{Constructor:} \texttt{new(t)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{size} & \texttt{size\_t} & --- & Count all nodes in the tree (has side effect of changing marks) \\
+\texttt{is\_empty} & \texttt{bit} & --- & Return 1 if no tree is bound \\
+\texttt{set} & \texttt{void} & \texttt{t} & Not implemented (satisfies interface) \\
+\texttt{get} & \texttt{tree} & --- & Return the tree node at the top of the traversal stack \\
+\texttt{first} & \texttt{bit} & --- & Reset the traversal; push the root node \\
+\texttt{next} & \texttt{bit} & --- & Advance to the next node (pop current, push its children) \\
+\texttt{is\_last} & \texttt{bit} & --- & Return 1 if only one node remains on the stack \\
+\texttt{at\_end} & \texttt{bit} & --- & Return 1 if the traversal stack is empty \\
+\texttt{skip} & \texttt{bit} & \texttt{distance} & Skip forward by distance nodes; cannot skip backward \\
+\end{xltabular}
+
+
+\end{document}

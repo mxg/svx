@@ -1,0 +1,634 @@
+\documentclass[11pt,letterpaper]{report}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{xltabular}
+\usepackage{microtype}
+\usepackage{parskip}
+\usepackage[colorlinks=true, linkcolor=black, urlcolor=blue]{hyperref}
+
+%% tighter table row spacing
+\renewcommand{\arraystretch}{1.25}
+
+%% chapter style: no "Chapter N" heading, just the title
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\normalfont\Huge\bfseries}{}{0pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{10pt}{20pt}
+
+\title{\textbf{SVX Library Class Catalog}\\[0.5em]
+       \large SystemVerilog Extension Library --- Applications (\texttt{apps/})\\[0.3em]
+       \normalsize Version 2.0.1 beta}
+\author{Mark Glasser}
+\date{September 2026}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\chapter{Clock Generator}
+
+\section{clk\_descriptor \#(uint32\_t N=1)}
+\label{cls:clkdescriptoruint32tN1}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{object}\\
+\noindent Holds all configuration data for a single clock signal, including name, frequency, duty cycle, high/low times, time scale, and virtual interface handle, and validates those parameters before clock startup.
+
+\noindent\textbf{Constructor:} \texttt{new()}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.55in} >{\small}p{1.1in} >{\small}p{1.1in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{set\_vif} & \texttt{void} & \texttt{vif}, \texttt{index} & Stores the virtual clock interface and the clock index within the interface signal array. \\
+\texttt{set\_name} & \texttt{void} & \texttt{n} & Stores the clock's display name. \\
+\texttt{set\_start\_event} & \texttt{void} & \texttt{e} & Stores the event used to trigger clock startup. \\
+\texttt{set\_duty\_cycle} & \texttt{void} & \texttt{dc} & Sets the duty cycle, accepting only values strictly greater than 0.0 and at most 1.0. \\
+\texttt{set\_freq} & \texttt{void} & \texttt{f} & Sets the clock frequency in Hz. \\
+\texttt{set\_times} & \texttt{void} & \texttt{hi}, \texttt{lo} & Directly sets the clock high-time and low-time values. \\
+\texttt{set\_scale} & \texttt{void} & \texttt{s} & Sets the time-scale enum used when computing period from frequency. \\
+\texttt{set\_initial\_delay} & \texttt{void} & \texttt{t} & Sets the one-time delay applied before the clock begins toggling. \\
+\texttt{set\_verbose} & \texttt{void} & --- & Enables verbose diagnostic messages for this clock. \\
+\texttt{clr\_verbose} & \texttt{void} & --- & Disables verbose diagnostic messages for this clock. \\
+\texttt{scale\_str} & \texttt{string} & --- & Returns the abbreviation string corresponding to the current time\_scale enum value. \\
+\texttt{validate} & \texttt{bit} & --- & Validates all descriptor fields, computing time\_hi and time\_lo from frequency and duty cycle when they have not been set directly, and returns 1 if the descriptor is fully consistent. \\
+\texttt{to\_str} & \texttt{string} & --- & Returns a human-readable summary string of this clock descriptor. \\
+\texttt{compare} & \texttt{int32\_t} & \texttt{obj} & Compares this descriptor to another by clk\_index, returning 0, 1, or -1 for ordering purposes. \\
+\texttt{copy} & \texttt{object} & \texttt{rhs} & Copies all fields from the given clk\_descriptor into this one and returns the result. \\
+\end{xltabular}
+
+\section*{\texttt{clk\_gen.sv}}
+\addcontentsline{toc}{section}{clk\_gen.sv}
+
+\noindent Package wrapper that includes all clock generator source files.
+
+\section{clk\_behavior \#(uint32\_t N=1)}
+\label{cls:clkbehavioruint32tN1}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{task\_behavior\#(clk\_descriptor\#(N))}\\
+\noindent Implements the task body that drives a single clock pin by waiting for the start event and then toggling the bound virtual interface signal forever according to the descriptor's time\_hi and time\_lo values.
+
+\noindent\textbf{Constructor:} \texttt{(none)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.55in} >{\small}p{1.1in} >{\small}p{1.1in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{tsk} & \texttt{void} & --- & Drives the associated clock signal by alternating low and high levels on the virtual interface at the intervals specified in the bound clk\_descriptor. \\
+\end{xltabular}
+
+\section{clk\_processor \#(uint32\_t N=1)}
+\label{cls:clkprocessoruint32tN1}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Implements:} \texttt{process\_if}\\
+\noindent Manages a collection of clock-driving processes by validating a vector of clk\_descriptors, spawning one clk\_behavior task per descriptor in a process\_group, and delegating suspend/resume/kill/await control to that group.
+
+\noindent\textbf{Constructor:} \texttt{(none)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.55in} >{\small}p{1.1in} >{\small}p{1.1in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{set\_vector} & \texttt{void} & \texttt{v} & Validates each clk\_descriptor in the supplied vector and, if all pass, stores the vector for use during exec. \\
+\texttt{print\_descriptors} & \texttt{void} & --- & Iterates over the stored clock descriptor vector and prints each descriptor's to\_str output. \\
+\texttt{exec} & \texttt{void} & --- & Kills any running clock processes, then creates and starts a new process\_group containing one process per clock descriptor. \\
+\texttt{suspend} & \texttt{void} & --- & Delegates suspension of all clock processes to the underlying process\_group. \\
+\texttt{resume} & \texttt{void} & --- & Delegates resumption of all clock processes to the underlying process\_group. \\
+\texttt{kill} & \texttt{void} & --- & Kills all clock processes via the process\_group and sets the group handle to null. \\
+\texttt{is\_done} & \texttt{bit} & --- & Returns whether all clock processes in the group have completed. \\
+\texttt{await} & \texttt{void} & --- & Blocks until all clock processes in the group have completed. \\
+\end{xltabular}
+
+\chapter{Memory Model}
+
+\section*{\texttt{mem\_types.svh}}
+\addcontentsline{toc}{section}{mem\_types.svh}
+
+\noindent Defines type aliases and enumerations used throughout the memory model.
+
+\section{mem\_base \#(uint32\_t ADDR\_BITS=32, uint32\_t PAGE\_BITS=16, uint32\_t BLOCK\_BITS=8, uint32\_t WORD\_SIZE=4)}
+\label{cls:membaseuint32tADDRBITS32uint32tPAGEBITS16uint32tBLOCKBITS8uint32tWORDSIZE4}
+
+\noindent\textbf{Kind:} virtual class\\
+\noindent\textbf{Extends:} \texttt{object}\\
+\noindent Parameterized abstract base class for all memory model components, supplying address-field decomposition helpers, a per-component security map with restriction get/set/clear, and pure-virtual interfaces for read, write, security interrogation, and dump.
+
+\noindent\textbf{Constructor:} \texttt{new(root)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.55in} >{\small}p{1.1in} >{\small}p{1.1in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{get\_page\_key} & \texttt{page\_key\_t} & \texttt{addr} & Extracts and returns the page-index field from a full address. \\
+\texttt{get\_block\_addr} & \texttt{block\_addr\_t} & \texttt{addr} & Extracts and returns the block-address field from a full address. \\
+\texttt{get\_byte\_addr} & \texttt{byte\_addr\_t} & \texttt{addr} & Extracts and returns the byte-address field from a full address. \\
+\texttt{get\_aligned\_byte\_addr} & \texttt{byte\_addr\_t} & \texttt{addr} & Returns the word-aligned byte address by masking off the low-order word-offset bits. \\
+\texttt{is\_word\_aligned} & \texttt{bit} & \texttt{addr} & Returns 1 if the address is aligned to a word boundary, 0 otherwise. \\
+\texttt{construct\_addr} & \texttt{addr\_t} & \texttt{page\_key}, \texttt{block\_addr}, \texttt{byte\_addr} & Assembles a full address from its constituent page, block, and byte fields. \\
+\texttt{read} & \texttt{word\_t} & \texttt{addr} & Pure virtual: reads one word from the given address. \\
+\texttt{write} & \texttt{void} & \texttt{addr}, \texttt{data} & Pure virtual: writes one word to the given address. \\
+\texttt{read\_byte} & \texttt{byte\_t} & \texttt{addr} & Pure virtual: reads one byte from the given address. \\
+\texttt{write\_byte} & \texttt{void} & \texttt{addr}, \texttt{data} & Pure virtual: writes one byte to the given address. \\
+\texttt{set\_error} & \texttt{void} & \texttt{err} & Forwards an error code to the root memory object's error-reporting interface. \\
+\texttt{set\_restriction} & \texttt{void} & \texttt{addr}, \texttt{r} & Inserts or updates an access restriction for the given address in this component's security map. \\
+\texttt{get\_restriction} & \texttt{restrict\_t} & \texttt{addr} & Retrieves the access restriction associated with the given address from this component's security map. \\
+\texttt{clear\_restriction} & \texttt{void} & \texttt{addr} & Removes the access restriction entry for the given address from this component's security map. \\
+\texttt{get\_addr\_restriction} & \texttt{restrict\_t} & \texttt{addr} & Pure virtual: returns the effective security restriction for the given address, searching all levels of the memory hierarchy. \\
+\texttt{dump\_security} & \texttt{void} & \texttt{addr} & Pure virtual: prints this component's security map. \\
+\texttt{dump} & \texttt{void} & \texttt{addr} & Pure virtual: prints this component's memory contents. \\
+\texttt{show\_addr} & \texttt{void} & \texttt{addr} & Displays all decomposed fields of the given address for debugging purposes. \\
+\texttt{show} & \texttt{void} & --- & Displays the current memory organization parameters and address-field masks. \\
+\end{xltabular}
+
+\section{mem\_block \#(uint32\_t ADDR\_BITS=32, uint32\_t PAGE\_BITS=16, uint32\_t BLOCK\_BITS=8, uint32\_t WORD\_SIZE=4)}
+\label{cls:memblockuint32tADDRBITS32uint32tPAGEBITS16uint32tBLOCKBITS8uint32tWORDSIZE4}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{mem\_base\#(ADDR\_BITS, PAGE\_BITS, BLOCK\_BITS, WORD\_SIZE)}\\
+\noindent Implements a memory block as a sparse byte vector, performing big-endian word-aligned and byte-level reads and writes with word-granularity security restriction enforcement.
+
+\noindent\textbf{Constructor:} \texttt{new(root)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.55in} >{\small}p{1.1in} >{\small}p{1.1in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{write} & \texttt{void} & \texttt{addr}, \texttt{data} & Writes one word big-endian into the byte vector, enforcing word alignment and write restrictions. \\
+\texttt{read} & \texttt{word\_t} & \texttt{addr} & Reads one word big-endian from the byte vector, enforcing word alignment and read restrictions. \\
+\texttt{read\_byte} & \texttt{byte\_t} & \texttt{addr} & Reads one byte from the byte vector, enforcing byte-level read restrictions. \\
+\texttt{write\_byte} & \texttt{void} & \texttt{addr}, \texttt{data} & Writes one byte into the byte vector, enforcing byte-level write restrictions. \\
+\texttt{get\_addr\_restriction} & \texttt{restrict\_t} & \texttt{addr} & Returns the word-level security restriction for the given address. \\
+\texttt{dump\_security} & \texttt{void} & \texttt{addr} & Prints all word-level security restrictions stored in this block's security map. \\
+\texttt{dump} & \texttt{void} & \texttt{addr} & Prints all bytes stored in this block in hexadecimal, 16 bytes per line. \\
+\end{xltabular}
+
+\section{mem\_page \#(uint32\_t ADDR\_BITS=32, uint32\_t PAGE\_BITS=16, uint32\_t BLOCK\_BITS=8, uint32\_t WORD\_SIZE=4)}
+\label{cls:mempageuint32tADDRBITS32uint32tPAGEBITS16uint32tBLOCKBITS8uint32tWORDSIZE4}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{mem\_base\#(ADDR\_BITS, PAGE\_BITS, BLOCK\_BITS, WORD\_SIZE)}\\
+\noindent Implements a memory page as a sparse map of blocks, creating blocks on demand and enforcing block-granularity security restrictions before delegating reads and writes to the appropriate block.
+
+\noindent\textbf{Constructor:} \texttt{new(root)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.55in} >{\small}p{1.1in} >{\small}p{1.1in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{write} & \texttt{void} & \texttt{addr}, \texttt{data} & Enforces block-level write restrictions and delegates a word write to the appropriate block, creating the block if it does not yet exist. \\
+\texttt{read} & \texttt{word\_t} & \texttt{addr} & Enforces block-level read restrictions and delegates a word read to the appropriate block, returning 0 if the block is absent. \\
+\texttt{write\_byte} & \texttt{void} & \texttt{addr}, \texttt{data} & Enforces block-level write restrictions and delegates a byte write to the appropriate block, creating the block if necessary. \\
+\texttt{read\_byte} & \texttt{byte\_t} & \texttt{addr} & Enforces block-level read restrictions and delegates a byte read to the appropriate block, returning 0 if the block is absent. \\
+\texttt{set\_word\_restriction} & \texttt{void} & \texttt{addr}, \texttt{r} & Sets a word-level security restriction in the block identified by the given address, creating the block if necessary. \\
+\texttt{clear\_word\_restriction} & \texttt{void} & \texttt{addr} & Clears a word-level security restriction in the block identified by the given address. \\
+\texttt{get\_addr\_restriction} & \texttt{restrict\_t} & \texttt{addr} & Returns the effective restriction for the given address, checking block-level then word-level security maps. \\
+\texttt{dump\_security} & \texttt{void} & \texttt{addr} & Prints this page's block-level security map and then recursively dumps each block's word-level security map. \\
+\texttt{dump} & \texttt{void} & \texttt{addr} & Iterates over all blocks in the page and dumps each one's byte contents. \\
+\end{xltabular}
+
+\section{mem \#(uint32\_t ADDR\_BITS=32, uint32\_t PAGE\_BITS=16, uint32\_t BLOCK\_BITS=8, uint32\_t WORD\_SIZE=4)}
+\label{cls:memuint32tADDRBITS32uint32tPAGEBITS16uint32tBLOCKBITS8uint32tWORDSIZE4}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{mem\_base\#(ADDR\_BITS, PAGE\_BITS, BLOCK\_BITS, WORD\_SIZE)}\\
+\noindent Top-level sparse memory model that organizes pages in a map, enforces three-level (page, block, word) security restrictions on every access, and provides a comprehensive error-reporting interface.
+
+\noindent\textbf{Constructor:} \texttt{new()}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.55in} >{\small}p{1.1in} >{\small}p{1.1in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{write} & \texttt{void} & \texttt{addr}, \texttt{data} & Checks page-level security, then writes a word to the addressed page, creating the page if absent. \\
+\texttt{read} & \texttt{word\_t} & \texttt{addr} & Checks page-level security, then reads a word from the addressed page, returning 0 if the page is absent. \\
+\texttt{write\_byte} & \texttt{void} & \texttt{addr}, \texttt{data} & Checks page-level security, then writes a byte to the addressed page, creating the page if absent. \\
+\texttt{read\_byte} & \texttt{byte\_t} & \texttt{addr} & Checks page-level security, then reads a byte from the addressed page, returning 0 if the page is absent. \\
+\texttt{set\_page\_restriction} & \texttt{void} & \texttt{addr}, \texttt{r} & Sets a page-level security restriction for the page that contains the given address. \\
+\texttt{get\_page\_restriction} & \texttt{restrict\_t} & \texttt{addr} & Returns the page-level security restriction for the page that contains the given address. \\
+\texttt{clear\_page\_restriction} & \texttt{void} & \texttt{addr} & Clears the page-level security restriction for the page that contains the given address. \\
+\texttt{set\_block\_restriction} & \texttt{void} & \texttt{addr}, \texttt{r} & Sets a block-level security restriction in the page identified by the given address, creating the page if absent. \\
+\texttt{clear\_block\_restriction} & \texttt{void} & \texttt{addr} & Clears a block-level security restriction in the page identified by the given address. \\
+\texttt{set\_word\_restriction} & \texttt{void} & \texttt{addr}, \texttt{r} & Sets a word-level security restriction in the appropriate page and block, creating them if absent. \\
+\texttt{clear\_word\_restriction} & \texttt{void} & \texttt{addr} & Clears a word-level security restriction in the page and block identified by the given address. \\
+\texttt{is\_readable} & \texttt{bit} & \texttt{addr} & Returns 1 if the given address has no read restriction active at any level. \\
+\texttt{is\_writable} & \texttt{bit} & \texttt{addr} & Returns 1 if the given address has no write restriction active at any level. \\
+\texttt{get\_addr\_restriction} & \texttt{restrict\_t} & \texttt{addr} & Returns the most restrictive security restriction for the given address across all three hierarchy levels. \\
+\texttt{set\_last\_error} & \texttt{void} & \texttt{err} & Records the most recent error code; called internally by mem\_base::set\_error. \\
+\texttt{last\_operation\_failed} & \texttt{bit} & --- & Returns 1 if the most recent memory operation resulted in any error. \\
+\texttt{get\_last\_error} & \texttt{error\_t} & --- & Returns the error\_t enum value from the most recent operation. \\
+\texttt{get\_last\_op\_string} & \texttt{string} & --- & Returns a formatted string describing the last operation, its address, and the associated error condition. \\
+\texttt{dump\_security} & \texttt{void} & \texttt{addr} & Prints the complete security map for all pages and their blocks. \\
+\texttt{dump} & \texttt{void} & \texttt{addr} & Traverses all pages in order and dumps each page's byte contents. \\
+\end{xltabular}
+
+\section{mem\_bounded \#(uint32\_t ADDR\_BITS=32, uint32\_t PAGE\_BITS=16, uint32\_t BLOCK\_BITS=8, uint32\_t WORD\_SIZE=4)}
+\label{cls:memboundeduint32tADDRBITS32uint32tPAGEBITS16uint32tBLOCKBITS8uint32tWORDSIZE4}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{mem\#(ADDR\_BITS, PAGE\_BITS, BLOCK\_BITS, WORD\_SIZE)}\\
+\noindent Extends the top-level sparse memory with configurable lower and upper address bounds, rejecting any read or write access that falls outside the defined range and locking the bounds on first access.
+
+\noindent\textbf{Constructor:} \texttt{new(lower, upper)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.55in} >{\small}p{1.1in} >{\small}p{1.1in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{set\_bounds} & \texttt{void} & \texttt{lower}, \texttt{upper} & Sets both the lower and upper address bounds, provided the bounds have not yet been locked. \\
+\texttt{set\_lower\_bound} & \texttt{void} & \texttt{lower} & Sets the lower address bound if the bounds are not yet locked. \\
+\texttt{set\_upper\_bound} & \texttt{void} & \texttt{upper} & Sets the upper address bound if the bounds are not yet locked. \\
+\texttt{get\_lower\_bound} & \texttt{addr\_t} & --- & Returns the current lower address bound. \\
+\texttt{get\_upper\_bound} & \texttt{addr\_t} & --- & Returns the current upper address bound. \\
+\texttt{set\_bounds\_lock} & \texttt{void} & --- & Locks the bounds, preventing further modification. \\
+\texttt{get\_bounds\_lock} & \texttt{bit} & --- & Returns 1 if the bounds are locked, 0 otherwise. \\
+\texttt{write} & \texttt{void} & \texttt{addr}, \texttt{data} & Locks bounds, validates the address is within range, then delegates the word write to the parent mem class. \\
+\texttt{read} & \texttt{word\_t} & \texttt{addr} & Locks bounds, validates the address is within range, then delegates the word read to the parent mem class. \\
+\texttt{write\_byte} & \texttt{void} & \texttt{addr}, \texttt{data} & Locks bounds, validates the address is within range, then delegates the byte write to the parent mem class. \\
+\texttt{read\_byte} & \texttt{byte\_t} & \texttt{addr} & Locks bounds, validates the address is within range, then delegates the byte read to the parent mem class. \\
+\texttt{dump} & \texttt{void} & \texttt{addr} & Prints the lower and upper bounds, then delegates to the parent dump. \\
+\end{xltabular}
+
+\section*{\texttt{mem.sv}}
+\addcontentsline{toc}{section}{mem.sv}
+
+\noindent Package wrapper that includes all memory model source files.
+
+\section{restrict\_traits}
+\label{cls:restricttraits}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{void\_t}\\
+\noindent Traits adapter for the restrict\_t enum type that supplies the equality, comparison, and sort operations required by SVX parameterized container classes.
+
+\noindent\textbf{Constructor:} \texttt{(none)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.55in} >{\small}p{1.1in} >{\small}p{1.1in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{equal} & \texttt{bit} & \texttt{a}, \texttt{b} & Static: returns 1 if the two restrict\_t values are equal. \\
+\texttt{compare} & \texttt{int32\_t} & \texttt{a}, \texttt{b} & Static: returns 1, -1, or 0 to indicate the ordering relationship between two restrict\_t values. \\
+\texttt{sort} & \texttt{void} & \texttt{vec} & Static: sorts a queue of restrict\_t values in ascending order. \\
+\end{xltabular}
+
+\chapter{Memory Map}
+
+\section{mem\_space \#(uint32\_t ADDR\_SIZE=32)}
+\label{cls:memspaceuint32tADDRSIZE32}
+
+\noindent\textbf{Kind:} virtual class\\
+\noindent\textbf{Extends:} \texttt{tree}\\
+\noindent Abstract base class for all nodes in a hierarchical address map, providing offset/size storage, absolute-address calculation, sibling overlap detection, recursive address search, and a hierarchical dump.
+
+\noindent\textbf{Constructor:} \texttt{new(name, parent, \_type, \_offset, \_size)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.55in} >{\small}p{1.1in} >{\small}p{1.1in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{insert\_space} & \texttt{void} & \texttt{space} & Adds a child memory space to this node after verifying the child type is permitted. \\
+\texttt{get\_type} & \texttt{mem\_space\_type\_t} & --- & Pure virtual: returns the enum identifying the kind of memory space this object represents. \\
+\texttt{check\_child} & \texttt{bit} & \texttt{child} & Pure virtual: returns 1 if the given child type is permitted under this memory space type. \\
+\texttt{get\_offset} & \texttt{addr\_t} & --- & Returns the byte offset of this space from its parent. \\
+\texttt{get\_size} & \texttt{mem\_size\_t} & --- & Returns the size of this memory space in bytes (or bits for a field). \\
+\texttt{get\_addr} & \texttt{addr\_t} & --- & Returns the calculated absolute address of this memory space. \\
+\texttt{get\_end\_addr} & \texttt{addr\_t} & --- & Returns the last address occupied by this memory space. \\
+\texttt{get\_type\_name} & \texttt{string} & --- & Returns a string name for the mem\_space\_type enum of this object. \\
+\texttt{get\_error} & \texttt{bit} & --- & Returns 1 if this memory space has been flagged as erroneous. \\
+\texttt{clear\_error} & \texttt{void} & --- & Clears the error flag on this memory space. \\
+\texttt{to\_str} & \texttt{string} & --- & Returns a formatted string showing the type, absolute address range, offset, size, and hierarchical name of this space. \\
+\texttt{calculate\_and\_check} & \texttt{bit} & --- & Computes absolute addresses for the entire subtree and then performs consistency checks, returning 1 if all checks pass. \\
+\texttt{calculate} & \texttt{void} & \texttt{base\_addr} & Recursively calculates and stores the absolute address for this space and all its descendants. \\
+\texttt{check} & \texttt{bit} & --- & Recursively checks this space and all descendants for hierarchy violations and sibling overlaps, returning 1 if no errors are found. \\
+\texttt{check\_overlap} & \texttt{bit} & --- & Checks all pairs of sibling spaces under this node for illegal address overlaps, flagging and reporting any that are found. \\
+\texttt{overlaps} & \texttt{bit} & \texttt{space}, \texttt{sibling} & Returns 1 if the two given memory spaces have overlapping address ranges. \\
+\texttt{find\_addr} & \texttt{list\_t} & \texttt{search\_addr} & Returns a list of all leaf memory spaces (registers and memories) whose address range contains the given address. \\
+\texttt{find\_addr\_all} & \texttt{list\_t} & \texttt{search\_addr} & Returns a list of all memory spaces at any hierarchy level whose address range contains the given address. \\
+\texttt{find\_addr\_recurse} & \texttt{void} & \texttt{search\_addr}, \texttt{list}, \texttt{all} & Recursively traverses the hierarchy to collect memory spaces containing the given address into the provided list. \\
+\texttt{dump} & \texttt{void} & --- & Prints a flat listing of all memory spaces in the subtree using a tree iterator. \\
+\end{xltabular}
+
+\section{mem\_field \#(uint32\_t ADDR\_SIZE=32)}
+\label{cls:memfielduint32tADDRSIZE32}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{mem\_space\#(ADDR\_SIZE)}\\
+\noindent Represents a bit field within a register, recording a bit offset and bit width, and prohibiting any children.
+
+\noindent\textbf{Constructor:} \texttt{new(name, parent, \_offset, \_size)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.55in} >{\small}p{1.1in} >{\small}p{1.1in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{get\_type} & \texttt{mem\_space\_type\_t} & --- & Returns the FIELD enum constant. \\
+\texttt{check\_child} & \texttt{bit} & \texttt{child} & Always returns 0 because fields cannot contain children. \\
+\end{xltabular}
+
+\section{mem\_register \#(uint32\_t ADDR\_SIZE=32)}
+\label{cls:memregisteruint32tADDRSIZE32}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{mem\_space\#(ADDR\_SIZE)}\\
+\noindent Represents a hardware register in the address map, allowing only mem\_field children and providing a convenience method to add fields by name.
+
+\noindent\textbf{Constructor:} \texttt{new(name, parent, \_offset, \_size)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.55in} >{\small}p{1.1in} >{\small}p{1.1in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{get\_type} & \texttt{mem\_space\_type\_t} & --- & Returns the REGISTER enum constant. \\
+\texttt{check\_child} & \texttt{bit} & \texttt{child} & Returns 1 only if the child is a FIELD. \\
+\texttt{add\_field} & \texttt{void} & \texttt{name}, \texttt{\_offset}, \texttt{\_size} & Creates and attaches a new mem\_field child with the given name, bit offset, and bit size. \\
+\end{xltabular}
+
+\section{mem\_memory \#(uint32\_t ADDR\_SIZE=32)}
+\label{cls:memmemoryuint32tADDRSIZE32}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{mem\_space\#(ADDR\_SIZE)}\\
+\noindent Represents a contiguous memory region (RAM or ROM) in the address map as a leaf node that cannot contain children.
+
+\noindent\textbf{Constructor:} \texttt{new(name, parent, \_offset, \_size)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.55in} >{\small}p{1.1in} >{\small}p{1.1in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{get\_type} & \texttt{mem\_space\_type\_t} & --- & Returns the MEMORY enum constant. \\
+\texttt{check\_child} & \texttt{bit} & \texttt{child} & Always returns 0 because memory spaces cannot contain children. \\
+\end{xltabular}
+
+\section{mem\_region \#(uint32\_t ADDR\_SIZE=32)}
+\label{cls:memregionuint32tADDRSIZE32}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{mem\_space\#(ADDR\_SIZE)}\\
+\noindent Represents a named address region that may contain registers, memories, sub-regions, and views but not fields, with convenience methods to add each child type.
+
+\noindent\textbf{Constructor:} \texttt{new(name, parent, \_offset, \_size)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.55in} >{\small}p{1.1in} >{\small}p{1.1in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{get\_type} & \texttt{mem\_space\_type\_t} & --- & Returns the REGION enum constant. \\
+\texttt{check\_child} & \texttt{bit} & \texttt{child} & Returns 1 for any child type except FIELD. \\
+\texttt{add\_register} & \texttt{void} & \texttt{name}, \texttt{\_offset}, \texttt{\_size} & Creates and attaches a new mem\_register child. \\
+\texttt{add\_memory} & \texttt{void} & \texttt{name}, \texttt{\_offset}, \texttt{\_size} & Creates and attaches a new mem\_memory child. \\
+\texttt{add\_region} & \texttt{void} & \texttt{name}, \texttt{\_offset}, \texttt{\_size} & Creates and attaches a new mem\_region child. \\
+\texttt{add\_view} & \texttt{void} & \texttt{name}, \texttt{\_offset}, \texttt{\_size} & Creates and attaches a new mem\_view child. \\
+\end{xltabular}
+
+\section{mem\_view \#(uint32\_t ADDR\_SIZE=32)}
+\label{cls:memviewuint32tADDRSIZE32}
+
+\noindent\textbf{Kind:} class\\
+\noindent\textbf{Extends:} \texttt{mem\_space\#(ADDR\_SIZE)}\\
+\noindent Represents an alternate view of a memory region that shares the parent's base address and is permitted to overlap sibling spaces, with convenience methods to add child registers, memories, regions, and views.
+
+\noindent\textbf{Constructor:} \texttt{new(name, parent, \_offset, \_size)}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.55in} >{\small}p{1.1in} >{\small}p{1.1in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{get\_type} & \texttt{mem\_space\_type\_t} & --- & Returns the VIEW enum constant. \\
+\texttt{check\_child} & \texttt{bit} & \texttt{child} & Returns 1 for any child type except FIELD. \\
+\texttt{add\_register} & \texttt{void} & \texttt{name}, \texttt{\_offset}, \texttt{\_size} & Creates and attaches a new mem\_register child. \\
+\texttt{add\_memory} & \texttt{void} & \texttt{name}, \texttt{\_offset}, \texttt{\_size} & Creates and attaches a new mem\_memory child. \\
+\texttt{add\_region} & \texttt{void} & \texttt{name}, \texttt{\_offset}, \texttt{\_size} & Creates and attaches a new mem\_region child. \\
+\texttt{add\_view} & \texttt{void} & \texttt{name}, \texttt{\_offset}, \texttt{\_size} & Creates and attaches a new mem\_view child. \\
+\end{xltabular}
+
+\chapter{Priority Queue}
+
+\section{pri\_queue \#(type T=int, type P=void\_traits)}
+\label{cls:priqueuetypeTinttypePvoidtraits}
+
+\noindent\textbf{Kind:} class\\
+\noindent Generic priority queue implemented as a map of FIFO queues keyed by priority value, returning the highest-priority item on each pop while preserving insertion order among equal-priority items.
+
+\noindent\textbf{Constructor:} \texttt{new()}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.55in} >{\small}p{1.1in} >{\small}p{1.1in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{is\_empty} & \texttt{bit} & --- & Returns 1 if the priority queue contains no items. \\
+\texttt{push} & \texttt{void} & \texttt{pri}, \texttt{item} & Inserts an item at the given priority level, creating a new queue for that priority if one does not already exist. \\
+\texttt{pop} & \texttt{T} & --- & Removes and returns the item with the highest priority, deleting the priority's queue when it becomes empty. \\
+\end{xltabular}
+
+\chapter{RPN Calculator}
+
+\section{calc}
+\label{cls:calc}
+
+\noindent\textbf{Kind:} class\\
+\noindent Reverse Polish Notation calculator that lexes an input string into tokens and evaluates the expression using a stack, supporting integer and floating-point addition, subtraction, multiplication, and division.
+
+\noindent\textbf{Constructor:} \texttt{new()}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.55in} >{\small}p{1.1in} >{\small}p{1.1in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\multicolumn{4}{l}{\textit{(continued\ldots)}} \\
+\midrule
+\textbf{Method} & \textbf{Returns} & \textbf{Arguments} & \textbf{Description} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\textit{(continued on next page\ldots)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{get\_last\_result} & \texttt{item\_t} & --- & Returns the triple holding the token type and value produced by the most recent successful calculate call. \\
+\texttt{print\_item} & \texttt{void} & \texttt{t} & Prints the value of a result item, formatting it as an integer or floating-point number based on its token type. \\
+\texttt{calculate} & \texttt{bit} & \texttt{s} & Parses and evaluates the given RPN expression string, printing the result and returning 1 on success or 0 on any error. \\
+\end{xltabular}
+
+
+\end{document}
