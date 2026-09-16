@@ -40,8 +40,8 @@
 
 `define SVX_PREFIX svx
 `define SVX_MAJOR_VERSION 2
-`define SVX_MINOR_VERSION 0
-`define SVX_FIX_VERSION   1
+`define SVX_MINOR_VERSION 1
+`define SVX_FIX_VERSION   0
 `define SVX_RELEASE_MODE  beta
 
 

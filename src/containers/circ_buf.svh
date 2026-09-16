@@ -27,6 +27,11 @@
 //======================================================================
 
 /* verilator lint_off WIDTHTRUNC */
+
+typedef enum {
+	      REJECT_MODE,
+	      OVERWRITE_MODE
+	      } circ_buf_mode_e;
 //----------------------------------------------------------------------
 // circ_buf
 //----------------------------------------------------------------------
@@ -76,38 +81,38 @@ class circ_buf #(type T=int, type P=void_traits, size_t S=8)
   endfunction
 
   //--------------------------------------------------------------------
-  // push_tail
+  // push
   //--------------------------------------------------------------------
-  virtual function void push_tail(T t);
+  virtual function void push(T t, circ_buf_mode_e mode = REJECT_MODE);
     
-    if(is_full()) begin
+    if(mode == REJECT_MODE && is_full()) begin
       $display("** ERROR: cannot push new item into full circular buffer");
       return;
     end
     
     buffer[tail] = t;
     tail++;
-    if(tail >= S)
+    if(tail >= S) // wrap arround
       tail = 0;
     count ++;
     
   endfunction
 
   //--------------------------------------------------------------------
-  // pop_head
+  // pop
   //--------------------------------------------------------------------
-  virtual function T pop_head();
+  virtual function T pop();
 
     T t;
     
     if(is_empty()) begin
       $display("** ERROR: circular buffer is empty");
-      return m_empty;
+      return P::empty;
     end
     
     t = buffer[head];
     head++;
-    if(head >= S)
+    if(head >= S) // wrap around
       head = 0;
     count --;
     

@@ -90,72 +90,72 @@ module circ_buf_unit_test;
   //===================================
   `SVUNIT_TESTS_BEGIN
 
-    `SVTEST(push_pop)
+    `SVTEST(push_pop_reject_mode)
       int32_t val;
       circ_buf#(int32_t, int32_traits, 4) cb = new();
   
-      cb.push_tail(1000);
-      cb.push_tail(485);
-      cb.push_tail(8922);
+      cb.push(1000);
+      cb.push(485);
+      cb.push(8922);
 
       `FAIL_UNLESS(cb.size() == 3);
 
-      val = cb.pop_head();
+      val = cb.pop();
       `FAIL_UNLESS(val == 1000);
       `FAIL_UNLESS(cb.size() == 2);
   
-      val = cb.pop_head();
+      val = cb.pop();
       `FAIL_UNLESS(val == 485);
       `FAIL_UNLESS(cb.size() == 1);
 
-      val = cb.pop_head();
+      val = cb.pop();
       `FAIL_UNLESS(val == 8922);
       `FAIL_UNLESS(cb.size() == 0);
       `FAIL_UNLESS(cb.is_empty());
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      cb.push_tail(86);
-      cb.push_tail(-389);
+      cb.push(86);
+      cb.push(-389);
       `FAIL_UNLESS(cb.size() == 2);
 
-      cb.push_tail(777);
-      cb.push_tail(9112);
+      cb.push(777);
+      cb.push(9112);
 
       `FAIL_UNLESS(cb.size() == 4);
       `FAIL_UNLESS(cb.is_full());
       `FAIL_UNLESS(!cb.is_empty());
 
-      val = cb.pop_head();
+      val = cb.pop();
       `FAIL_UNLESS(val == 86);
       `FAIL_UNLESS(cb.size() == 3);
 
-      val = cb.pop_head();
+      val = cb.pop();
       `FAIL_UNLESS(val == -389);
       `FAIL_UNLESS(cb.size() == 2);
   
-      val = cb.pop_head();
+      val = cb.pop();
       `FAIL_UNLESS(val == 777);
       `FAIL_UNLESS(cb.size() == 1);
   
-      val = cb.pop_head();
+      val = cb.pop();
       `FAIL_UNLESS(val == 9112);
       `FAIL_UNLESS(cb.size() == 0);
       `FAIL_UNLESS(cb.is_empty());
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      cb.push_tail(600);
+      cb.push(600);
       `FAIL_UNLESS(cb.size() == 1);
 
-      cb.push_tail(-111);
+      cb.push(-111);
       `FAIL_UNLESS(cb.size() == 2);
 
-      val = cb.pop_head();
+      val = cb.pop();
       `FAIL_UNLESS(val == 600);
       `FAIL_UNLESS(cb.size() == 1);
 
-      val = cb.pop_head();
+      val = cb.pop();
       `FAIL_UNLESS(val == -111);
       `FAIL_UNLESS(cb.size() == 0);
   

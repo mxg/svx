@@ -68,7 +68,7 @@ module range_unit_test;
     /* Place Setup Code Here */
 
     //randomize the size of the test vector;
-    vector_size = index_t'($urandom()) % index_t'(100);
+    vector_size = index_t'($urandom_range(1, 100));
     // Fill the vector with random numbers
     for(i = 0; i < vector_size; i++) begin
       vec.appendc(int32_t'($urandom() % 1000));
@@ -118,7 +118,7 @@ module range_unit_test;
       // Generate randomized upper and lower bounds of the range.
       `FAIL_IF(vector_size < 2);
       ub = index_t'($urandom()) % vector_size;
-      lb = (ub == 0) ? index_t'(0) : index_t'($urandom()) % ub;
+      lb = index_t'($urandom_range(0, uint32_t'(ub)));
       iter = new(vec);
       rg = new(iter, lb, ub);
   
