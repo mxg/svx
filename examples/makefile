@@ -26,7 +26,7 @@
 # permissions and limitations under the License.
 #=======================================================================
 
-EXAMPLES	:= algo calc containers mem mem_map pri_queue types use_models 
+EXAMPLES	:= algo containers lexer mem mem_map pri_queue types use_models 
 
 MAKE		:= /usr/bin/make -s
 
