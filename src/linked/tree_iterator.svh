@@ -30,8 +30,10 @@
 //----------------------------------------------------------------------
 // tree_iterator
 //----------------------------------------------------------------------
-class tree_iterator 
-  implements fwd_intf#(tree, class_traits#(tree));
+class tree_iterator #(type T=tree, P=class_traits#(T))
+  implements fwd_intf#(T,P);
+
+  `check_trait(P, is_class, true);
 
   typedef enum {PREORDER, POSTORDER} order_t;
 

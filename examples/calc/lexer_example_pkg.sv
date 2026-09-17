@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,23 +27,14 @@
 // permissions and limitations under the License.
 //======================================================================
 
-module top;
+package lexer_example_pkg;
 
-  import svx::*;
+ /* verilator lint_off IMPORTSTAR */
   `include "svx_macros.svh"
-  import rpn_calc::*;
+  import svx::*;
+  import example_pkg::*;
+  /* verilator lint_on IMPORTSTAR */
 
-  calc c;
+  `include "lexer_example.svh"
 
-  initial
-    begin
-      c = new();
-      void'(c.calculate("5280 3 / 1.257722 *"));
-      void'(c.calculate("2750 88.0 / 16 * 122.456 *"));
-      void'(c.calculate("1 2 3 4 * * * "));
-      void'(c.calculate("1 0 /"));
-      void'(c.calculate("0 1 /"));
-      void'(c.calculate("3.14159 4 4 * 1.141 /"));
-    end
-
-endmodule
+endpackage;

@@ -8,6 +8,8 @@ September 2026
 
 ----------------------------------------------------------------------
 
+* Moved to Verilator v5.052
+
 * Refactored iterator base classes to make them simpler.
 
 * Removed fwd, bkwd, and bidir iterators.  Replaced them with just
@@ -19,6 +21,11 @@ September 2026
   a vector.  The vector is gone.
 
 * Now algorithms can use tree iterators.
+
+* Documentation for apps
+
+* Converted rpn_calc app to a lexer example, which is more
+  appropriate.
 
 * FIXED: Tree::get_children() now returns an empty deque instead of a
   null handle when there are zero children.

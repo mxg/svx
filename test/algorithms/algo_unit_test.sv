@@ -348,7 +348,7 @@ module algo_unit_test;
     `SVTEST(find_tree)
 
       match_name p;
-      tree_iterator iter;
+      tree_iterator#(tree, class_traits#(tree)) iter;
       tree t;
       tree t_d;
 

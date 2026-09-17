@@ -26,6 +26,14 @@
 // permissions and limitations under the License.
 //======================================================================
 
+typedef class mem_space;
+  
+class print extends fcn#(mem_space);
+  virtual function void f(mem_space t);
+    $display("%s", t.to_str());
+  endfunction
+endclass
+
 //----------------------------------------------------------------------
 // mem_space
 //
@@ -524,9 +532,23 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
   //
   //======================================================================
 
+  // For some reason, Verilator is unhappy with this code. It says
+  // that a tree_iterator cannot be cast to a fwd_intf (with matching
+  // class parameters).  I think this is a bug in Verilator.
+
+  // function void dump();
+
+  //   print p = new();
+  //   tree_iterator#(mem_space, class_traits#(mem_space)) iter = new(this);
+
+  //   $display("--- Memory Map Dump for: %s ---", get_full_name());
+  //   algo#(mem_space, class_traits#(mem_space))::for_each(iter, p);
+  //   $display("--- End Memory Map Dump ---");
+  // endfunction
+
   function void dump();
     
-    tree_iterator iter = new(this);
+    tree_iterator#(mem_space, class_traits#(mem_space)) iter = new(this);
 
     $display("--- Memory Map Dump for: %s ---", get_full_name());
 
@@ -543,7 +565,6 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
     end
 
     $display("--- End Memory Map Dump ---");
-  endfunction  
-
+  endfunction    
+ 
 endclass
-

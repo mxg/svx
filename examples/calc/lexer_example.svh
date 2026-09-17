@@ -62,7 +62,7 @@ class calc;
       TOKEN_FLOAT: $display("%g",  t.third());
       default:     $display("invalid token");
     endcase
-  endfunction  
+  endfunction
 
   //--------------------------------------------------------------------
   // calculate
@@ -279,3 +279,29 @@ class calc;
   endfunction
 
 endclass
+
+class lexer_example extends example;
+
+  calc c;
+  
+  virtual function void setup();
+    c = new();
+ endfunction
+  
+  virtual function void run();
+    begin
+      c = new();
+      void'(c.calculate("5280 3 / 1.257722 *"));
+      void'(c.calculate("2750 88.0 / 16 * 122.456 *"));
+      void'(c.calculate("1 2 3 4 * * * "));
+      void'(c.calculate("1 0 /"));
+      void'(c.calculate("0 1 /"));
+      void'(c.calculate("3.14159 4 4 * 1.141 /"));
+    end
+  endfunction
+  
+  virtual function void show();
+  endfunction
+  
+endclass
+

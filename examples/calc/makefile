@@ -28,9 +28,9 @@
 
 TOP		:= ../..
 
-RPN_CALC         := ${TOP}/apps/rpn_calc
+EXAMPLE_DIR	:= ${TOP}/examples
 
-SV_INC		:= +incdir+. +incdir+${RPN_CALC}
-SV_SRC		:= ${RPN_CALC}/rpn_calc.sv ${wildcard *.sv}
+SV_INC		:= +incdir+. +incdir+${EXAMPLE_DIR}
+SV_SRC		:= ${EXAMPLE_DIR}/example_pkg.sv  lexer_example_pkg.sv top.sv
 
 include ${TOP}/make/makefile

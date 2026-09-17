@@ -48,7 +48,8 @@
 // the keys in the priority queue represent priorities, the last
 // element is the one with the highest priority.
 //----------------------------------------------------------------------
-class pri_queue #(type T=int, type P=void_traits);
+class pri_queue #(type T=int, type P=void_traits)
+  extends typed_container #(T,P);
 
   // The priorty queue is a _compound_ data structure, a map of
   // queues. Each entry in the map is a queue.
@@ -68,9 +69,23 @@ class pri_queue #(type T=int, type P=void_traits);
   //
   // Does the queue contain any items?
   //--------------------------------------------------------------------
-  function bit is_empty();
+  virtual function bit is_empty();
     return qmap.is_empty();
   endfunction
+
+  //--------------------------------------------------------------------
+  // size
+  //--------------------------------------------------------------------
+  virtual function size_t size();
+    return qmap.size();
+  endfunction
+
+  //--------------------------------------------------------------------
+  // clear
+  //--------------------------------------------------------------------
+  virtual function void clear();
+    qmap.clear();
+  endfunction   
   
   //--------------------------------------------------------------------
   // push

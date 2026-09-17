@@ -26,11 +26,17 @@
 // permissions and limitations under the License.
 //======================================================================
 
-package rpn_calc;
+module top;
 
-  import svx::*;
   `include "svx_macros.svh"
+  import svx::*;
+  import lexer_example_pkg::*;
 
-  `include "rpn_calc.svh"
+  lexer_example lex_ex;
+  
+  initial begin
+    lex_ex = new();
+    lex_ex.exec();
+  end
 
-endpackage;
+endmodule

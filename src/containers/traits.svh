@@ -154,7 +154,7 @@ class class_traits#(type T=int) extends void_traits;
   endfunction
 
 endclass
-  
+
 //----------------------------------------------------------------------
 // base_int_traits
 //
