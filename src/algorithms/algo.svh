@@ -28,13 +28,28 @@
 
 //----------------------------------------------------------------------
 // algo
+//
+// A collection of generic algorithms.  All of the algorithms
+// (functions) are static and can be run from anywhere.
 //----------------------------------------------------------------------
 class algo#(type T=int, type P=void_traits);
 
+  //--------------------------------------------------------------------
+  // count
+  //
+  // Count the number of items for which the predicate is true.
+  //--------------------------------------------------------------------
   static function uint32_t count(fwd_intf#(T,P) iter, predicate#(T) p);
     
-    uint32_t n = 0;
-    void'(iter.first());
+    uint32_t n;
+
+    if(iter == null || p == null)
+      return 0;
+    
+    if(!iter.first())
+      return 0;
+
+    n = 0;
     while(!iter.at_end()) begin
       if(p.is_true(iter.get()))
 	n++;
@@ -49,13 +64,19 @@ class algo#(type T=int, type P=void_traits);
   // all_of
   //
   // Return true if the predicate holds (is true) for all of the
-  // elements in the list
+  // elements in the list.
   //--------------------------------------------------------------------
   static function bit all_of(fwd_intf#(T,P) iter, predicate#(T) p);
     
-    bit ok = 1;
+    bit ok;
+
+    if(iter == null || p == null)
+      return 0;
     
-    void'(iter.first());
+    if(!iter.first())
+      return 0;
+    
+    ok = 1;
     while(ok && !iter.at_end()) begin
       ok &= p.is_true(iter.get());
       void'(iter.next());
@@ -73,9 +94,15 @@ class algo#(type T=int, type P=void_traits);
   //--------------------------------------------------------------------
   static function bit none_of(fwd_intf#(T,P) iter, predicate#(T) p);
     
-    bit ok = 0;
+    bit ok;
+
+    if(iter == null || p == null)
+      return 0;
     
-    void'(iter.first());
+    if(!iter.first())
+      return 0;
+    
+    ok = 0;
     while(!ok && !iter.at_end()) begin
       ok |= p.is_true(iter.get());
       void'(iter.next());
@@ -92,6 +119,12 @@ class algo#(type T=int, type P=void_traits);
   // element in the list.
   //--------------------------------------------------------------------
   static function bit any_of(fwd_intf#(T,P) iter, predicate#(T) p);
+    if(iter == null || p == null)
+      return 0;
+    
+    if(!iter.first())
+      return 0;
+
     return !none_of(iter, p);
   endfunction
 
@@ -104,10 +137,12 @@ class algo#(type T=int, type P=void_traits);
 
     T m;
 
-    if(iter.is_empty())
+    if(iter == null || iter.is_empty())
       return P::empty;
     
-    void'(iter.first());
+    if(!iter.first())
+      return P::empty;
+    
     m = iter.get();
     while(!iter.at_end()) begin
       T t = iter.get();
@@ -129,10 +164,12 @@ class algo#(type T=int, type P=void_traits);
 
     T m;
     
-    if(iter.is_empty())
+    if(iter == null || iter.is_empty())
       return P::empty;
 
-    void'(iter.first());
+    if(!iter.first())
+      return P::empty;
+    
     m = iter.get();
     while(!iter.at_end()) begin
       T t = iter.get();
@@ -149,14 +186,21 @@ class algo#(type T=int, type P=void_traits);
   // find
   //
   // Locate the first element in the list for which the predicate
-  // holds (is true).  Return the iterator whose current element is
-  // the first element for which the predicate is true.
+  // holds (is true).  There is no functio return value, but the
+  // iterator is set to point to the first element for which the
+  // predicate is true.
   //--------------------------------------------------------------------
   static function void find(fwd_intf#(T,P) iter, predicate#(T) p);
 
-    bit found = 0;
+    bit found;
+
+    if(iter == null || p == null)
+      return;
     
-    void'(iter.first());
+    if(!iter.first())
+      return;
+    
+    found = 0;
     while(!found && !iter.at_end()) begin
       found = p.is_true(iter.get());
       if(!found)
@@ -172,7 +216,12 @@ class algo#(type T=int, type P=void_traits);
   //--------------------------------------------------------------------
   static function void for_each(fwd_intf#(T,P) iter, fcn#(T) fn);
 
-    void'(iter.first());
+    if(iter == null || fn == null)
+      return;
+
+    if(!iter.first())
+      return;
+    
     while(!iter.at_end()) begin
       T t = iter.get();
       fn.f(t);

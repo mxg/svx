@@ -26,41 +26,33 @@
 // permissions and limitations under the License.
 //======================================================================
 
-virtual class fcn_base;
-endclass
+class algo2#(type T1=int, type P1=void_traits, type T2=T1, type P2=P1);
 
-//----------------------------------------------------------------------
-// fcn
-//
-// A class that contains a function that takes a single argument.
-//----------------------------------------------------------------------
-virtual class fcn#(type T=int) extends fcn_base;
+  //-------------------------------------------------------------------
+  // zip
+  //
+  // An algorithm that traverses two iterators simultaneously.
+  //--------------------------------------------------------------------
+  static function void zip(fwd_intf#(T1,P1) iter1, 
+			   fwd_intf#(T2,P2) iter2,
+			   fcn2#(T1,T2) fn);
 
-  pure virtual function void f(T t);
-  
-endclass
+    if(iter1 == null || iter2 == null || fn == null)
+      return;
 
-//----------------------------------------------------------------------
-// fcn2
-//
-// A class that contains a function that takes two arguments.
-//----------------------------------------------------------------------
-virtual class fcn2#(type T1=int, type T2=T1) extends fcn_base;
-
-  pure virtual function void f(T1 t1, T2 t2);
-  
-endclass
-
-//----------------------------------------------------------------------
-// fcn2
-//
-// A class that contains a function that takes one argument. The
-// seconnd argument is a ref argument used to accumulate or aggregate
-// information across calls
-//----------------------------------------------------------------------
-virtual class accum_fcn#(type T=int, type A=int) extends fcn_base;
-
-  pure virtual function void f(T t, ref A a);
+    if(!iter1.first() || !iter2.first())
+      return;
+    
+    while(!iter1.at_end() && !iter2.at_end()) begin
+      T1 t1 = iter1.get();
+      T2 t2 = iter2.get();
+      fn.f(t1, t2);
+      void'(iter1.next());
+      void'(iter2.next());
+    end
+  endfunction
 
 endclass
+
+      
 

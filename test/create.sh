@@ -69,6 +69,13 @@ create_testsuite.pl -add iterators/list_iterators_unit_test.sv        \
                     -out iterators/iterators_testsuite.sv             \
                     -overwrite
 
+# create set test suite
+echo
+echo "*** Create set test suite"
+create_testsuite.pl -add set/set_unit_test.sv                         \
+		    -out set/set_testsuite.sv                         \
+		    -overwrite
+
 # create algorithms test suite
 echo
 echo "*** create algorithms test suite"
@@ -118,6 +125,7 @@ echo "*** Create top-level test runner"
 create_testrunner.pl -add types/types_testsuite.sv                    \
                      -add containers/containers_testsuite.sv          \
                      -add iterators/iterators_testsuite.sv            \
+		     -add set/set_testsuite.sv                        \
 		     -add algorithms/algorithms_testsuite.sv          \
                      -add linked/linked_testsuite.sv                  \
                      -add lexer/lexer_testsuite.sv                    \

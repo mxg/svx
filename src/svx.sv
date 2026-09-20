@@ -49,6 +49,7 @@ package svx;
   `include "version/version.svh"
   `include "containers/containers.svh"
   `include "iterators/iterators.svh"
+  `include "set/set.svh"
   `include "algorithms/algorithms.svh"
   `include "lexer/lexer.svh"
   `include "linked/linked.svh"

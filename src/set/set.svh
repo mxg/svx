@@ -26,41 +26,9 @@
 // permissions and limitations under the License.
 //======================================================================
 
-virtual class fcn_base;
-endclass
-
 //----------------------------------------------------------------------
-// fcn
-//
-// A class that contains a function that takes a single argument.
+// set
 //----------------------------------------------------------------------
-virtual class fcn#(type T=int) extends fcn_base;
 
-  pure virtual function void f(T t);
-  
-endclass
-
-//----------------------------------------------------------------------
-// fcn2
-//
-// A class that contains a function that takes two arguments.
-//----------------------------------------------------------------------
-virtual class fcn2#(type T1=int, type T2=T1) extends fcn_base;
-
-  pure virtual function void f(T1 t1, T2 t2);
-  
-endclass
-
-//----------------------------------------------------------------------
-// fcn2
-//
-// A class that contains a function that takes one argument. The
-// seconnd argument is a ref argument used to accumulate or aggregate
-// information across calls
-//----------------------------------------------------------------------
-virtual class accum_fcn#(type T=int, type A=int) extends fcn_base;
-
-  pure virtual function void f(T t, ref A a);
-
-endclass
+`include "set/set_impl.svh"
 

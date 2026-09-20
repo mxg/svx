@@ -374,6 +374,32 @@ module algo_unit_test;
   
     `SVTEST_END
 
+    `SVTEST(null_args)
+
+     uint32_t n;
+     int32_t k;
+     bit ok;
+
+      n = algo#(int32_t, int32_traits)::count(null, null);
+      `FAIL_UNLESS(n == 0);
+
+      ok = algo#(int32_t, int32_traits)::all_of(null, null);
+      `FAIL_UNLESS(ok == false);
+
+      ok = algo#(int32_t, int32_traits)::none_of(null, null);
+      `FAIL_UNLESS(ok == false);
+
+      ok = algo#(int32_t, int32_traits)::any_of(null, null);
+      `FAIL_UNLESS(ok == false);
+  
+      k = algo#(int32_t, int32_traits)::min(null);
+      `FAIL_UNLESS(k == int32_traits::empty);
+
+      k = algo#(int32_t, int32_traits)::max(null);
+      `FAIL_UNLESS(k == int32_traits::empty);
+
+    `SVTEST_END
+
   `SVUNIT_TESTS_END
 
 endmodule

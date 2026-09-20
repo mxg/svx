@@ -33,4 +33,5 @@
 `include "algorithms/predicate.svh"
 `include "algorithms/fcn.svh"
 `include "algorithms/algo.svh"
+`include "algorithms/algo2.svh"
 `include "algorithms/accum.svh"

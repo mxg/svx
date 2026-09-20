@@ -12,7 +12,7 @@ September 2026
 
 * Refactored iterator base classes to make them simpler.
 
-* Removed fwd, bkwd, and bidir iterators.  Replaced them with just
+* REMOVED: fwd, bkwd, and bidir iterators.  Replaced them with just
   "iterator."  Iterators support both forward and backward
   access. Iterators still use fwd and bkwd interfaces, but that is not
   visible to iterator users.
@@ -27,11 +27,20 @@ September 2026
 * Converted rpn_calc app to a lexer example, which is more
   appropriate.
 
+* ADDED: sets.  A set is a set of objects. Only one of any value can
+  be in the set at a time.
+
+* ADDED: algo2::zip() algorithm which traverses two iterators
+  simultaneously.  The iterators can be of the same type or different types.
+
 * FIXED: Tree::get_children() now returns an empty deque instead of a
   null handle when there are zero children.
 
-* FIXED: tree::find(), which finds a tree node by pathname was
+* FIXED: tree::find(), which finds a tree node by path name was
   non-functional.  It works now.
+
+* FIXED; Improved robustness of algorithms so they respond properly
+  with null or empty parameters.
 
 ----------------------------------------------------------------------
 
