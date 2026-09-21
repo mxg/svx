@@ -52,7 +52,7 @@ virtual class fcn2#(type T1=int, type T2=T1) extends fcn_base;
 endclass
 
 //----------------------------------------------------------------------
-// fcn2
+// accum_fcn
 //
 // A class that contains a function that takes one argument. The
 // seconnd argument is a ref argument used to accumulate or aggregate
@@ -61,6 +61,19 @@ endclass
 virtual class accum_fcn#(type T=int, type A=int) extends fcn_base;
 
   pure virtual function void f(T t, ref A a);
+
+endclass
+
+//----------------------------------------------------------------------
+// accum_fcn2
+//
+// A class that contains a function that takes two arguments and a
+// third ref argument for accumulation.
+//---------------------------------------------------------------------
+virtual class accum_fcn2#(type T1=int, type T2=int, type A=int) 
+  extends fcn_base;
+
+  pure virtual function void f(T1 t1, T2 t2, ref A a);
 
 endclass
 

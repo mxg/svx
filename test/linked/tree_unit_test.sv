@@ -110,6 +110,8 @@ module tree_unit_test;
       `FAIL_UNLESS_STR_EQUAL("top.c1", c1.get_full_name())
       `FAIL_UNLESS_STR_EQUAL("top.c2", c2.get_full_name())
 
+      `FAIL_UNLESS(parent.size() == 3)
+
     `SVTEST_END
 
   //--------------------------------------------------------------------
@@ -126,6 +128,8 @@ module tree_unit_test;
         child = new("c2", top);
         child = new("c3", top);
         child = new("c4", top);
+
+        `FAIL_UNLESS(top.size() == 5)
 
         deq = top.get_children();
 

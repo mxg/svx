@@ -37,6 +37,9 @@ endclass
 
 //----------------------------------------------------------------------
 // class: type_handle
+//
+// A type handle is a singleton object that uniquely represents a
+// type.
 //----------------------------------------------------------------------
 class type_handle #(type T=int) extends type_handle_base;
 
@@ -79,7 +82,8 @@ endclass
 //----------------------------------------------------------------------
 // type_container
 //
-// Contains an object of type T with a handle
+// A polymorphic container that holds an object of type T with a
+// corresponding type handle.
 //----------------------------------------------------------------------
 class type_container#(type T) extends type_container_base;
 

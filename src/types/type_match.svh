@@ -44,6 +44,7 @@ class type_match #(type T1=int, type T2=int);
     return 1;
   endfunction
 
+  // Are T1 and T2 the same type?
   static function bit test_is_match();
     type_handle_base th1 = type_handle#(T1)::get_type();
     type_handle_base th2 = type_handle#(T2)::get_type();
@@ -58,7 +59,6 @@ class type_match #(type T1=int, type T2=int);
   endfunction
 
   // Is type T1 derived from type T2?
-
   static function bit is_derived_from(int line = 0, string file = "");
     if(!test_is_derived_from())
       fail_derived(line, file);

@@ -34,6 +34,11 @@ typedef enum {
 	      } circ_buf_mode_e;
 //----------------------------------------------------------------------
 // circ_buf
+//
+// A circular or ring buffer.  It operates in one of two modes.  The
+// default is rject mode, where the next item will bit rejected if the
+// buffer is full.  The other mode is overwrite mode.  If the buffer
+// is full the next push will overwrite the item at the tail.
 //----------------------------------------------------------------------
 class circ_buf #(type T=int, type P=void_traits, size_t S=8)
   extends typed_container #(T,P);

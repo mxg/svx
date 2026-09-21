@@ -247,16 +247,16 @@ class list_iterator#(type T=int, type P=void_traits)
     return super.get();
   endfunction
 
- // The Verilator compiler doesn't seem to be able to find the
+  // The Verilator compiler doesn't seem to be able to find the
   // implementations in the base class, so we give it a hint.
   virtual function size_t size();
     return super.size();
   endfunction
-    
+  
   virtual function bit is_empty();
     return super.is_empty();
   endfunction
-    
+  
   //--------------------------------------------------------------------
   // is_first
   //--------------------------------------------------------------------
@@ -278,6 +278,8 @@ class list_iterator#(type T=int, type P=void_traits)
 
   //--------------------------------------------------------------------
   // is_last
+  //
+  // Are we at the last item in the container?
   //--------------------------------------------------------------------
   virtual function bit is_last();
     return ((m_list != null) && (m_list.size() > 0) && (idx >= m_list.size() - 1));
@@ -285,6 +287,9 @@ class list_iterator#(type T=int, type P=void_traits)
 
   //--------------------------------------------------------------------
   // at_end
+  //
+  // Are we at the end of the container -- i.e., past the last
+  // element?
   //--------------------------------------------------------------------
   virtual function bit at_end();
     if(m_list == null || m_list.size() == 0)
@@ -294,6 +299,8 @@ class list_iterator#(type T=int, type P=void_traits)
   
   //--------------------------------------------------------------------
   // last
+  //
+  // Move to the last item in the container.
   //--------------------------------------------------------------------
   virtual function bit last();
     if(m_list == null)
@@ -304,6 +311,8 @@ class list_iterator#(type T=int, type P=void_traits)
 
   //--------------------------------------------------------------------
   // prev
+  //
+  // Move to the previous item in the container.
   //--------------------------------------------------------------------
   virtual function bit prev();
     if(m_list == null || m_list.size() == 0 || idx < 0)
@@ -314,6 +323,8 @@ class list_iterator#(type T=int, type P=void_traits)
   
   //--------------------------------------------------------------------
   // is_first
+  //
+  // Are we at the first item in the container?
   //--------------------------------------------------------------------
   virtual function bit is_first();
     return ((m_list != null) && ((m_list.size() > 0) && (idx == 0)));
@@ -321,6 +332,9 @@ class list_iterator#(type T=int, type P=void_traits)
 
   //--------------------------------------------------------------------
   // at_beginning
+  //
+  // Are we at the beginning of the container -- i.e., before the
+  // first item.
   //--------------------------------------------------------------------
   virtual function bit at_beginning();
     if(m_list == null || m_list.size() == 0)

@@ -158,13 +158,17 @@ class tree extends node;
   // size
   //--------------------------------------------------------------------
   function size_t size();
-    deque#(tree, class_traits#(tree)) deq;
-    deq = get_children();
-    if(deq == null)
-      return 0;
-    else
-      return deq.size();
-  endfunction
+    size_t n = 1; // count this node
+    string nm;
+    tree c;
+    if(!first_child(nm))
+      return n;
+    do begin
+      c = get_child(nm);
+      n += c.size();
+    end while(next_child(nm));
+    return n;
+endfunction  
 
   //--------------------------------------------------------------------
   // get_children

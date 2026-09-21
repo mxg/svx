@@ -12,8 +12,9 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed The Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -29,8 +30,9 @@
 //----------------------------------------------------------------------
 // class: deque
 //
-// A deque is a vector with fifo and lifo (stack) properties.  You can
-// push and pop the front and the back of a deque.
+// A deque is a generalized queue with fifo and lifo (stack)
+// properties.  You can push and pop the front and the back of a
+// deque.
 //----------------------------------------------------------------------
 class deque #(type T=int, type P=void_traits) extends vector#(T,P);
 
@@ -81,7 +83,7 @@ class deque #(type T=int, type P=void_traits) extends vector#(T,P);
   //--------------------------------------------------------------------
   // function: clone
   //
-  // Clone a stack
+  // Clone a deque
   //--------------------------------------------------------------------
   function this_t clone();
     this_t d = new();

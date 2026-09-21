@@ -30,15 +30,15 @@
 //----------------------------------------------------------------------
 // Data Type Traits
 //
-// These traits classes supply some constants and methods for use by the
+// These traits classes supply constants, and typedefs for use by the
 // containers.  Each traits class provides an empty type and an empty
 // object.  It also provides equal() and compare() methods.  Equal()
 // returns a bit -- either the two values are equal or not.  Compare()
 // potentially returns one of three values -- 0 if the two objects are
 // equal, some value > 0 if a > b, or some value < 0 if a < b.  Some
-// data types only can be compared for equality and not for > or <.  In
-// those cases compare() must be implemented appropriately to return
-// only 0 or a value > 0.
+// data types only can be compared for equality and not for > or <.
+// In those cases compare() must be implemented appropriately to
+// return only 0 or a value > 0.
 //
 // This set of traits classes is not necessarily complete. This is just
 // a set of traits for common data types. Users can provide additional
@@ -51,6 +51,8 @@
 
 // A macro to check type traits invariants.  The simulation will fail
 // if the invariant is not met. Instantiate this macro within a class.
+// It creates a local const varible whose value is established at
+// static initialization time.
 `define check_trait(t, trait, exp) const local bit x_``t``_``trait``_``exp = void_traits::check_trait(t::trait, exp, `__LINE__, `__FILE__);
 
 //----------------------------------------------------------------------
@@ -194,6 +196,9 @@ class base_int_traits #(type T=int) extends void_traits;
 
 endclass
 
+//----------------------------------------------------------------------
+// Traits for unsigned integers
+//----------------------------------------------------------------------
 class base_unsigned_int_traits #(type T=int) extends base_int_traits#(T);
 
   localparam bit is_signed   = false;
@@ -201,6 +206,9 @@ class base_unsigned_int_traits #(type T=int) extends base_int_traits#(T);
   
 endclass
 
+//----------------------------------------------------------------------
+// Traits for signed integers
+//----------------------------------------------------------------------
 class base_signed_int_traits #(type T=int) extends base_int_traits#(T);
 
   localparam bit is_signed = true;
@@ -232,6 +240,9 @@ typedef base_signed_int_traits#(int32_t)             int32_traits;
 typedef base_signed_int_traits#(int64_t)             int64_traits;
 typedef base_signed_int_traits#(int128_t)            int128_traits;
 
+//----------------------------------------------------------------------
+// Traits for four-state integers
+//----------------------------------------------------------------------
 class base_four_state_traits #(type T=int) extends base_int_traits#(T);
 
   localparam bit is_two_state  = false;

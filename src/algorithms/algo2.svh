@@ -54,5 +54,3 @@ class algo2#(type T1=int, type P1=void_traits, type T2=T1, type P2=P1);
 
 endclass
 
-      
-

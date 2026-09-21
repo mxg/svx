@@ -28,6 +28,10 @@
 
 //----------------------------------------------------------------------
 // class: pair
+//
+// Hold two objects or potentially different types.  It's a convenient
+// way tp bind two objects together and carry them around in a single
+// container
 //----------------------------------------------------------------------
 class pair#(type T1=int, type T2=int) extends void_t;
 
@@ -59,6 +63,8 @@ endclass
 
 //----------------------------------------------------------------------
 // triple
+//
+// A container that holds three object.
 //----------------------------------------------------------------------
 class triple#(type T1=int, type T2=int, type T3=int)
   extends pair#(T1,T2);
@@ -82,6 +88,8 @@ endclass
 
 //----------------------------------------------------------------------
 // quadruple
+//
+// A container that holds four objects.
 //----------------------------------------------------------------------
 class quadruple#(type T1=int, type T2=int, type T3=int, type T4=int)
   extends triple#(T1,T2,T3);

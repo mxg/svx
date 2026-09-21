@@ -48,7 +48,7 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   //====================================================================
 
   //--------------------------------------------------------------------
-  // function: get
+  // get
   //
   // Returns the item with the given ~key~.
   //--------------------------------------------------------------------
@@ -59,7 +59,7 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   endfunction
   
   //--------------------------------------------------------------------
-  // function: insert
+  // insert
   //
   // Adds the given (~key~, ~item~) pair to the map. The return value
   // indicated whether or not the key is a duplicate -- i.e. is already
@@ -72,7 +72,7 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   endfunction
 
   //--------------------------------------------------------------------
-  // function: size
+  // size
   //
   // Returns the number of uniquely keyed items stored in the map.
   //--------------------------------------------------------------------
@@ -85,7 +85,7 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   endfunction
 
   //--------------------------------------------------------------------
-  // function: delete
+  // delete
   //
   // Removes the item with the given ~key~ from the map.
   //--------------------------------------------------------------------
@@ -97,7 +97,7 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   endfunction
 
   //--------------------------------------------------------------------
-  // function: clear
+  // clear
   //
   // Remove all of the elements from the map.
   //--------------------------------------------------------------------
@@ -106,7 +106,7 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   endfunction
 
   //--------------------------------------------------------------------
-  // function: exists
+  // exists
   //
   // Returns 1 if a item with the given ~key~ exists in the map,
   // 0 otherwise.
@@ -116,7 +116,7 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   endfunction
 
   //--------------------------------------------------------------------
-  // function: copy
+  // copy
   //
   // Perform a shallow copy of a map. Copy the map supplied as an
   // argument into this map.
@@ -142,7 +142,7 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   endfunction
 
   //--------------------------------------------------------------------
-  // function: clone
+  // clone
   //
   // Clone the map.  The implementation is based on copy()
   //--------------------------------------------------------------------
@@ -153,7 +153,7 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   endfunction
 
   //--------------------------------------------------------------------
-  // function: compare
+  // compare
   //
   // Compare two maps.  Maps are either equal or not.  The notion of one
   // map being less than or greater than another is undefined.  This
@@ -164,9 +164,8 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
     return int32_t'(!equal(m));
   endfunction
 
-
   //--------------------------------------------------------------------
-  // function: equal
+  // equal
   //
   // Determine if the map supplied by the argument t is equal to this
   // one.  The two maps are equal if all of the elements are equal.  To
@@ -214,25 +213,25 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   // call them!
   //====================================================================  
 
-  // function: first
+  // first
   //
   virtual function bit first(ref KEY index);
     return bit'(m_map.first(index));
   endfunction
 
-  // function: last
+  // last
   //
   virtual function bit last (ref KEY index);
     return bit'(m_map.last(index));
   endfunction
 
-  // function: next
+  // next
   //
   virtual function bit next(ref KEY index);
     return bit'(m_map.next(index));
   endfunction
 
-  // function: prev()
+  // prev()
   //
   virtual function bit prev(ref KEY index);
     return bit'(m_map.prev(index));
