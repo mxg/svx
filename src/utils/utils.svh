@@ -11,7 +11,6 @@
 //                  SystemVerilog Extension Library
 //
 //
-// Copyright 2016 NVIDIA Corporation
 // Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,36 +26,10 @@
 // permissions and limitations under the License.
 //======================================================================
 
+
 //----------------------------------------------------------------------
-// types
-//
-// Standardized types
+// utils
 //----------------------------------------------------------------------
 
-typedef byte                 int8_t;
-typedef byte unsigned        uint8_t;
-typedef shortint             int16_t;
-typedef shortint unsigned    uint16_t;
-typedef int                  int32_t;
-typedef int unsigned         uint32_t;
-typedef longint              int64_t;
-typedef longint unsigned     uint64_t;
-typedef bit [127:0]          int128_t;
-typedef bit unsigned [127:0] uint128_t;
-
-// Represents sizes of various things.
-typedef uint64_t size_t;
-
-// Used for indexes
-typedef uint64_t index_t;
-typedef int64_t signed_index_t;
-
-// Process identifiers.
-typedef int unsigned pid_t;
-
-// Package-level constants
-
-/* verilator lint_off UNUSEDPARAM */
-localparam bit true = 1;
-localparam bit false = 0;
-/* verilator lint_on UNUSEDPARAM */
+`include "utils/msg.svh"
+`include "utils/version.svh"

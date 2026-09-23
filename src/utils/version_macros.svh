@@ -28,35 +28,22 @@
 //======================================================================
 
 //----------------------------------------------------------------------
-// types
-//
-// Standardized types
+// Version Macros
 //----------------------------------------------------------------------
 
-typedef byte                 int8_t;
-typedef byte unsigned        uint8_t;
-typedef shortint             int16_t;
-typedef shortint unsigned    uint16_t;
-typedef int                  int32_t;
-typedef int unsigned         uint32_t;
-typedef longint              int64_t;
-typedef longint unsigned     uint64_t;
-typedef bit [127:0]          int128_t;
-typedef bit unsigned [127:0] uint128_t;
+`define STRINGIFY(x) `"x`"
 
-// Represents sizes of various things.
-typedef uint64_t size_t;
+`ifdef VERILATOR
+  `define SVX_SIM Verilator
+`else
+  `define SVX_SIM ""
+`endif
 
-// Used for indexes
-typedef uint64_t index_t;
-typedef int64_t signed_index_t;
+`define SVX_PREFIX svx
+`define SVX_MAJOR_VERSION 2
+`define SVX_MINOR_VERSION 1
+`define SVX_FIX_VERSION   1
+`define SVX_RELEASE_MODE  beta
 
-// Process identifiers.
-typedef int unsigned pid_t;
 
-// Package-level constants
-
-/* verilator lint_off UNUSEDPARAM */
-localparam bit true = 1;
-localparam bit false = 0;
-/* verilator lint_on UNUSEDPARAM */
+`define SVX_VERSION `STRINGIFY(`SVX_PREFIX``-```SVX_MAJOR_VERSION``.```SVX_MINOR_VERSION <`SVX_RELEASE_MODE `SVX_FIX_VERSION> -- `SVX_SIM)

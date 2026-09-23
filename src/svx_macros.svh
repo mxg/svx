@@ -33,7 +33,8 @@
 `ifndef __SVX_MACROS_SVH__
 `define __SVX_MACROS_SVH__
 
-`include "version/version_macros.svh"
+`include "utils/version_macros.svh"
+`include "utils/msg_macros.svh"
 `include "lexer/ctypes_macros.svh"
 
 `endif

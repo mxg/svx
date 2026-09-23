@@ -37,11 +37,21 @@ class map_range #(type KEY=int, type T=void_t, type P=void_traits)
   typedef map_iterator#(KEY,T,P) map_iter_t;
   map_iter_t map_iter;
 
+  //--------------------------------------------------------------------
+  // constructor
+  //--------------------------------------------------------------------
   function new(map_iter_t it, index_t lower_bound, index_t upper_bound);
     super.new(it, lower_bound, upper_bound);
     map_iter = it;
   endfunction
 
+  //--------------------------------------------------------------------
+  // get_index
+  //
+  // Retrieve the value of the key of the current map item.  This
+  // function is not part of the iterator interfaces because only maps
+  // have keys.
+  //--------------------------------------------------------------------
   virtual function KEY get_index();
     return map_iter.get_index();
   endfunction

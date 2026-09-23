@@ -36,21 +36,28 @@
 //----------------------------------------------------------------------
 class type_match #(type T1=int, type T2=int);
 
-  // Do the two types in the paramter list match?
-
+  //--------------------------------------------------------------------
+  // Do the two types in the class paramter list match?  The
+  // simulation will terminate if they do not
+  //--------------------------------------------------------------------
   static function bit is_match(int line = 0, string file = "");
     if(!test_is_match())
       fail_match(line, file);
     return 1;
   endfunction
 
+  //--------------------------------------------------------------------
   // Are T1 and T2 the same type?
+  //--------------------------------------------------------------------
   static function bit test_is_match();
     type_handle_base th1 = type_handle#(T1)::get_type();
     type_handle_base th2 = type_handle#(T2)::get_type();
     return (th1 == th2);
   endfunction
 
+  //--------------------------------------------------------------------
+  // Generate a system failyure if there is a problem.
+  //--------------------------------------------------------------------
   static function void fail_match(int line = 0, string file = "");
     if(file == "" && line == 0)
       $fatal(0, "Types %s and %s do not match",  $typename(T1), $typename(T2));
@@ -58,13 +65,18 @@ class type_match #(type T1=int, type T2=int);
       $fatal(0, "Types %s and %s do not match at %s:%0d",  $typename(T1), $typename(T2), file, line);
   endfunction
 
-  // Is type T1 derived from type T2?
+  //--------------------------------------------------------------------
+  // Is type T1 derived from type T2?  Fail if not.
+  //--------------------------------------------------------------------
   static function bit is_derived_from(int line = 0, string file = "");
     if(!test_is_derived_from())
       fail_derived(line, file);
     return 1;
   endfunction
 
+  //--------------------------------------------------------------------
+  // Is type T1 derived from type T2?
+  //--------------------------------------------------------------------
   static function bit test_is_derived_from();
     T1 derived;
     T2 base;
@@ -75,6 +87,9 @@ class type_match #(type T1=int, type T2=int);
     return (x != 0);
   endfunction
 
+  //--------------------------------------------------------------------
+  // Generate a system failure if there is a problem.
+  //--------------------------------------------------------------------
   static function void fail_derived(int line = 0, string file = "");
     if(file == "" && line == 0)
       $fatal(0, "Type %s is not derived from type %s", $typename(T1), $typename(T2));
@@ -88,7 +103,8 @@ endclass
 //----------------------------------------------------------------------
 // check_is_derived
 //
-// A convenience macro for determineing if two types match.
+// A convenience macro for determineing if two types match. The macro
+// create a local constant.  The expression is evaluated at static
+// evaluation time (before time 0).
 //----------------------------------------------------------------------
-
 `define check_is_derived_from(t1, t2) const local bit x_``t1``_``t2``_derived = type_match#(t1,t2)::is_derived_from(`__LINE__, `__FILE__)

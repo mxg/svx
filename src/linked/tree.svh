@@ -81,17 +81,17 @@ class tree extends node;
   //
   // insert a new node into the tree as a child of the current node.
   // The name must be unique amongst all its siblings.
-  //
-  // TODO: Remove $display; Use return code instead
   //--------------------------------------------------------------------
   function void insert(tree t);
     
     if(t == null)
       return;
 
-    if(!m_children.insert(t.get_name(), t))
-      $display("*error* A child whose name is %s is already a child of this node",
-	       t.get_name());
+    if(!m_children.insert(t.get_name(), t)) begin
+      string str = $sformatf("A child whose name is %s is already a child of this node",
+			     t.get_name());
+      `error_msg("insert", str);
+    end
     
   endfunction
 

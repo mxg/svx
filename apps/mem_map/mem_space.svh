@@ -124,13 +124,14 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
     // add a new memory space to the hierarchy.
 
     if(_size == 0) begin
-      $display("*** error: The size of a memory space cannot be zero");
+      `warning_msg("new", "The size of a memory space cannot be zero");
       has_error = 1;
     end
     
     if((parent != null) && (!parent.check_child(this))) begin
-      $display("*** error: A %s cannot contain a %s\n           parent = %s, child = %s", 
+      string str = $sformatf("A %s cannot contain a %s\n           parent = %s, child = %s", 
 	       parent.get_type_name(), get_type_name(), parent.get_full_name(), get_name());
+      `warning_msg("new", str);
       has_error = 1;
     end
 
@@ -148,9 +149,11 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
   function void insert_space(mem_space_t space);
     if(check_child(space))
       insert(space);
-    else
-      $display("*** error: Invalid child type %s for parent %s", 
-	       space.get_type_name(), get_full_name());
+    else begin
+      string str = $sformatf("Invalid child type %s for parent %s", 
+			     space.get_type_name(), get_full_name());
+      `warning_msg("insert_space", str);
+    end
   endfunction
   
 
@@ -394,10 +397,11 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
 	       (inner_space.get_type() != VIEW) &&
 	       (outer_space.get_type() != VIEW)) begin
 	      if(overlaps(outer_space, inner_space)) begin
+		string str = $sformatf("The following two spaces overlap:\n%s\n%s",
+				       outer_space.to_str(), inner_space.to_str());
+		`warning_msg("check_overlap", str);
 	        outer_space.has_error = 1;
 	        inner_space.has_error = 1;
-	        $display("*** error: The following two spaces overlap:\n%s\n%s",
-		             outer_space.to_str(), inner_space.to_str());
 	        ok = 0;
 	      end
 	    end
@@ -557,7 +561,7 @@ virtual class mem_space #(uint32_t ADDR_SIZE=32) extends tree;
       mem_space ms;
       tree t = iter.get();
       if(!$cast(ms, t)) begin
-	$display("*** error Attempt to dump a tree that is not a memory space");
+	`warning_msg("dump", "Attempt to dump a tree that is not a memory space");
 	return;
       end
       $display("%s", ms.to_str());

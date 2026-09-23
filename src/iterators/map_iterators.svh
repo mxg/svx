@@ -47,7 +47,7 @@ virtual class map_iterator_base#(type KEY=int,
   //--------------------------------------------------------------------
   // constructor
   //
-  // Optionally, bind a map to the iterator
+  // Optionally, bind a map to the iterator.
   //--------------------------------------------------------------------
   function new(map_t map_inst = null);
     bind_map(map_inst);
@@ -350,6 +350,9 @@ class map_iterator#(type KEY=int, type T=int, type P=void_traits)
 
   //--------------------------------------------------------------------
   // skip
+  //
+  // Skip 0 or more places forward or backward -- forward for a
+  // positive distance, backward for a negative distance.
   //--------------------------------------------------------------------
   virtual function bit skip(signed_index_t distance);
     index_t ix;

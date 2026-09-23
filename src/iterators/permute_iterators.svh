@@ -12,7 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
-// Copyright 2016 Mark Glasser
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -104,7 +104,7 @@ class permute_iterator_base #(type T=int, type P=void_traits);
   // This is somewhat arbitrary. Computing the factorial of numbers
   // larger than 34 results in a value that is too large to hold
   // in a variable of type longint unsigned.
-  local const int unsigned max_fact = 34;
+  local const uint32_t max_fact = 34;
 
   // permutation index
   protected signed_index_t pix;
@@ -156,14 +156,16 @@ class permute_iterator_base #(type T=int, type P=void_traits);
   //
   // A little utility to compute n!
   //--------------------------------------------------------------------
-  protected function longint unsigned factorial(longint unsigned n);
+  protected function uint64_t  factorial(uint64_t n);
     return (n <= 2)
       ? n
-      : (n * factorial(n-1));
+		 : (n * factorial(n-1));
   endfunction
 
   //--------------------------------------------------------------------
   // initialize
+  //
+  // Initialize the underlying machinery for generating permutations.
   //--------------------------------------------------------------------
   protected function void initialize();
     index_t i;
@@ -178,8 +180,8 @@ class permute_iterator_base #(type T=int, type P=void_traits);
     // pre-compute factorials once so we don't have to do
     // it for each permutation operation
     fact = (m_vec.size < 2)
-                ? m_vec.size()
-                : factorial(m_vec.size()-1);
+      ? m_vec.size()
+        : factorial(m_vec.size()-1);
     max_pix = fact * m_vec.size();
     pix = 0;
 
@@ -283,7 +285,6 @@ class permute_iterator_base #(type T=int, type P=void_traits);
   // interface.  They are used by the permutation iterator classes.
   //====================================================================
 
-
   //--------------------------------------------------------------------
   // set_permutation
   //
@@ -306,7 +307,7 @@ class permute_iterator_base #(type T=int, type P=void_traits);
     end
 
     len = index_t'(pv.size());
-    f = fact; // sets f to the pre-computed value of len! (i.e. factorial of len).
+    f = fact; // sets f to the pre-computed value of len! (i.e., factorial of len).
 
     // reset pv vector
     for (i = 0; i < m_vec.size(); i++) begin
@@ -322,9 +323,9 @@ class permute_iterator_base #(type T=int, type P=void_traits);
         pv[j] = pv[j-1];
 
       pv[i] = temp;
- 
+      
       f /= (len - i - 1);
- 
+      
     end 
 
     pix = n;
@@ -351,18 +352,18 @@ class permute_iterator_base #(type T=int, type P=void_traits);
 
     n = signed_index_t'(pv.size());
     for(i = n - 2; (i >= 0) && (pv[i] > pv[i + 1]); i--);
-  
+    
     // If i is smaller than 0, then there are no more permutations,
     // so we return 0.
     if (i < 0) begin  
       pix++;
       return 0;
     end
-  
+    
     // Find the largest element after pv[i] but not larger than pv[i]
     for(k = n - 1; pv[i] > pv[k]; k--);
     `SWAP(pv[i], pv[k]);   
-  
+    
     // Swap the last n - i elements.
     k = 0;   
     for (j = i + 1; j < (n + i) / 2 + 1; ++j) begin
@@ -385,7 +386,7 @@ class permute_iterator_base #(type T=int, type P=void_traits);
     index_t i;
 
     if(!initialized) begin
-      $display("<uninitialized>");
+      `info_msg("permute_iterator", "<uninitialized>");
       return;
     end
 
@@ -486,20 +487,40 @@ class permute_iterator#(type T=int, type P=void_traits)
   virtual function size_t size();
     return super.size();
   endfunction
-    
+  
+  //--------------------------------------------------------------------
+  // is_empty
+  //--------------------------------------------------------------------
   virtual function bit is_empty();
     return super.is_empty();
   endfunction
 
+  //--------------------------------------------------------------------
+  // set
+  //
+  // Not implemented for permutation iterator because the iterator
+  // does not point to data other than the permutation vector
+  //--------------------------------------------------------------------
   virtual function void set(T t);
     // intentionally not implemented
   endfunction
 
+  //--------------------------------------------------------------------
+  // get
+  //
+  // Not implemented for permutation iterator because the iterator
+  // does not point to data other than the permutation vector
+  //--------------------------------------------------------------------
   virtual function T get();
     // intentionally not implemented
     return m_empty;
   endfunction
   
+  //--------------------------------------------------------------------
+  // first
+  //
+  // Move the permutation state to ther first (0th) permutation.
+  //--------------------------------------------------------------------
   virtual function bit first();
     if((m_vec == null) || (m_vec.size() == 0))
       return 0;
@@ -508,22 +529,43 @@ class permute_iterator#(type T=int, type P=void_traits)
     return 1;
   endfunction
 
+  //--------------------------------------------------------------------
+  // next
+  //
+  // Advance the permutation state to the next permutation.
+  //--------------------------------------------------------------------
   virtual function bit next();
     if((m_vec == null) || !initialized)
       return 0;
     return next_permutation();
   endfunction
 
+  //--------------------------------------------------------------------
+  // is_last
+  //
+  // Does the permutation state represent the last (highest)
+  // permutation?
+  //--------------------------------------------------------------------
   virtual function bit is_last();
     return ((m_vec != null) && (m_vec.size() > 0) && (pix >= max_pix - 1));
   endfunction
 
+  //--------------------------------------------------------------------
+  // at_end
+  //
+  // Does the permutation state point bneyond the last permutation?
+  //--------------------------------------------------------------------
   virtual function bit at_end();
     if(m_vec == null || m_vec.size() == 0)
       return 1;
     return (pix >= max_pix);
   endfunction
 
+  //--------------------------------------------------------------------
+  // last
+  //
+  // Move the permutation to the last (highest) permutation.
+  //--------------------------------------------------------------------
   virtual function bit last();
     if(m_vec == null)
       return 0;
@@ -532,6 +574,8 @@ class permute_iterator#(type T=int, type P=void_traits)
     return 1;
   endfunction
 
+  //--------------------------------------------------------------------
+  //--------------------------------------------------------------------
   virtual function bit prev();
     if(m_vec == null || m_vec.size() == 0 || pix < 0)
       return 0;
@@ -540,10 +584,21 @@ class permute_iterator#(type T=int, type P=void_traits)
     return 1;
   endfunction
   
+  //--------------------------------------------------------------------
+  // is_first
+  //
+  // Does the permutation state represent the first (0th) permutation?
+  //--------------------------------------------------------------------
   virtual function bit is_first();
     return ((m_vec != null) && ((m_vec.size() > 0) && (pix == 0)));
   endfunction
 
+  //--------------------------------------------------------------------
+  // at_beginning
+  //
+  // Does the permutation state point to a fictitious permutation that
+  // is before the first permutation (-1).
+  //--------------------------------------------------------------------
   virtual function bit at_beginning();
     if(m_vec == null || m_vec.size() == 0)
       return 1;

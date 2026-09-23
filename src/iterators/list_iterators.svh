@@ -334,7 +334,7 @@ class list_iterator#(type T=int, type P=void_traits)
   // at_beginning
   //
   // Are we at the beginning of the container -- i.e., before the
-  // first item.
+  // first item?
   //--------------------------------------------------------------------
   virtual function bit at_beginning();
     if(m_list == null || m_list.size() == 0)

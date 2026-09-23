@@ -91,7 +91,7 @@ class circ_buf #(type T=int, type P=void_traits, size_t S=8)
   virtual function void push(T t, circ_buf_mode_e mode = REJECT_MODE);
     
     if(mode == REJECT_MODE && is_full()) begin
-      $display("** ERROR: cannot push new item into full circular buffer");
+      `error_msg("circ_buf", "cannot push new item into full circular buffer");
       return;
     end
     
@@ -111,7 +111,7 @@ class circ_buf #(type T=int, type P=void_traits, size_t S=8)
     T t;
     
     if(is_empty()) begin
-      $display("** ERROR: circular buffer is empty");
+      `error_msg("circ_buf", "circular buffer is empty");
       return P::empty;
     end
     

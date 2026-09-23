@@ -11,7 +11,7 @@
 //                  SystemVerilog Extension Library
 //
 //
-// Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,22 +27,27 @@
 //======================================================================
 
 //----------------------------------------------------------------------
-// Version Macros
+// msg
+//
+// A simple interface for printing messages
 //----------------------------------------------------------------------
 
-`define STRINGIFY(x) `"x`"
+class msg;
 
-`ifdef VERILATOR
-  `define SVX_SIM Verilator
-`else
-  `define SVX_SIM ""
-`endif
+  static function void error(string id, string txt);
+    $error("** ERROR %s: %s", id, txt);
+  endfunction
 
-`define SVX_PREFIX svx
-`define SVX_MAJOR_VERSION 2
-`define SVX_MINOR_VERSION 1
-`define SVX_FIX_VERSION   0
-`define SVX_RELEASE_MODE  beta
+  static function void warning(string id, string txt);
+    $warning("** WARNING %s: %s", id, txt);
+  endfunction
+    
+  static function void info(string id, string txt);
+    $info("** INFO %s: %s", id, txt);
+  endfunction
 
+  static function void fatal(string id, string txt);
+    $fatal(1, "** FATAL %s: %s", id, txt);
+  endfunction
 
-`define SVX_VERSION `STRINGIFY(`SVX_PREFIX``-```SVX_MAJOR_VERSION``.```SVX_MINOR_VERSION <`SVX_RELEASE_MODE `SVX_FIX_VERSION> -- `SVX_SIM)
+endclass

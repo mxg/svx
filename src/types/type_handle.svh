@@ -27,7 +27,9 @@
 //======================================================================
 
 //----------------------------------------------------------------------
-// class: type_handle_base
+// type_handle_base
+//
+// Base class for type handles.
 //----------------------------------------------------------------------
 virtual class type_handle_base extends object;
 
@@ -36,7 +38,7 @@ virtual class type_handle_base extends object;
 endclass
 
 //----------------------------------------------------------------------
-// class: type_handle
+// type_handle
 //
 // A type handle is a singleton object that uniquely represents a
 // type.
@@ -82,7 +84,7 @@ endclass
 //----------------------------------------------------------------------
 // type_container
 //
-// A polymorphic container that holds an object of type T with a
+// A polymorphic container that holds an object of type T along with a
 // corresponding type handle.
 //----------------------------------------------------------------------
 class type_container#(type T) extends type_container_base;

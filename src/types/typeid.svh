@@ -36,67 +36,101 @@
 //----------------------------------------------------------------------
 class typeid #(type T=int);
 
+  //--------------------------------------------------------------------
+  // Is the class parameter an int type?
+  //--------------------------------------------------------------------
   static function bit is_int();
     return test_int();
   endfunction
 
+  //--------------------------------------------------------------------
+  // Check if the class parameter is an integer type.  If not generate
+  // a failure.
+  //--------------------------------------------------------------------
   static function bit is_int_fail();
     if(!test_int())
       begin
-	$display("*** Error: Type %s is not an integer type", $typename(T));
-	$finish;
+	string str = $sformatf("Type %s is not an integer type", $typename(T));
+	`fatal_msg("type error", str);
+	// no need to return a value after a fatal!
       end
     return 1;
   endfunction
 
+  //--------------------------------------------------------------------
+  // Is the class param3ter a two-state type?
+  //--------------------------------------------------------------------
   static function bit is_two_state();
     return test_two_state();
   endfunction
 
+  //--------------------------------------------------------------------
+  // Generate a failure if the class parameter is not a two-state
+  // type.
+  //--------------------------------------------------------------------
   static function bit is_two_state_fail();
     if(!test_two_state())
       begin
-	$display("*** Error: Type %s is not an two-state type", $typename(T));
-	$finish;
+	string str = $sformatf("Type %s is not an two-state type", $typename(T));
+	`fatal_msg("type error", str);
+	// no need to return a value after a fatal!
       end
     return 1;
   endfunction
 
+  //--------------------------------------------------------------------
+  // Is the class parameter a four-state type?
+  //--------------------------------------------------------------------
   static function bit is_four_state();
     return test_four_state();
   endfunction
 
+  //--------------------------------------------------------------------
+  // Generate a failure if the class parameter is not a four-state
+  // type.
+  //--------------------------------------------------------------------
   static function bit is_four_state_fail();
     if(!test_four_state())
       begin
-	$display("*** Error: Type %s is not an four-state type", $typename(T));
-	$finish;
+	string str = $sformatf("Type %s is not an four-state type", $typename(T));
+	`fatal_msg("type error", str);
+	// no need to return a value after a fatal!
       end
     return 1;
   endfunction  
 
+  //--------------------------------------------------------------------
+  //--------------------------------------------------------------------
   static function bit is_string();
     return test_string();
   endfunction
 
+  //--------------------------------------------------------------------
+  //--------------------------------------------------------------------
   static function bit is_string_fail();
     if(!test_string())
       begin
-	$display("*** Error: Type %s is not string type", $typename(T));
-	$finish;
+	string str = $sformatf("Type %s is not string type", $typename(T));
+	`fatal_msg("type error", str);
+	// no need to return a value after a fatal!
       end
     return 1;
   endfunction
 
+  //--------------------------------------------------------------------
+  //--------------------------------------------------------------------
   static function bit is_real();
     return test_real();
   endfunction
 
+  //--------------------------------------------------------------------
+  //--------------------------------------------------------------------
   static function bit is_real_fail();
     if(!test_real())
       begin
-	$display("*** Error: Type %s is not real type", $typename(T));
-	$finish;
+	string str = $sformatf("Type %s is not real type", $typename(T));
+	`fatal_msg("type error", str);
+	// no need to return a value after a fatal!
       end
     return 1;
   endfunction  
@@ -108,37 +142,37 @@ class typeid #(type T=int);
   //--------------------------------------------------------------------  
   local static function bit test_int();
   
-    type_handle_base th = type_handle#(T)::get_type();
+  type_handle_base th = type_handle#(T)::get_type();
 
-    case(th)
-      type_handle#(int)::get_type()              : return 1;
-      type_handle#(int unsigned)::get_type()     : return 1;
-      type_handle#(longint)::get_type()          : return 1;
-      type_handle#(longint unsigned)::get_type() : return 1;
-      type_handle#(shortint)::get_type()         : return 1;
-      type_handle#(shortint unsigned)::get_type(): return 1;
-      type_handle#(byte)::get_type()          	 : return 1;
-      type_handle#(byte unsigned)::get_type() 	 : return 1;
-      type_handle#(logic)::get_type()            : return 1;
-      type_handle#(reg)::get_type()              : return 1;
-      type_handle#(integer)::get_type()          : return 1;
-      type_handle#(time)::get_type()             : return 1;
-      type_handle#(bit)::get_type()              : return 1;
-      type_handle#(int8_t)::get_type()        	 : return 1;
-      type_handle#(uint8_t)::get_type()       	 : return 1;
-      type_handle#(int16_t)::get_type()       	 : return 1;
-      type_handle#(uint16_t)::get_type()      	 : return 1;
-      type_handle#(int32_t)::get_type()       	 : return 1;
-      type_handle#(uint32_t)::get_type()      	 : return 1;
-      type_handle#(int64_t)::get_type()       	 : return 1;
-      type_handle#(uint64_t)::get_type()      	 : return 1;
-      type_handle#(int128_t)::get_type()      	 : return 1;
-      type_handle#(uint128_t)::get_type()     	 : return 1;
-      default:
-	return 0;
-    endcase
+  case(th)
+    type_handle#(int)::get_type()              : return 1;
+    type_handle#(int unsigned)::get_type()     : return 1;
+    type_handle#(longint)::get_type()          : return 1;
+    type_handle#(longint unsigned)::get_type() : return 1;
+    type_handle#(shortint)::get_type()         : return 1;
+    type_handle#(shortint unsigned)::get_type(): return 1;
+    type_handle#(byte)::get_type()          	 : return 1;
+    type_handle#(byte unsigned)::get_type() 	 : return 1;
+    type_handle#(logic)::get_type()            : return 1;
+    type_handle#(reg)::get_type()              : return 1;
+    type_handle#(integer)::get_type()          : return 1;
+    type_handle#(time)::get_type()             : return 1;
+    type_handle#(bit)::get_type()              : return 1;
+    type_handle#(int8_t)::get_type()        	 : return 1;
+    type_handle#(uint8_t)::get_type()       	 : return 1;
+    type_handle#(int16_t)::get_type()       	 : return 1;
+    type_handle#(uint16_t)::get_type()      	 : return 1;
+    type_handle#(int32_t)::get_type()       	 : return 1;
+    type_handle#(uint32_t)::get_type()      	 : return 1;
+    type_handle#(int64_t)::get_type()       	 : return 1;
+    type_handle#(uint64_t)::get_type()      	 : return 1;
+    type_handle#(int128_t)::get_type()      	 : return 1;
+    type_handle#(uint128_t)::get_type()     	 : return 1;
+    default:
+      return 0;
+  endcase
 
-  endfunction
+endfunction
 
   //--------------------------------------------------------------------
   // test_four_state
@@ -147,41 +181,41 @@ class typeid #(type T=int);
   //--------------------------------------------------------------------  
   local static function bit test_four_state();
   
-    type_handle_base th = type_handle#(T)::get_type();
+  type_handle_base th = type_handle#(T)::get_type();
 
-    case(th)
-      type_handle#(logic)::get_type()            : return 1;
-      type_handle#(reg)::get_type()              : return 1;
-      type_handle#(integer)::get_type()          : return 1;
-      type_handle#(time)::get_type()             : return 1;
-      default:
-	return 0;
-    endcase
+  case(th)
+    type_handle#(logic)::get_type()            : return 1;
+    type_handle#(reg)::get_type()              : return 1;
+    type_handle#(integer)::get_type()          : return 1;
+    type_handle#(time)::get_type()             : return 1;
+    default:
+      return 0;
+  endcase
 
-  endfunction
+endfunction
 
   //--------------------------------------------------------------------
   // test_two_state
   //--------------------------------------------------------------------
   local static function bit test_two_state();
-    return(test_int() && !test_four_state());
-  endfunction
+  return(test_int() && !test_four_state());
+endfunction
   
   //--------------------------------------------------------------------
   // test_real
   //--------------------------------------------------------------------  
   local static function bit test_real();
-    type_handle_base th = type_handle#(T)::get_type();
-    return (th == type_handle#(real)::get_type());
-  endfunction
+  type_handle_base th = type_handle#(T)::get_type();
+  return (th == type_handle#(real)::get_type());
+endfunction
 
   //--------------------------------------------------------------------
   // test_string
   //--------------------------------------------------------------------  
   local static function bit test_string(bit fail=0);
-    type_handle_base th = type_handle#(T)::get_type();
-    return(th == type_handle#(string)::get_type());
-  endfunction    
+  type_handle_base th = type_handle#(T)::get_type();
+  return(th == type_handle#(string)::get_type());
+endfunction    
 
 endclass
 /* verilator lint_on SIDEEFFECT */

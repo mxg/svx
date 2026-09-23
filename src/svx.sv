@@ -46,7 +46,7 @@
 package svx;
 
   `include "types/types.svh"
-  `include "version/version.svh"
+  `include "utils/utils.svh"
   `include "containers/containers.svh"
   `include "iterators/iterators.svh"
   `include "set/set.svh"
@@ -56,9 +56,7 @@ package svx;
   `include "convenience_typedefs.svh"
   `include "behaviors/behaviors.svh"
 
-
 endpackage
-
 
 //----------------------------------------------------------------------
 // svx_anchor
