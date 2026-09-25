@@ -1,0 +1,289 @@
+\documentclass[11pt,letterpaper]{report}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{xltabular}
+\usepackage[expansion=false]{microtype}
+\usepackage{parskip}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{makecell}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue,
+}
+
+\titleformat{\chapter}[block]
+  {\normalfont\Large\bfseries}{Chapter \thechapter:}{0.5em}{}
+\titlespacing*{\chapter}{0pt}{20pt}{10pt}
+
+\titleformat{\section}
+  {\normalfont\large\bfseries}{\thesection}{1em}{}
+
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  \vspace*{2cm}
+  {\Huge\bfseries SVX\par}
+  \vspace{0.5em}
+  {\Large SystemVerilog Extension Library\par}
+  \vspace{1.5em}
+  {\huge Examples Catalog\par}
+  \vspace{1em}
+  {\large Version 2.1.1~beta\par}
+  \vspace{0.5em}
+  {\large September 2026\par}
+  \vspace{0.5em}
+  {\large Mark Glasser\par}
+  \vspace{0.5em}
+  {\large Apache License 2.0\par}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+\chapter{Containers}
+
+The container examples demonstrate the four core generic containers provided by SVX\@: \texttt{vector}, \texttt{deque}, \texttt{queue}, and \texttt{map}.  Each example is self-contained and focuses on the essential operations for that container.
+
+\section{Vector}
+
+\textit{Source:} \texttt{examples/containers/vector}\\
+
+Demonstrates the two distinct ways to grow a vector. In the first approach, elements are written past the current end of the vector using write(); the vector extends itself automatically to accommodate the new index. In the second approach, appendc() adds new elements one at a time to the back, also growing the vector. After population the example performs random-access reads and a targeted write, then traverses the vector by index to print its contents.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{vector\#(T,P)}
+  \item \texttt{int32\_traits}
+\end{itemize}
+\section{Deque}
+
+\textit{Source:} \texttt{examples/containers/deque}\\
+
+Demonstrates double-ended queue operations. Elements are pushed onto both the back and the front of the deque, then drained from the front with pop\_front(). A second pass re-populates the deque and shows that read(), inherited from the vector base class, can be used for indexed access even on a deque instance. The deque is then reversed in place and printed again.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{deque\#(T,P)}
+  \item \texttt{int32\_traits}
+\end{itemize}
+\section{Queue}
+
+\textit{Source:} \texttt{examples/containers/queue}\\
+
+Demonstrates storing user-defined class objects in a queue. The example defines a packet class with a randomized destination byte and a 16-byte payload stored in a vector. A static vector of valid destinations is shared across all packet instances and populated once at setup time.
+
+Ten packets are created via a static factory function, which selects a random destination from the shared table and fills the payload with random bytes. The packets are put into a queue and then retrieved in FIFO order. The example illustrates the use of class\_traits\#() as the policy parameter required when storing class handles in a container.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{queue\#(T,P)}
+  \item \texttt{vector\#(T,P)}
+  \item \texttt{class\_traits\#(T)}
+  \item \texttt{uint8\_traits}
+\end{itemize}
+\section{Map}
+
+\textit{Source:} \texttt{examples/containers/map}\\
+
+Demonstrates a string-keyed map whose values are polymorphic class handles. Three concrete classes (str\_obj, real\_obj, int\_obj) each extend an abstract base class that declares a virtual to\_string() method. One instance of each is created and inserted into the map under a descriptive key.
+
+The example then performs direct key-based retrieval and calls to\_string() on each result. A final traversal using the first()/next() idiom on the map itself prints all entries, illustrating map iteration without an explicit iterator object.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{map\#(KEY,T,P)}
+  \item \texttt{class\_traits\#(T)}
+\end{itemize}
+\chapter{Algorithms}
+
+The algorithm examples demonstrate the \texttt{algo\#()} class, which provides a set of higher-order, iterator-based algorithms. Each algorithm accepts an iterator and a predicate or functor, operating generically over any container that exposes the forward iterator interface.
+
+\section{Algo}
+
+\textit{Source:} \texttt{examples/algo/algo}\\
+
+Demonstrates the core algorithms in algo\#() applied to a small vector of bytes. A custom predicate class (extending predicate\#()) tests whether each element is less than 0x0f. A custom functor class (extending fcn\#()) prints each element.
+
+The example runs five algorithms against the vector: all\_of, none\_of, any\_of, count, and for\_each. The results of the predicate-based queries are printed as boolean strings, and for\_each prints the full vector contents.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{algo\#(T,P)}
+  \item \texttt{predicate\#(T)}
+  \item \texttt{fcn\#(T)}
+  \item \texttt{vector\#(T,P)}
+  \item \texttt{list\_iterator\#(T,P)}
+  \item \texttt{uint8\_traits}
+\end{itemize}
+\chapter{Types}
+
+The types examples demonstrate SVX\textquotesingle s compile-time type classification and trait-checking facilities.
+
+\section{Type Check}
+
+\textit{Source:} \texttt{examples/types/type\_check}\\
+
+Demonstrates compile-time type trait assertions via the check\_trait macro. The example class is parameterized by a type T and its associated traits class P. Three check\_trait invocations at class elaboration time assert that the type is integral, is two-state, and is not a string. If any assertion fails, elaboration terminates with a fatal message.
+
+At runtime the show() method uses typeid\#(T) to query and print the same three trait values, confirming what was already verified statically. The example is instantiated with uint16\_t and uint16\_traits.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{typeid\#(T)}
+  \item \texttt{void\_traits}
+  \item \texttt{\texttt{\`{}check\_trait}\ (macro)}
+\end{itemize}
+\chapter{Lexer}
+
+The lexer example demonstrates \texttt{lexer\_core} in a realistic application context: a reverse Polish notation (RPN) calculator.
+
+\section{RPN Calculator}
+
+\textit{Source:} \texttt{examples/lexer}\\
+
+Implements a reverse Polish notation (RPN) calculator using the lexer\_core tokenizer and a stack. The lexer tokenizes an input string into integer operands, floating-point operands, and arithmetic operators (+, -, *, /). The calculator maintains a stack of triple\#() items, where each item carries the token type, an integer value, and a real value. For each token the calculator either pushes an operand onto the stack or pops two operands, performs the operation, and pushes the result.
+
+The example evaluates six expressions covering integer arithmetic, floating-point arithmetic, mixed-type coercion, and integer and floating-point division by zero. The triple\#() class is used as a discriminated union, with the first field carrying the token type and the second and third fields carrying integer and real values respectively.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{lexer\_core}
+  \item \texttt{stack\#(T,P)}
+  \item \texttt{triple\#(A,B,C)}
+  \item \texttt{class\_traits\#(T)}
+\end{itemize}
+\chapter{Use Models}
+
+The use model examples are longer, more detailed demonstrations that show recommended patterns for using SVX containers, iterators, and algorithms. They are collected in \texttt{examples/use\_models} and can be run together from a single top-level module. Each sub-example is described separately below.
+
+\section{List}
+
+\textit{Source:} \texttt{examples/use\_models/list\_example.svh}\\
+
+Demonstrates the canonical forward-iteration use model for SVX containers. A vector of 20 random integers is built using appendc(). A list\_iterator is then created and bound to the vector, and the standard idiom (first() / at\_end() / get() / next()) is used to traverse and print all elements.
+
+The vector is then sorted with sort(), and the same iterator is reset to first() and traversed again to display the sorted output. This example is the recommended starting point for understanding how to use SVX iterators.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{vector\#(T,P)}
+  \item \texttt{list\_iterator\#(T,P)}
+  \item \texttt{uint32\_traits}
+\end{itemize}
+\section{Map --- Basic Use}
+
+\textit{Source:} \texttt{examples/use\_models/map\_example.svh}\\
+
+Demonstrates inserting, looking up, and iterating over a typed map. The map stores eight physical constants (Faraday, Planck, Avogadro, Boltzmann, electron mass, proton mass, magnetic flux constant, and elementary charge) keyed by their common names. A map\_iterator traverses all entries, using get\_index() to retrieve each key and printing the value and units.
+
+Two direct lookups follow: one for a key that exists (proton\_mass) and one for a key that does not (alpha\_particle\_mass), demonstrating the null-handle return on a failed get().
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{map\#(KEY,T,P)}
+  \item \texttt{map\_iterator\#(KEY,T,P)}
+  \item \texttt{class\_traits\#(T)}
+\end{itemize}
+\section{Map --- Polymorphic Container}
+
+\textit{Source:} \texttt{examples/use\_models/map\_example.svh}\\
+
+Demonstrates storing heterogeneous values of different types in a single map by wrapping them in type\_container\#(). Three entries are inserted under string keys: an integer, a real number, and a string, each wrapped in the corresponding type\_container specialization.
+
+The example then demonstrates two approaches to processing the polymorphic map. The first uses virtual dispatch: iterating the map and calling convert2string() on each type\_container\_base handle. The second uses type handles: each item's type is identified by comparing get\_type\_handle() against type\_handle\#(T)::get\_type() in a case statement, allowing the handle to be cast to the concrete type without virtual functions.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{map\#(KEY,T,P)}
+  \item \texttt{map\_iterator\#(KEY,T,P)}
+  \item \texttt{type\_container\#(T)}
+  \item \texttt{type\_container\_base}
+  \item \texttt{type\_handle\#(T)}
+  \item \texttt{class\_traits\#(T)}
+\end{itemize}
+\section{Algo with Range}
+
+\textit{Source:} \texttt{examples/use\_models/algo\_example.svh}\\
+
+Demonstrates running algorithms over a sub-range of a vector using the range\#() iterator. A vector of random 16-bit integers is created with a randomized size. A range iterator is then bound to a list\_iterator over the vector, with randomly chosen lower and upper bounds.
+
+for\_each prints the full vector, then for\_each prints just the elements within the range. count and all\_of are run over the range using a predicate that tests whether a value is >= 50, showing how range\#() composes with the algorithm library to restrict operations to a sub-sequence.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{algo\#(T,P)}
+  \item \texttt{predicate\#(T)}
+  \item \texttt{fcn\#(T)}
+  \item \texttt{vector\#(T,P)}
+  \item \texttt{list\_iterator\#(T,P)}
+  \item \texttt{range\#(T,P)}
+  \item \texttt{uint16\_traits}
+\end{itemize}
+\chapter{Applications}
+
+The application examples demonstrate SVX\textquotesingle s three application-layer packages: \texttt{mem}, \texttt{mem\_map}, and \texttt{pri\_queue}. Each example is a complete, runnable simulation.
+
+\section{Sparse Memory}
+
+\textit{Source:} \texttt{examples/mem}\\
+
+Demonstrates the mem\#() sparse memory model in a read/write verification scenario. A 32-bit memory with 16-bit pages, 8-bit blocks, and a 4-byte word size is instantiated. One word at a fixed offset within the test region is marked write-protected with set\_word\_restriction() before any writes begin.
+
+100 random words are written to consecutive word-aligned addresses starting at a base address of 0x7460\_0000. After writing, all 100 locations are read back and compared against a local reference array. Data mismatches are reported as errors. The write to the protected address is also expected to fail; last\_operation\_failed() and get\_last\_op\_string() detect and report the restriction violation. The test concludes with calls to show() and dump() to display the security map and allocated page contents.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{mem\#(ADDR\_BITS,PAGE\_BITS,BLOCK\_BITS,WORD\_SIZE)}
+\end{itemize}
+\section{Device Memory Map}
+
+\textit{Source:} \texttt{examples/mem\_map}\\
+
+Constructs a realistic SoC-style hierarchical address map and exercises its path-based and address-based lookup facilities. The hierarchy models a complete system with a 64 KB address space (0x0000--0xFFFF). An IO bus region at 0xFF00 contains two UART sub-regions, each with read\_buf, write\_buf, and ctrl registers. A system bus at 0x0000 is modeled by two overlapping views: sys\_bus, which contains a timer region (with a CSR register holding start\_stop and status fields) and two memory blocks; and sys\_bus\_2, an alternate view of the same address range that exposes the memory as a single flat block. The two views are both of type mem\_view\#(), which permits overlapping sibling instances.
+
+After the hierarchy is constructed, calculate\_and\_check() is called on the root to propagate absolute addresses and verify that no non-view siblings overlap. dump() prints the entire hierarchy with offsets, sizes, and absolute addresses. Three path-based lookups using find() demonstrate successful and failed navigation by dot-separated name path. Six address-based lookups using find\_addr\_all() return all spaces at every hierarchy level whose range contains the queried address; an iterator over the returned list prints each matching space.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{mem\_region\#(ADDR\_SIZE)}
+  \item \texttt{mem\_view\#(ADDR\_SIZE)}
+  \item \texttt{mem\_register\#(ADDR\_SIZE)}
+  \item \texttt{mem\_field\#(ADDR\_SIZE)}
+  \item \texttt{mem\_memory\#(ADDR\_SIZE)}
+  \item \texttt{mem\_space\#(ADDR\_SIZE)}
+\end{itemize}
+\section{Priority Queue Job Scheduler}
+
+\textit{Source:} \texttt{examples/pri\_queue}\\
+
+Simulates a priority-based job scheduler using two concurrent simulation threads. Sixteen jobs labeled A through P are pre-loaded into an SVX queue, which serves as a staging buffer for convenience. The first thread dequeues jobs one at a time, assigns each a randomized priority (0--9), pushes it into a priority queue, and waits two time units before pushing the next.
+
+The second thread runs concurrently, waiting for the priority queue to become non-empty, waiting five additional time units, and then popping and printing the highest-priority job available. Because the inter-push delay (2 units) is shorter than the inter-pop delay (5 units), the queue accumulates jobs before each pop, and the pop always retrieves the highest-priority job from among those currently waiting. This demonstrates that pri\_queue\#() maintains priority order dynamically as items arrive.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{pri\_queue\#(T,P)}
+  \item \texttt{queue\#(T,P)}
+  \item \texttt{string\_traits}
+\end{itemize}
+\end{document}
