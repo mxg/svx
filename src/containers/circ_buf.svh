@@ -32,6 +32,7 @@ typedef enum {
 	      REJECT_MODE,
 	      OVERWRITE_MODE
 	      } circ_buf_mode_e;
+
 //----------------------------------------------------------------------
 // circ_buf
 //
@@ -40,18 +41,21 @@ typedef enum {
 // buffer is full.  The other mode is overwrite mode.  If the buffer
 // is full the next push will overwrite the item at the tail.
 //----------------------------------------------------------------------
-class circ_buf #(type T=int, type P=void_traits, size_t S=8)
+class circ_buf #(type T=int, type P=void_traits)
   extends typed_container #(T,P);
 
+  local size_t max_size;
   local index_t head;
   local index_t tail;
   local size_t count;
-  local T buffer[S];
+  local T buffer[];
 
   //--------------------------------------------------------------------
   // constructor
   //--------------------------------------------------------------------
-  function new();
+  function new(size_t s=4);
+    max_size = s;
+    buffer = new [max_size];
     clear();
   endfunction
 
@@ -82,7 +86,7 @@ class circ_buf #(type T=int, type P=void_traits, size_t S=8)
   // is_full
   //--------------------------------------------------------------------
   virtual function bit is_full();
-    return (count == S);
+    return (count == max_size);
   endfunction
 
   //--------------------------------------------------------------------
@@ -97,7 +101,7 @@ class circ_buf #(type T=int, type P=void_traits, size_t S=8)
     
     buffer[tail] = t;
     tail++;
-    if(tail >= S) // wrap arround
+    if(tail >= max_size) // wrap arround
       tail = 0;
     count ++;
     
@@ -117,7 +121,7 @@ class circ_buf #(type T=int, type P=void_traits, size_t S=8)
     
     t = buffer[head];
     head++;
-    if(head >= S) // wrap around
+    if(head >= max_size) // wrap around
       head = 0;
     count --;
     

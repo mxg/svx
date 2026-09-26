@@ -92,7 +92,7 @@ module circ_buf_unit_test;
 
     `SVTEST(push_pop_reject_mode)
       int32_t val;
-      circ_buf#(int32_t, int32_traits, 4) cb = new();
+      circ_buf#(int32_t, int32_traits) cb = new(4);
   
       cb.push(1000);
       cb.push(485);

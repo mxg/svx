@@ -296,11 +296,11 @@ endclass
 //----------------------------------------------------------------------
 // real_base_traits
 //----------------------------------------------------------------------
-class real_base_traits #(type T=int) extends void_traits;
+class real_base_traits #(type T=int, T EP=2.2e-16) extends void_traits;
 
   typedef T empty_t;
   localparam empty_t empty = T'(0.0);
-  localparam T epsilon = T'(2.2e-16);
+  localparam T epsilon = T'(EP);
 
   localparam bit is_void	= false;
   localparam bit is_integral	= false;
@@ -332,11 +332,15 @@ class real_base_traits #(type T=int) extends void_traits;
 endclass
 
 typedef real_base_traits#(real) real_traits;
-
-// For some reason, this makes the Verilator compiler unhappy.					    
-//class shortreal_traits extends real_base_traits#(shortreal);
-//  localparam shortreal epsilon = shortreal'(1.2e-7);
-//endclass
+`ifdef VERILATOR
+  // The Verilator compiler promotes shortreal to real; use
+  // real_traits directly.
+  typedef real_traits shortreal_traits;
+`else
+  /* verilator lint_off SHORTREAL */
+  typedef real_base_traits#(shortreal, 1.2e-7) shortreal_traits;
+  /* verilator lint_on SHORTREAL */
+`endif
 
 //----------------------------------------------------------------------
 // string_traits
