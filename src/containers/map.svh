@@ -54,7 +54,7 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
   //--------------------------------------------------------------------
   virtual function T get(KEY key);
     if (!m_map.exists(key))
-      return m_empty;
+      return P::empty;
     return m_map[key];
   endfunction
   
@@ -80,6 +80,11 @@ class map #(type KEY=int, type T=void_t, type P=void_traits)
     return size_t'(m_map.num());
   endfunction
 
+  //--------------------------------------------------------------------
+  // is_empty
+  //
+  // Are there any items in the map?
+  //--------------------------------------------------------------------
   virtual function bit is_empty();
     return (size == 0);
   endfunction

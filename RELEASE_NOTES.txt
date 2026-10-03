@@ -2,6 +2,22 @@
 
 RELEASE NOTES
 
+Version svx-2.1 <beta 2>
+
+October 2026
+
+----------------------------------------------------------------------
+
+* ADDED: peek_front() and peek_back() functions top the deque
+  interface.
+
+* ADDED: multimap container and associated tests.  A multimap is a map that can hold
+  multiple items with the same key.
+
+* ADDED: multimap iterator and associated tests.
+
+----------------------------------------------------------------------
+
 Version svx-2.1 <beta 1>
 
 September 2026
@@ -14,8 +30,6 @@ September 2026
 * Improved comments in the code to improve understandability.
 
 ----------------------------------------------------------------------
-
-RELEASE NOTES
 
 Version svx-2.1 <beta 0>
 
@@ -61,8 +75,6 @@ September 2026
 
 ----------------------------------------------------------------------
 
-RELEASE NOTES
-
 Version svx-2.0 <beta 1>
 
 August 2026
@@ -78,8 +90,6 @@ August 2026
   accumulation across iterations.
 
 ----------------------------------------------------------------------
-
-RELEASE NOTES
 
 Version svx-2.0 <beta 0>
 
@@ -184,8 +194,6 @@ function is evaluated for each element in the iterator.
   + Use of svx_types is more consistent
   + The test suite was ported to use SVUnit version 3.38.1
 ----------------------------------------------------------------------
-
-RELEASE NOTES
 
 March 12, 2016
 

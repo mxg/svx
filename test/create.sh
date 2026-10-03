@@ -51,19 +51,21 @@ create_testsuite.pl -add containers/traits_unit_test.sv               \
                     -add containers/container_unit_test.sv            \
                     -add containers/vector_unit_test.sv               \
                     -add containers/map_unit_test.sv                  \
+                    -add containers/multimap_unit_test.sv             \
                     -add containers/queue_unit_test.sv                \
                     -add containers/deque_unit_test.sv                \
                     -add containers/stack_unit_test.sv                \
                     -add containers/sorter_unit_test.sv               \
 		    -add containers/circ_buf_unit_test.sv             \
                     -out containers/containers_testsuite.sv           \
-                   -overwrite
+                    -overwrite
 
 # create iterators test suite
 echo
 echo "*** Create iterators test suite"
 create_testsuite.pl -add iterators/list_iterators_unit_test.sv        \
                     -add iterators/map_iterators_unit_test.sv         \
+		    -add iterators/multimap_iterator_unit_test.sv     \
                     -add iterators/permute_iterators_unit_test.sv     \
 		    -add iterators/range_unit_test.sv                 \
                     -out iterators/iterators_testsuite.sv             \

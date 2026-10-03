@@ -67,6 +67,24 @@ class deque #(type T=int, type P=void_traits) extends vector#(T,P);
   endfunction
 
   //--------------------------------------------------------------------
+  // function: peek_front
+  //--------------------------------------------------------------------
+  virtual function T peek_front();
+    return (is_empty())
+      ? P::empty
+      : m_vector[0];
+  endfunction
+
+  //--------------------------------------------------------------------
+  // function: peek_back
+  //--------------------------------------------------------------------
+  virtual function T peek_back();
+    return (is_empty())
+      ? P::empty
+      : m_vector[size()-1];
+  endfunction
+
+  //--------------------------------------------------------------------
   // function: shuffle
   //--------------------------------------------------------------------
   virtual function void shuffle();

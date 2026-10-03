@@ -93,6 +93,19 @@ module map_unit_test;
   `SVUNIT_TESTS_BEGIN
 
   //--------------------------------------------------------------------
+  // empty_map
+  //--------------------------------------------------------------------
+    `SVTEST(empty_map)
+      int32_t n;
+
+      m = new();
+      `FAIL_UNLESS(m.size == 0);
+      
+      n = m.get("A");
+      `FAIL_UNLESS(n == int32_traits::empty);
+    `SVTEST_END
+      
+  //--------------------------------------------------------------------
   // string_map
   //
   // Ensure basic functionality of a map that maps strings to
@@ -280,7 +293,6 @@ module singleton_map_unit_test;
   singleton_map#(string, int32_t, int32_traits) sm;
   typedef singleton_map#(string, int32_t, int32_traits) map_t;
 
-
   //===================================
   // Build
   //===================================
@@ -326,7 +338,7 @@ module singleton_map_unit_test;
 
   //--------------------------------------------------------------------
   // singleton
-
+  //
   // Ensure that each call to get() returns the same handle
   //--------------------------------------------------------------------
 

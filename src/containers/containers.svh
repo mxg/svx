@@ -42,6 +42,7 @@
 `include "containers/vector.svh"
 `include "containers/deque.svh"
 `include "containers/queue.svh"
+`include "containers/multimap.svh"
 `include "containers/stack.svh"
 `include "containers/circ_buf.svh"
 

@@ -258,7 +258,7 @@ class list_iterator#(type T=int, type P=void_traits)
   endfunction
   
   //--------------------------------------------------------------------
-  // is_first
+  // first
   //--------------------------------------------------------------------
   virtual function bit first();
     idx = 0;

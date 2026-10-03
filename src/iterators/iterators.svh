@@ -33,6 +33,7 @@
 `include "iterators/iterator_intf.svh"
 `include "iterators/map_iterators.svh"
 `include "iterators/list_iterators.svh"
+`include "iterators/multimap_iterator.svh"
 `include "iterators/permute_iterators.svh"
 `include "iterators/range.svh"
 `include "iterators/map_range.svh"
