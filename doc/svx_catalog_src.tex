@@ -16,7 +16,7 @@
        \large SystemVerilog Extension Library --- Core Library (\texttt{src/})\\[0.3em]
        \normalsize Version 2.1.2 beta}
 \author{Mark Glasser}
-\date{September 2026}
+\date{October 2026}
 \begin{document}
 \maketitle
 \tableofcontents
@@ -681,6 +681,38 @@ Sorts queues of type T using P::compare() as the element comparator.
 \texttt{qsort} & void & \texttt{ref T vec[\$], int32\_t l, int32\_t r} & Sort the subrange [l, r] of vec recursively. Static. \\
 \end{xltabular}
 
+\section{multimap}
+\noindent\small\textit{File: \texttt{src/containers/multimap.svh}}\par
+
+A map in which each key may be associated with multiple values. Internally, each key maps to a \texttt{deque\#(T,P)}, so insertion order is preserved within a key and values can be retrieved individually or as a group. \texttt{multimap} is built on top of \texttt{map\#(KEY, deque\_t, class\_traits\#(deque\_t))}.
+
+\subsection*{\texttt{multimap\#(KEY, T, P)}}
+\noindent\small\textit{class}\quad \textbf{extends} \texttt{typed\_container\#(T,P)}\par
+
+Container that maps each key to an ordered collection of values. Multiple values may be stored under the same key; they are kept in insertion order.
+
+\noindent\textbf{Constructor:} \texttt{new(---)} --- Construct an empty multimap.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{get} & \texttt{T} & \texttt{KEY key} & Return the last-inserted value for key, or P::empty if the key is absent. \\
+\texttt{get\_all} & \texttt{deque\_t} & \texttt{KEY key} & Return a cloned deque of all values stored under key, in insertion order; returns the empty sentinel if the key is absent. \\
+\texttt{get\_map} & \texttt{map\_t} & --- & Return the internal map handle. Not intended for general use; required by multimap\textbackslash{}\_iterator because SystemVerilog lacks friend access. \\
+\texttt{insert} & void & \texttt{KEY key, T item} & Append item to the deque stored under key, creating the deque if needed. \\
+\texttt{size} & \texttt{size\_t} & --- & Return the total number of items across all keys (O(k) in the number of distinct keys). \\
+\texttt{size\_nonzero} & \texttt{bit} & --- & Return 1 if at least one item has been inserted; O(1) alternative to testing size() \textgreater{} 0. \\
+\texttt{contains} & \texttt{bit} & \texttt{KEY key} & Return 1 if key has at least one associated value, 0 otherwise. \\
+\texttt{count} & \texttt{size\_t} & \texttt{KEY key} & Return the number of values stored under key, or 0 if the key is absent. \\
+\texttt{is\_empty} & \texttt{bit} & --- & True if no keys (and therefore no items) have been inserted. \\
+\texttt{delete} & \texttt{bit} & \texttt{KEY key} & Remove all items stored under key; returns 1 on success, 0 if the key was not found. \\
+\texttt{clear} & void & --- & Remove all keys and values from the multimap. \\
+\end{xltabular}
+
 \chapter{Iterators}
 \section{Iterator Interfaces}
 \noindent\small\textit{File: \texttt{src/iterators/iterator\_intf.svh}}\par
@@ -1047,6 +1079,59 @@ Range view over a map iterator slice, exposing the current key.
 \bottomrule
 \endfoot
 \texttt{get\_index} & \texttt{KEY} & --- & Return the key at the current iterator position. \\
+\end{xltabular}
+
+\section{multimap\_iterator}
+\noindent\small\textit{File: \texttt{src/iterators/multimap\_iterator.svh}}\par
+
+Bidirectional iterator for \texttt{multimap}. Uses a dual-iterator design: a \texttt{map\_iterator} advances across keys and a \texttt{list\_iterator} traverses the values within each key's deque. The concrete \texttt{multimap\_iterator} implements both \texttt{fwd\_intf} and \texttt{bkwd\_intf}.
+
+\subsection*{\texttt{multimap\_iterator\_base\#(KEY, T, P)}}
+\noindent\small\textit{virtual class}\par
+
+Abstract base that holds the map binding and the two internal iterators. Provides get\_index(), size(), and is\_empty().
+
+\noindent\textbf{Constructor:} \texttt{new(multimap\_t map=null)} --- Optionally bind a multimap.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{bind\_map} & void & \texttt{multimap\_t m} & Bind the iterator to a multimap, initialising the internal map and list iterators. \\
+\texttt{get\_index} & \texttt{KEY} & --- & Return the key associated with the current iterator position. \\
+\texttt{size} & \texttt{size\_t} & --- & Return the total number of items in the bound multimap. \\
+\texttt{is\_empty} & \texttt{bit} & --- & True if unbound or the multimap contains no items. \\
+\end{xltabular}
+
+\subsection*{\texttt{multimap\_iterator\#(KEY, T, P)}}
+\noindent\small\textit{class}\quad \textbf{extends} \texttt{multimap\_iterator\_base\#(KEY,T,P)} \quad \textbf{implements} \texttt{fwd\_intf\#(T,P)}, \texttt{bkwd\_intf\#(T,P)}\par
+
+Full bidirectional iterator over a multimap. Iterates all stored values in key order; within a key, values appear in insertion order.
+
+\noindent\textbf{Constructor:} \texttt{new(multimap\_t map=null)} --- Optionally bind a multimap.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{get} & \texttt{T} & --- & Return the value at the current position; returns P::empty if unbound or empty. \\
+\texttt{set} & void & \texttt{T t} & Replace the value at the current position. \\
+\texttt{get\_index} & \texttt{KEY} & --- & Return the key at the current position. \\
+\texttt{first} & \texttt{bit} & --- & Move to the first value in the map; returns 0 if empty. \\
+\texttt{next} & \texttt{bit} & --- & Advance one position; moves to the next value in the current deque, or to the first value of the next key. Returns 0 when past the end. \\
+\texttt{is\_last} & \texttt{bit} & --- & True if the current position is the very last value in the multimap. \\
+\texttt{at\_end} & \texttt{bit} & --- & True if the iterator is past the last value; always true when the multimap is empty. \\
+\texttt{last} & \texttt{bit} & --- & Move to the last value in the map; returns 0 if empty. \\
+\texttt{prev} & \texttt{bit} & --- & Move one position backward; moves to the previous value in the current deque, or to the last value of the preceding key. Returns 0 when before the beginning. \\
+\texttt{is\_first} & \texttt{bit} & --- & True if the current position is the very first value in the multimap. \\
+\texttt{at\_beginning} & \texttt{bit} & --- & True if the iterator is before the first value. \\
+\texttt{skip} & \texttt{bit} & \texttt{signed\_index\_t d} & Move forward (d\textgreater{}0) or backward (d\textless{}0) by d positions; returns 0 if the limit is reached before all steps are taken. \\
 \end{xltabular}
 
 \chapter{Algorithms}
