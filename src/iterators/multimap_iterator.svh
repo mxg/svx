@@ -58,8 +58,10 @@ virtual class multimap_iterator_base#(type KEY=int,
   // Bind a map to the iterator
   //--------------------------------------------------------------------
    virtual function void bind_map(multimap_t m = null);
+     if(m == null)
+       return;
      m_map = m;
-     map_iter = new(m_map.m_map);
+     map_iter = new(m_map.get_map());
      list_iter = new();
    endfunction
 
@@ -84,7 +86,7 @@ virtual class multimap_iterator_base#(type KEY=int,
   // is_empty
   //--------------------------------------------------------------------
   virtual function bit is_empty();
-    return (m_map == null) || (size() == 0);
+    return (m_map == null) || (m_map.size_nonzero() == 0);
   endfunction
     
 endclass
@@ -257,9 +259,12 @@ class multimap_iterator#(type KEY=int, type T=int, type P=void_traits)
   // at_beginning
   //--------------------------------------------------------------------
   virtual function bit at_beginning();
+    
     if(is_empty())
-      return 0;
+      return 1;
+    
     return (map_iter.at_beginning());
+    
   endfunction
 
   //--------------------------------------------------------------------
@@ -273,7 +278,7 @@ class multimap_iterator#(type KEY=int, type T=int, type P=void_traits)
     signed_index_t ix;
 
     if(distance == 0)
-      return 0;
+      return 1;
 
     if(distance > 0) begin
       for(ix = 0; ix < distance; ix++)

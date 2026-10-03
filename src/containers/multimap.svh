@@ -52,7 +52,24 @@ class multimap #(type KEY=int, type T=void_t, type P=void_traits)
   endfunction
 
   //--------------------------------------------------------------------
+  // get_map
+  //
+  // ** Don't use this function **
+  //
+  // Returns a handle to the internal map used to implement a
+  // multimap.  Required by the multimap_iterator, but is not for
+  // general use.  If SystemVerilog supported friends this would not
+  // be necessary.
+  //--------------------------------------------------------------------
+  function map_t get_map();
+    return m_map;
+  endfunction
+
+  //--------------------------------------------------------------------
   // get
+  //
+  // If the key exists in the map then return the last item inserted
+  // for that key. If the key is not in the map then return empty.
   //--------------------------------------------------------------------
   virtual function T get(KEY key);
     deque_t q = m_map.get(key);
@@ -109,6 +126,41 @@ class multimap #(type KEY=int, type T=void_t, type P=void_traits)
 
     return sz;
     
+  endfunction
+
+  //--------------------------------------------------------------------
+  // size_nonzero
+  //
+  // Sometimes we just need to know if there is at least one entry in
+  // the multimap.  In those cases, traversing the entire map to count
+  // all the items is not very efficient.  So this function lets you
+  // find out if anything is in the map without counting all the
+  // items.
+  //--------------------------------------------------------------------
+  virtual function bit size_nonzero();
+    return (m_map.size() > 0);
+  endfunction
+
+  //--------------------------------------------------------------------
+  // contains
+  //
+  // Does the multimap contain a specific key?
+  //--------------------------------------------------------------------
+  virtual function bit contains(KEY key);
+    deque_t q = m_map.get(key);
+    return ((q != traits_t::empty)  && (q.size() > 0));
+  endfunction
+
+  //--------------------------------------------------------------------
+  // count
+  //
+  // How many entires as associated with a specific key?
+  //--------------------------------------------------------------------
+  virtual function size_t count(KEY key);
+    deque_t q = m_map.get(key);
+    return (q == traits_t::empty)
+      ? 0
+      : q.size();
   endfunction
 
   //--------------------------------------------------------------------

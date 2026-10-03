@@ -160,6 +160,42 @@ module multimap_unit_test;
   
     `SVTEST_END
 
+  //--------------------------------------------------------------------
+  // delete_key
+  //--------------------------------------------------------------------
+    `SVTEST(delete_key)
+      deque#(int32_t, int32_traits) q;
+      bit ok;
+      multimap#(string, int32_t, int32_traits) m = new();
+
+      m.insert("fred", 4);
+      m.insert("fred", 443);
+      m.insert("fred", -99);
+      m.insert("wilma", 4000);
+      m.insert("barney", 20);
+      m.insert("wilma", 328);
+      m.insert("betty", 6188);
+      m.insert("barney", 26); 
+
+      `FAIL_UNLESS(m.size() == 8);
+
+      q = m.get_all("fred");
+      `FAIL_UNLESS(q != null);
+      `FAIL_UNLESS(q.size() == 3);
+      `FAIL_UNLESS(m.size_nonzero() == 1);
+
+      ok = m.delete("fred");
+      `FAIL_UNLESS(ok == 1);
+      q = m.get_all("fred");
+      `FAIL_UNLESS(q == null);
+
+      `FAIL_UNLESS(m.size() == 5);
+      m.clear();
+      `FAIL_UNLESS(m.size() == 0)
+      `FAIL_UNLESS(m.size_nonzero() == 0);
+  
+    `SVTEST_END
+
   `SVUNIT_TESTS_END
 
 endmodule
