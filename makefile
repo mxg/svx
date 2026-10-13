@@ -26,31 +26,32 @@
 # permissions and limitations under the License.
 #=======================================================================
 
-DIRS	:= test examples
+#------------------------------------------------------------
+# Command Verbosity
+
+V               = @
+#V               =
 
 MAKE	:= /usr/bin/make -s
 
-phony: clean build run
+.PHONY: core uvm build run clean
 
-all: clean build run
+all: core uvm
 
-clean:
-	@for f in ${DIRS}; do \
-	  cd $$f; \
-	  ${MAKE} clean; \
-	  cd ..; \
-	done
+core:
+	${V}cd core; ${MAKE}
+
+uvm:
+	${V}cd uvm; ${MAKE}
 
 build:
-	@for f in ${DIRS}; do \
-	  cd $$f; \
-	  ${MAKE} build; \
-	  cd ..; \
-	done
+	${V}cd core; ${MAKE} build
+	${V}cd uvm; ${MAKE} build
 
 run:
-	@for f in ${DIRS}; do \
-	  cd $$f; \
-	  ${MAKE} run; \
-	  cd ..; \
-	done
+	${V}cd core; ${MAKE} run
+	${V}cd uvm; ${MAKE} run
+
+clean:
+	${V}cd core; ${MAKE} clean
+	${V}cd uvm; ${MAKE} clean
