@@ -46,9 +46,9 @@ endclass
 //
 // A type_container#() is a base class for an object container of any
 // type. These are the basis for building polymorphic data structures.
-// It provides virtual functions convert2string(), which prints the
-// contents, and get_type_handle(), which returns a unique handle
-// based on the container's type.
+// It provides virtual functions val2str(), which prints the contents,
+// and get_type_handle(), which returns a unique handle based on the
+// container's type.
 //
 // Notice that we use the get() function to retrieve the object in the
 // container.  The object is declared as local and is not visible in a
@@ -57,24 +57,20 @@ endclass
 // intentionally or unintentionally, in this context).
 
 class int_container extends type_container#(int32_t);
-  function string convert2string();
-    string s;
-    $sformat(s, "%0d", get());
-    return s;
+  function new();
+    set_default_fmt("%0d");
   endfunction
 endclass
 
 class real_container extends type_container#(real);
-  function string convert2string();
-    string s;
-    $sformat(s, "%0g", get());
-    return s;
+  function new();
+    set_default_fmt("%0g");
   endfunction
 endclass
 
 class string_container extends type_container#(string);
-  function string convert2string();
-    return get();
+  function new();
+    set_default_fmt("%s");
   endfunction
 endclass
 
@@ -236,16 +232,16 @@ class map_example;
       // Using the iterator, retrieve the item from the map.
       tcb = iter.get();
       // The get_index() function returns the key for the current item.
-      $display("%s = %s", iter.get_index(), tcb.convert2string());
+      $display("%s = %s", iter.get_index(), tcb.val2str());
       // Advance to the next item in the map.
       void'(iter.next());
     end
 
     // For some weird reason, if you didn't want to or could not use
     // virtual functions you could still process the polymorphic map
-    // using a case statement.  The important point in this part of the
-    // example is that we are yusing type handles to identify the type
-    // of the object.
+    // using a case statement.  The important point in this part of
+    // the example is that we are using type handles to identify the
+    // type of the object.
     
     iter = new(poly_map);
     void'(iter.first());

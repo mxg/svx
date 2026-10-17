@@ -12,11 +12,17 @@ October 2026
   pair#() that contains the key and the data item.
 
 * Enable compilation of UVM in the makefile system. Using IEEE
-  1800.2-2020 standard as implmented in the Accellera kit version
+  1800.2-2020 standard as implemented in the Accellera kit version
   1800.2-2020.3.2.
 
 * FIXED: bug in lexer that caused the first character of an identifier
   lexeme to disappear.
+
+* ADDED: Added val2str() virtual function to type_container_base and
+  type_container. It can be implemented to convert an internal value
+  to a printable string.
+
+* FIXED: Fixed bugs in lexer related to recognizing numeric constants.
 
 
 ----------------------------------------------------------------------
@@ -45,7 +51,7 @@ September 2026
 
 ----------------------------------------------------------------------
 
-* ADDED; Lightweight message interface along with correspondeing
+* ADDED; Lightweight message interface along with corresponding
   macros.
 
 * Improved comments in the code to improve understandability.

@@ -1,3 +1,31 @@
+//======================================================================
+//
+//               .oooooo..o oooooo     oooo ooooooo  ooooo     
+//              d8P'    `Y8  `888.     .8'   `8888    d8'      
+//              Y88bo.        `888.   .8'      Y888..8P        
+//               `"Y8888o.     `888. .8'        `8888'         
+//                   `"Y88b     `888.8'        .8PY888.        
+//              oo     .d8P      `888'        d8'  `888b       
+//              8""88888P'        `8'       o888o  o88888o
+//
+//                  SystemVerilog Extension Library
+//
+//
+// Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+// implied.  See the License for the specific language governing
+// permissions and limitations under the License.
+//======================================================================
 
 //----------------------------------------------------------------------
 // lexer_core
@@ -42,14 +70,16 @@ class lexer_core;
   local string s;
 
   // variable: pointer (index) to the current character in the stream
-  local int unsigned p;
+  local uint32_t p;
 
   // variable: pointer (index) to the beginning of the current lexeme
-  local int unsigned lexp;
+  local uint32_t lexp;
 
   // variable: class object that contains additional information about
   // each lexeme.  Mainly used for numeric tokens
   local token_descriptor token_desc;
+
+  local uint32_t first_digit;
 
   //+==================================================================+
   //+                                                                  +
@@ -98,8 +128,7 @@ class lexer_core;
     if(`isalpha(c) || c == "_") begin
       putc();
       for(c = getc(); `isalnum(c) || (c == "_"); c = getc());
-      if(c != 0)
-        putc();
+      if(c != 0) putc();
       case(get_lexeme())
         "off"   : return TOKEN_OFF;
         "OFF"   : return TOKEN_OFF;
@@ -129,7 +158,7 @@ class lexer_core;
 
     // if we have a digit or a plus or minus then the next token could
     // be a number
-    if(`isdigit(c) || c == "-" || c == "+") begin
+    if(`isdigit(c) || c == "-" || c == "+" || c == ".") begin
       putc();
       return lex_num();
     end
@@ -197,7 +226,7 @@ class lexer_core;
   // get_loc
   // return the location of the last lexeme
   //--------------------------------------------------------------------
-  function int unsigned get_loc();
+  function uint32_t get_loc();
     return lexp;
   endfunction
 
@@ -238,6 +267,16 @@ class lexer_core;
       else
         p = s.len() - 1;
     end
+endfunction
+
+  //--------------------------------------------------------------------
+  // function: put_token
+  //
+  // Return a token back to the input stream
+  //--------------------------------------------------------------------
+  function void put_token(string lex);
+    for(uint32_t ix = 0; ix < lex.len(); ix++)
+      putc;
   endfunction
 
   //--------------------------------------------------------------------
@@ -269,7 +308,7 @@ class lexer_core;
   // convenience function to be called only from lex_num().  This is not
   // a general purpose function.
   //--------------------------------------------------------------------
-  local function int unsigned get_int_size();
+  local function uint32_t get_int_size();
     string lexeme = s.substr(lexp, p-2);
     return lexeme.atoi();
   endfunction
@@ -288,6 +327,7 @@ class lexer_core;
     typedef enum {
                   STATE_START,
                   STATE_SIGN,
+		  STATE_DOT,
                   STATE_DIGIT,
                   STATE_UNDERBAR,
                   STATE_DECIMAL_POINT,
@@ -331,36 +371,72 @@ class lexer_core;
         STATE_START:
           // Initial state of the FSM
           begin
-            sign = "";
-            if(c == "-" || c == "+") begin
-              sign = c;
-              state = STATE_SIGN;
-            end
-            else
-              if(`isdigit(c))
-                state = STATE_DIGIT;
-              else
+            sign = 0;
+	    case(1)
+              (c == "-" || c == "+"):
+		  begin
+		    sign = c;
+		    state = STATE_SIGN;
+		  end
+	      (c == "."):
+		  begin
+		    state = STATE_DOT;
+		    first_digit = p-1;
+		  end
+	      `isdigit(c):
+		begin
+                  state = STATE_DIGIT;
+		  first_digit = p-1;
+		end
+	      default:
                 return TOKEN_ERROR;
-          end
+	    endcase
+	  end
+
+	STATE_DOT:
+	  // One character lookahead.  If we have a digit then we ar
+	  // decimal territory.  Otherwise, it's just a dot.
+	  begin
+	    putc();
+	    if(`isdigit(c)) begin
+	      state = STATE_DECIMAL_POINT;
+	    end
+	    else
+	      return TOKEN_DOT;
+	  end
 
         STATE_SIGN:
           // We've seen a + or - so perhaps we are at the beginning of a
           // signed constant.
           begin
+	    case(1)
             // If the next character is a digit then definitely we are
             // at the beginning of a signed constant.
-            if(`isdigit(c))
-              state = STATE_DIGIT;
-            else begin
-              // Nope, no signed constant, just a sign character.
-	      if(c != 0)
-		putc();
-              case (sign)
-                "+" : return TOKEN_PLUS;
-                "-" : return TOKEN_MINUS;
-                default: return TOKEN_ERROR; // uh oh, something has gone wrong
-              endcase
-            end
+            `isdigit(c):
+	      begin
+		state = STATE_DIGIT;
+		first_digit = p-1;
+		token_desc.sign = sign;
+	      end
+	    (c == "."):
+		begin
+		  state = STATE_DECIMAL_POINT;
+		  first_digit = p-1;
+		  token_desc.sign = sign;
+		end
+	    default:
+	      begin
+		// Nope, no signed constant, just a sign character.
+		if(c != 0) putc();
+		case (sign)
+                  "+" : return TOKEN_PLUS;
+                  "-" : return TOKEN_MINUS;
+		  "." : return TOKEN_DOT;
+                  default: 
+		    return TOKEN_ERROR; // uh oh, something has gone wrong
+		endcase
+	      end
+	    endcase
           end
 
         STATE_DIGIT:
@@ -380,31 +456,43 @@ class lexer_core;
               "h" :
                 begin
                   token_desc.size = get_int_size();
+		  token_desc.base = c;
+		  first_digit = p;
                   state = STATE_HEX;
                 end
               "H" :
                 begin
                   token_desc.size = get_int_size();
+		  token_desc.base = c;
+		  first_digit = p;
                   state = STATE_HEX;
                 end
               "o" :
                 begin
                   token_desc.size = get_int_size();
+		  token_desc.base = c;
+		  first_digit = p;
                   state = STATE_OCT;
                 end
               "O" :
                 begin
                   token_desc.size = get_int_size();
+		  token_desc.base = c;
+		  first_digit = p;
                   state = STATE_OCT;
                 end
               "b" :
                 begin
                   token_desc.size = get_int_size();
+		  token_desc.base = c;
+		  first_digit = p;
                   state = STATE_BIN;
                 end
               "B" :
                 begin
                   token_desc.size = get_int_size();
+		  token_desc.base = c;
+		  first_digit = p;
                   state = STATE_BIN;
                 end
               "S" : 
@@ -423,6 +511,7 @@ class lexer_core;
                   if(!`isdigit(c)) begin
                     if(c != 0) putc();
                     token_desc.kind = TOKEN_KIND_INT;
+		    token_desc.digits = s.substr(first_digit, p-1);
                     return TOKEN_INT;
                   end
                 end
@@ -471,6 +560,7 @@ class lexer_core;
                   if(!`isdigit(c) && c != "_") begin
                     if(c != 0) putc();
                     token_desc.kind = TOKEN_KIND_INT;
+		    token_desc.digits = s.substr(first_digit, p-1);
                     return TOKEN_INT;
                   end
                  end
@@ -508,6 +598,8 @@ class lexer_core;
                 begin
                   if(!`isdigit(c)) begin
                     if(c != 0) putc();
+		    token_desc.digits = s.substr(first_digit, p-1);
+		    token_desc.base = "f";
                     return TOKEN_FLOAT;
                   end
                 end
@@ -534,8 +626,11 @@ class lexer_core;
                 end
               default:
                 begin
-                  if(!`isdigit(c))
+                  if(!`isdigit(c)) begin
+		    token_desc.digits = s.substr(first_digit, p-1);
+		    token_desc.base = "f";
                     return TOKEN_FLOAT;
+		  end
                 end
             endcase
           end
@@ -544,13 +639,11 @@ class lexer_core;
           // We encountered an exponent marker.  Let's get the exponent
           // digits.  Byt the way, and exponent may be signed.
           begin
-            if(c == "+" || c == "-")
-              state = STATE_EXP_SIGN;
-            else
-              if(`isdigit(c))
-                state = STATE_EXP_DIGIT;
-              else
-                return TOKEN_ERROR;
+	    case(1)
+              (c == "+" || c == "-"): state = STATE_EXP_SIGN;
+	      `isdigit(c):            state = STATE_EXP_DIGIT;
+	      default:                return TOKEN_ERROR;
+	    endcase
           end
 
         STATE_EXP_SIGN:
@@ -581,6 +674,8 @@ class lexer_core;
               default:
                 begin
                   if(!`isdigit(c)) begin
+		    token_desc.digits = s.substr(first_digit, p-1);
+		    token_desc.base = "f";
                     return TOKEN_FLOAT;
                   end
                 end
@@ -645,6 +740,7 @@ class lexer_core;
             if( !`isxdigit(c) && c != "_" && !`islogic(c)) begin
               if(c != 0) putc();
               token_desc.kind = TOKEN_KIND_HEX;
+	      token_desc.digits = s.substr(first_digit, p-1);
               return token_desc.is_logic ? TOKEN_LOGIC : TOKEN_INT;
             end
             token_desc.is_logic |= `islogic(c);
@@ -656,6 +752,7 @@ class lexer_core;
             if(`isodigit(c) || `islogic(c)) begin
               mark_lexeme();
               token_desc.is_logic |= `islogic(c);
+	      token_desc.digits = s.substr(first_digit, p-1);
               state = STATE_OCT_DIGIT;
             end
             else
@@ -669,6 +766,7 @@ class lexer_core;
               if(c != 0) putc();
               lexeme = get_lexeme();
               token_desc.kind = TOKEN_KIND_OCT;
+	      token_desc.digits = s.substr(first_digit, p-1);
               return token_desc.is_logic ? TOKEN_LOGIC : TOKEN_INT;
             end
             token_desc.is_logic |= `islogic(c);
@@ -692,6 +790,7 @@ class lexer_core;
             if(! (c == "0" || c == "1")  && !`islogic(c)) begin
               if(c != 0) putc();
               token_desc.kind = TOKEN_KIND_BIN;
+	      token_desc.digits = s.substr(first_digit, p-1);
               return token_desc.is_logic ? TOKEN_LOGIC : TOKEN_INT;
             end
             token_desc.is_logic |= `islogic(c);

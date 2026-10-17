@@ -35,6 +35,6 @@ SV_SRC		+= top.sv
 
 UVM		= 1
 
-RUN_OPTS	= +abc=45 +def +abc=198 +xyz=4.5e-6 +fred=off +ddd=4b1010
+RUN_OPTS	= +abc=45 +def=3003 +abc=-198 +xyz=-4.5e-6 +fred +ddd=4b1010 +def=16hf72c +xyz=.92 +def=16b1001011000111010 +abc=12he78 +str=\"qrstuvw\" +fritz=gripple +ddd=16o44721
 
 include ${TOP}/make/makefile

@@ -39,25 +39,52 @@ typedef enum uint32_t { ARG_INT,
 // Define traits for the arg_t enum
 typedef base_unsigned_int_traits#(arg_t)  arg_traits;
 
-class opt_desc;
-  string val;
+//----------------------------------------------------------------------
+// cl_opt_desc
+//
+// A command line option descriptor contains information about a
+// command line option that could appear.
+//----------------------------------------------------------------------
+class cl_opt_desc;
+  string name;
+  arg_t arg_type;
+  bit multiple;
+
+  function void print();
+    $write("%12s: %s", name, arg_type.name());
+    if(multiple)
+      $display(" (multiple ok)");
+    else
+      $display();
+  endfunction
+  
+endclass
+
+// Convenience typedef for cl_opt_desc traits
+typedef class_traits#(cl_opt_desc) cl_opt_traits;
+
+//----------------------------------------------------------------------
+// print_cl_opt
+//----------------------------------------------------------------------
+class print_cl_opt extends fcn#(cl_opt_desc);
+  function void f(cl_opt_desc opt);
+    opt.print();
+  endfunction
 endclass
 
 //----------------------------------------------------------------------
 // cl_mgr
 //
-// Command Line option manager
+// Command Line option manager contains the map of command line option
+// descriptors.  This is the set of all possible command line options
+// that are available.
 //----------------------------------------------------------------------
 class cl_mgr;
 
-  typedef map_iterator #(string, arg_t, arg_traits) iter_t;
-  typedef multimap_iterator#(string, opt_desc, class_traits#(opt_desc)) cl_iter_t;
+  typedef map_iterator #(string, cl_opt_desc, cl_opt_traits) map_iter_t;
 
-  local static uvm_cmdline_processor clp = new();
-  
-  local static cl inst;
-  local static map#(string, arg_t, arg_traits) opt_map;
-  local static multimap#(string, opt_desc, class_traits#(opt_desc)) cl_map;
+  local static cl_mgr inst;
+  local static map#(string, cl_opt_desc, cl_opt_traits) opt_map;
 
   //--------------------------------------------------------------------
   // constructor
@@ -73,7 +100,7 @@ class cl_mgr;
   //
   // Retrieve a handle to the singleton instance
   //--------------------------------------------------------------------
-  static function cl get();
+  static function cl_mgr get();
     if(inst == null)
       inst = new();
     return inst;
@@ -84,10 +111,22 @@ class cl_mgr;
   //
   // Add a new command line option to the list of options
   //--------------------------------------------------------------------
-  static function void add(string name, arg_t arg_type);
+  static function void add(string name, arg_t arg_type, bit multi = 0);
+    cl_opt_desc opt = new();
+    opt.name = name;
+    opt.arg_type = arg_type;
+    opt.multiple = multi;
+    
     if(opt_map == null)
       opt_map = new();
-    void'(opt_map.insert(name, arg_type));
+    void'(opt_map.insert(name, opt));
+  endfunction
+
+  //--------------------------------------------------------------------
+  // find
+  //--------------------------------------------------------------------
+  static function cl_opt_desc find(string name);
+    return opt_map.get(name);
   endfunction
 
   //--------------------------------------------------------------------
@@ -96,39 +135,9 @@ class cl_mgr;
   // Dump the list of command line options
   //--------------------------------------------------------------------
   static function void dump();
-    iter_t iter = new(opt_map);
-
-    if(!iter.first())
-      return;
-
-    $display("--- Command Line Option List ---");
-    
-    while(!iter.at_end()) begin
-      pair#(string, arg_t) item = iter.get_item();
-      $display("  %16s: %s", item.first(), item.second());
-      void'(iter.next());
-    end
+    map_iter_t iter = new(opt_map);
+    print_cl_opt print = new();
+    algo#(cl_opt_desc, cl_opt_traits)::for_each(iter, print);
   endfunction
 
-  //--------------------------------------------------------------------
-  // parse
-  //--------------------------------------------------------------------
-  static function void parse();
-    string val;
-    iter_t iter = new(opt_map);
-
-    if(!iter.first())
-      return;
-
-    while(!iter.at_end()) begin
-      pair#(string, arg_t) item = iter.get_item();
-      while($value$plusargs(item.first(), val)) begin
-	$display("%s = %s", item.first(), val);
-      end
-      void'(iter.next());
-    end   
-    
-  endfunction 
-    
-  
 endclass

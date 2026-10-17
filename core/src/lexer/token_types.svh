@@ -12,6 +12,7 @@
 //
 //
 // Copyright 2016 NVIDIA Corporation
+// Copyright 2026 Mark Glasser
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -115,17 +116,26 @@ endclass
 //----------------------------------------------------------------------
 class token_descriptor;
 
+  byte base;
   int unsigned size;
+  byte	       sign;
+  string       digits;
   bit is_signed;
   bit is_logic;
   token_kind_t kind;
   real multiplier;
 
   function new();
-    size = 32;
+    sign = 0;
+    base = "d";
+    size = 0;
     is_signed = 0;
     is_logic = 0;
     multiplier = 1.0;
+  endfunction
+
+  function void print();
+    $display("token: %s [%0d] %s %s", sign, size, base, digits);
   endfunction
 
 endclass

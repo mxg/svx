@@ -71,14 +71,24 @@ endclass
 //----------------------------------------------------------------------
 class type_container_base;
 
-  virtual function string convert2string();
-    return "";
-  endfunction
+  protected string default_fmt;
 
   virtual function type_handle_base get_type_handle();
     return null;
   endfunction
-  
+
+  virtual function string val2str(string fmt="");
+    return "";
+  endfunction
+
+  virtual function void set_default_fmt(string fmt);
+    default_fmt = fmt;
+  endfunction
+
+  virtual function string get_typename();
+    return "";
+  endfunction
+
 endclass
 
 //----------------------------------------------------------------------
@@ -110,6 +120,18 @@ class type_container#(type T) extends type_container_base;
   // Retrieve the object from the container.
   virtual function T get();
     return t;
+  endfunction
+
+  virtual function string val2str(string fmt="");
+   string str;
+    if(fmt == "")
+      fmt = default_fmt;
+    str= $sformatf(fmt, get());
+    return str;
+  endfunction
+
+  virtual function string get_typename();
+    return $typename(T);
   endfunction
 
 endclass
