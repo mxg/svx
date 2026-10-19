@@ -71,12 +71,19 @@ typedef list_iterator#(cl_opt_instance, cl_opt_inst_traits) opt_iterator_t;
 // val_string
 //----------------------------------------------------------------------
 class val_string extends type_container#(string);
-
   // fmt is ignored for strings
   virtual function string val2str(string fmt="");
     return get();
   endfunction
+endclass
 
+//----------------------------------------------------------------------
+// val_bit
+//----------------------------------------------------------------------
+class val_bit extends type_container#(bit);
+  function new();
+    set_default_fmt("%0b");
+  endfunction
 endclass
 
 //----------------------------------------------------------------------

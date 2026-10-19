@@ -26,8 +26,6 @@
 // permissions and limitations under the License.
 //======================================================================
 
-typedef multimap#(string, cl_opt_instance, cl_opt_inst_traits) opt_map_t;
-typedef multimap_iterator#(string, cl_opt_instance, cl_opt_inst_traits) opt_map_iter_t;
 //----------------------------------------------------------------------
 // parse_opt
 //
@@ -81,12 +79,18 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     token = lex.get_token();
 
     // Get the value
+
+    // If the form of the option is +<name> and NOT +<name>=<value>
+    // then the option is a switch. Supplying the switch on the
+    // comnmand line without a value means the switch is being turned
+    // on.
     if(token != TOKEN_EQUAL) begin
       lex.put_token(lex.get_lexeme());
       opt_inst.token = TOKEN_ON;
       opt_inst.lexeme = "ON";
     end
     else begin
+      // Option has the form +<name>=<value>
       token = lex.get_token();
       opt_inst.token = token;
       opt_inst.lexeme = lex.get_lexeme();
@@ -98,11 +102,11 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
   //--------------------------------------------------------------------
   // setval
   //
-  // Conver the parsed value into an internal value suitable for using
-  // in computations. Regine the information in cl_opt_instance using
-  // information from the token_descriptor, Cl_opt_instance objects
-  // are kept around for fiurther processing, token_descriptors are
-  // discarded.
+  // Convert the parsed value into an internal value suitable for
+  // using in computations. Refine the information in cl_opt_instance
+  // using information from the token_descriptor, Cl_opt_instance
+  // objects are kept around for fiurther processing,
+  // token_descriptors are discarded.
   //
   // The straight-line code in this function is straightfoward, but
   // the code is a bit unwieldy.  Perhaps we can find a more compact
@@ -112,6 +116,21 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
 
 /* verilator lint_off CASEINCOMPLETE */    
     case(opt_inst.token)
+
+      TOKEN_OFF:
+	begin
+	  val_bit val = new();
+	  val.set(0);
+	  opt_inst.value = val;
+	end
+
+      TOKEN_ON:
+	begin
+	  val_bit val = new();
+	  val.set(1);
+	  opt_inst.value = val;
+	end
+      
       TOKEN_ID:
 	begin
 	  val_string val = new();
@@ -232,22 +251,22 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
 		case(token_desc.base)
 		  "d":
 		    begin
-		      n = int64_t'(token_desc.digits.atoi());
+		      $sscanf(token_desc.digits, "%d", n);
 		      val.set_default_fmt("%0d");
 		    end
 		  "b":
 		    begin
-		      n = int64_t'(token_desc.digits.atobin());
+		      $sscanf(token_desc.digits, "%b", n);
 		      val.set_default_fmt("b%064b");
 		    end
 		  "o": 
 		    begin
-		      n = int64_t'(token_desc.digits.atooct());
+		      $sscanf(token_desc.digits, "%o", n);
 		      val.set_default_fmt("o%024o");
 		    end
 		  "h":
 		    begin
-		      n = int64_t'(token_desc.digits.atohex());
+		      $sscanf(token_desc.digits, "%x", n);
 		      val.set_default_fmt("h%016x");
 		    end
 		endcase
@@ -375,14 +394,94 @@ class validate_opt extends fcn#(cl_opt_instance);
 endclass
 
 //----------------------------------------------------------------------
-// map_opt
+// populate_resource_db
 //
-// Put an cl_opt_instance into the multimap
+// A function class that puts each command line option into the
+// resource database.
 //----------------------------------------------------------------------
-class map_opt extends accum_fcn#(cl_opt_instance, opt_map_t);
-  virtual function void f(cl_opt_instance opt, ref opt_map_t map);
-    map.insert(opt.name, opt);
-  endfunction
+/* verilator lint_off SIDEEFFECT */
+// Dear Verilator team: What the heck is "Mishandling of a side
+// effect?"
+class populate_resource_db extends fcn#(cl_opt_instance);
+
+  function void f(cl_opt_instance t);
+
+    $display("populating %s", t.name);
+
+    case(t.value.get_type_handle())
+      
+      // bit
+      type_handle#(bit)::get():
+	begin
+	  type_container#(bit) value;
+	  if(!$cast(value, t.value))
+	    `error_msg("CAST", {"Cannot cast command line option to bit for ", t.name});
+	  uvm_resource_db#(bit)::set("CL::", t.name, value.get());
+	end
+
+      // string
+      type_handle#(string)::get():
+	begin
+	  type_container#(string) value;
+	  if(!$cast(value, t.value))
+	    `error_msg("CAST", {"Cannot cast command line option to string for ", t.name});
+	  uvm_resource_db#(string)::set("CL::", t.name, value.get());
+	end
+
+      // int8_t
+      type_handle#(int8_t)::get():
+	begin
+	  type_container#(int8_t) value;
+	  if(!$cast(value, t.value))
+	    `error_msg("CAST", {"Cannot cast command line option to int8_t for ", t.name});
+	  uvm_resource_db#(int8_t)::set("CL::", t.name, value.get());
+	end
+
+      // int16_t
+      type_handle#(int16_t)::get():
+	begin
+	  type_container#(int16_t) value;
+	  if(!$cast(value, t.value))
+	    `error_msg("CAST", {"Cannot cast command line option to int16_t for ", t.name});
+	  uvm_resource_db#(int16_t)::set("CL::", t.name, value.get());
+	end
+
+      // int32_t
+      type_handle#(int32_t)::get():
+	begin
+	  type_container#(int32_t) value;
+	  if(!$cast(value, t.value))
+	    `error_msg("CAST", {"Cannot cast command line option to int32_t for ", t.name});
+	  uvm_resource_db#(int32_t)::set("CL::", t.name, value.get());
+	end
+
+      // int64_t
+      type_handle#(int64_t)::get():
+	begin
+	  type_container#(int64_t) value;
+	  if(!$cast(value, t.value))
+	    `error_msg("CAST", {"Cannot cast command line option to int64_t for ", t.name});
+	  uvm_resource_db#(int64_t)::set("CL::", t.name, value.get());
+	end
+
+      // real
+      type_handle#(real)::get():
+	begin
+	  type_container#(real) value;
+	  if(!$cast(value, t.value))
+	    `error_msg("CAST", {"Cannot cast command line option to real for ", t.name});
+	  uvm_resource_db#(real)::set("CL::", t.name, value.get());
+	end
+
+      default:
+	`error_msg("UNSUPPORTED TYPE", "Cannot convert command line option value");
+
+    endcase
+    
+      
+    endfunction
+/* verilator lint_on SIDEEFFECT */
+
 endclass
 
 //----------------------------------------------------------------------
@@ -428,11 +527,13 @@ class cl_parse;
     opt_iterator_t opt_iter;
     print_opt print;
 
-    opt_map_t opt_map;
-    map_opt putmap;
-    opt_map_iter_t opt_map_iter;
+    //opt_map_t opt_map;
+//    map_opt putmap;
+//    opt_map_iter_t opt_map_iter;
 
     validate_opt validate;
+
+    populate_resource_db populate;
 
     //------------------------------------------------------------------
     // First pass.  Pull apart each option and put the result into a
@@ -459,23 +560,29 @@ class cl_parse;
     //$display("\n--> pass 2: validate");
     algo#(cl_opt_instance, cl_opt_inst_traits)::for_each(opt_iter, validate);
 
-    //------------------------------------------------------------------
-    // Third pass. Put all the parsed args into a multimap.  The map
-    // does not preserve overall order of command line options, but it
-    // does preserve the order of appearance of options with the same
-    // name.  The multimap is searchable.
+    // //------------------------------------------------------------------
+    // // Third pass. Put all the parsed args into a multimap.  The map
+    // // does not preserve overall order of command line options, but it
+    // // does preserve the order of appearance of options with the same
+    // // name.  The multimap is searchable.
     
-    opt_map = new();
-    putmap = new();
-    opt_map_iter = new(opt_map);
-    accum#(cl_opt_instance, cl_opt_inst_traits, opt_map_t)::accumulate(opt_iter,
-								       putmap,
-								       opt_map);
+    // opt_map = new();
+    // putmap = new();
+    // opt_map_iter = new(opt_map);
+    // accum#(cl_opt_instance, cl_opt_inst_traits, opt_map_t)::accumulate(opt_iter,
+    // 								       putmap,
+    // 								       opt_map);
 
     // Save these lines for debugging.  They print the parsed and
     // validated args from the multimap.
     //$display("\n--> pass 3: map");
-    algo#(cl_opt_instance, cl_opt_inst_traits)::for_each(opt_map_iter, print);
+    //algo#(cl_opt_instance, cl_opt_inst_traits)::for_each(opt_map_iter, print);
+
+    $display("\n--> pass 3: populate resource database");
+    populate = new();
+    algo#(cl_opt_instance, cl_opt_inst_traits)::for_each(opt_iter, populate);
+
+    uvm_resource_db#(bit)::dump();
 
   endfunction
 

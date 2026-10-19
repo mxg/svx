@@ -364,8 +364,8 @@ endfunction
 
       // This is a useful statement for debugging, so we'll leave it
       // here.  Uncomment when you want to see the state transitions the
-      // lexer goes through.
-      //$display("state = %s : c = %s", state.name(), c);
+      // lexer goes through for parsing numbers.
+      // $display("state = %s : c = %s", state.name(), c);
 
       case(state)
         STATE_START:

@@ -58,6 +58,10 @@ class type_handle #(type T=int) extends type_handle_base;
     return get_type();
   endfunction
 
+  static function type_handle_base get();
+    return get_type();
+  endfunction
+
 endclass
 
 //----------------------------------------------------------------------
