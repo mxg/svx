@@ -34,6 +34,7 @@
 virtual class type_handle_base extends object;
 
   pure virtual function type_handle_base get_type_handle();
+  pure virtual function string get_typename();
 
 endclass
 
@@ -60,6 +61,10 @@ class type_handle #(type T=int) extends type_handle_base;
 
   static function type_handle_base get();
     return get_type();
+  endfunction
+
+  virtual function string get_typename();
+    return $typename(T);
   endfunction
 
 endclass

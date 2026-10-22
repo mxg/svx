@@ -35,13 +35,14 @@ class cl_opt_instance;
   string name;
   string lexeme;
   token_t token;
+  string fmt;
   type_container_base value;
 
   function void print();
     if(value == null)
-      $display("opt: %s = %s (%s)", name, lexeme, token.name());
+      $display("opt: %s = \"%s\"", name, lexeme);
     else
-      $display("opt: %s = %s (%s)", name, value.val2str(), token.name());
+      $display("opt: %s = %s", name, value.val2str(fmt));
   endfunction
 
 endclass
@@ -67,49 +68,3 @@ typedef class_traits#(cl_opt_instance) cl_opt_inst_traits;
 typedef vector#(cl_opt_instance, cl_opt_inst_traits) opt_vector_t;
 typedef list_iterator#(cl_opt_instance, cl_opt_inst_traits) opt_iterator_t;
 
-//----------------------------------------------------------------------
-// val_string
-//----------------------------------------------------------------------
-class val_string extends type_container#(string);
-  // fmt is ignored for strings
-  virtual function string val2str(string fmt="");
-    return get();
-  endfunction
-endclass
-
-//----------------------------------------------------------------------
-// val_bit
-//----------------------------------------------------------------------
-class val_bit extends type_container#(bit);
-  function new();
-    set_default_fmt("%0b");
-  endfunction
-endclass
-
-//----------------------------------------------------------------------
-// val_int
-//----------------------------------------------------------------------
-class val_int#(type T=int) extends type_container#(T);
-  function new();
-    set_default_fmt("%0d");
-  endfunction
-endclass
-
-typedef val_int#(int8_t)  val_int8;
-typedef val_int#(int16_t) val_int16;
-typedef val_int#(int32_t) val_int32;
-typedef val_int#(int64_t) val_int64;
-
-typedef val_int#(uint8_t)  val_uint8;
-typedef val_int#(uint16_t) val_uint16;
-typedef val_int#(uint32_t) val_uint32;
-typedef val_int#(uint64_t) val_uint64;
-
-//----------------------------------------------------------------------
-// val_real
-//----------------------------------------------------------------------
-class val_real extends type_container#(real);
-  function new();
-    set_default_fmt("%g");
-  endfunction
-endclass

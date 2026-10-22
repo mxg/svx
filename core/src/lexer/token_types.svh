@@ -69,15 +69,6 @@ typedef enum {TOKEN_PLUS,
               TOKEN_ERROR
              } token_t;
 
-typedef enum {
-              TOKEN_KIND_INT,
-              TOKEN_KIND_HEX,
-              TOKEN_KIND_OCT,
-              TOKEN_KIND_BIN,
-              TOKEN_KIND_FLOAT,
-              TOKEN_KIND_RAND_INT
-             } token_kind_t;
-
 //----------------------------------------------------------------------
 // token_traits
 //
@@ -122,7 +113,6 @@ class token_descriptor;
   string       digits;
   bit is_signed;
   bit is_logic;
-  token_kind_t kind;
   real multiplier;
 
   function new();

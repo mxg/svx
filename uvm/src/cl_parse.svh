@@ -94,8 +94,8 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
       token = lex.get_token();
       opt_inst.token = token;
       opt_inst.lexeme = lex.get_lexeme();
-      td = lex.get_token_descriptor();
     end
+    td = lex.get_token_descriptor();
     setval(opt_inst, td);
   endfunction
 
@@ -119,21 +119,21 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
 
       TOKEN_OFF:
 	begin
-	  val_bit val = new();
+	  type_container#(bit) val = new();
 	  val.set(0);
 	  opt_inst.value = val;
 	end
 
       TOKEN_ON:
 	begin
-	  val_bit val = new();
+	  type_container#(bit) val = new();
 	  val.set(1);
 	  opt_inst.value = val;
 	end
       
       TOKEN_ID:
 	begin
-	  val_string val = new();
+	  type_container#(string) val = new();
 	  val.set(opt_inst.lexeme);
 	  opt_inst.value = val;
 	end
@@ -147,29 +147,13 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
 	    // 8-bint integers
 	    size <= 8:
 	      begin
-		val_int8 val = new();
+		type_container#(int8_t) val = new();
 		int8_t n;
 		case(token_desc.base)
-		  "d":
-		    begin
-		      n = int8_t'(token_desc.digits.atoi());
-		      val.set_default_fmt("%0d");
-		    end
-		  "b":
-		    begin
-		      n = int8_t'(token_desc.digits.atobin());
-		      val.set_default_fmt("b%08b");
-		    end
-		  "o":
-		    begin
-		      n = int8_t'(token_desc.digits.atooct());
-		      val.set_default_fmt("o%03o");
-		    end
-		  "h":
-		    begin
-		      n = int8_t'(token_desc.digits.atohex());
-		      val.set_default_fmt("h%02x");
-		    end
+		  "d": n = int8_t'(token_desc.digits.atoi());
+		  "b": n = int8_t'(token_desc.digits.atobin());
+		  "o": n = int8_t'(token_desc.digits.atooct());
+		  "h": n = int8_t'(token_desc.digits.atohex());
 		endcase
 		if(token_desc.sign == "-")
 		  n = n * -1;
@@ -180,29 +164,13 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
 	    // 16-bit integers
 	    size > 8 && size <= 16:
               begin
-		val_int16 val = new();
+		type_container#(int16_t) val = new();
 		int16_t n;
 		case(token_desc.base)
-		  "d":
-		    begin
-		      n = int16_t'(token_desc.digits.atoi());
-		      val.set_default_fmt("%0d");
-		    end
-		  "b":
-		    begin
-		      n = int16_t'(token_desc.digits.atobin());
-		      val.set_default_fmt("b%016b");
-		    end
-		  "o": 
-		    begin
-		      n = int16_t'(token_desc.digits.atooct());
-		      val.set_default_fmt("o%06o");
-		    end
-		  "h": 
-		    begin
-		      n = int16_t'(token_desc.digits.atohex());
-		      val.set_default_fmt("h%04x");
-		    end
+		  "d": n = int16_t'(token_desc.digits.atoi());
+		  "b": n = int16_t'(token_desc.digits.atobin());
+		  "o": n = int16_t'(token_desc.digits.atooct());
+		  "h": n = int16_t'(token_desc.digits.atohex());
 		endcase
 		if(token_desc.sign == "-")
 		  n = n * -1;
@@ -213,29 +181,13 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
 	    // 32-bit integers
 	    size > 16 && size <= 32:
               begin
-		val_int32 val = new();
+		type_container#(int32_t) val = new();
 		int32_t n;
 		case(token_desc.base)
-		  "d": 
-		    begin
-		      n = token_desc.digits.atoi();
-		      val.set_default_fmt("%0d");
-		    end
-		  "b":
-		    begin
-		      n = token_desc.digits.atobin();
-		      val.set_default_fmt("b%032b");
-		    end
-		  "o":
-		    begin
-		      n = token_desc.digits.atooct();
-		      val.set_default_fmt("o%012o");
-		    end
-		  "h": 
-		    begin
-		      n = token_desc.digits.atohex();
-		      val.set_default_fmt("h%08x");
-		    end
+		  "d": n = token_desc.digits.atoi();
+		  "b": n = token_desc.digits.atobin();
+		  "o": n = token_desc.digits.atooct();
+		  "h": n = token_desc.digits.atohex();
 		endcase
 		if(token_desc.sign == "-")
 		  n = n * -1;
@@ -246,29 +198,13 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
 	    // 64-bit integer
 	    size > 32 && size <= 64:
 	      begin
-		val_int64 val = new();
+		type_container#(int64_t) val = new();
 		int64_t n;
 		case(token_desc.base)
-		  "d":
-		    begin
-		      $sscanf(token_desc.digits, "%d", n);
-		      val.set_default_fmt("%0d");
-		    end
-		  "b":
-		    begin
-		      $sscanf(token_desc.digits, "%b", n);
-		      val.set_default_fmt("b%064b");
-		    end
-		  "o": 
-		    begin
-		      $sscanf(token_desc.digits, "%o", n);
-		      val.set_default_fmt("o%024o");
-		    end
-		  "h":
-		    begin
-		      $sscanf(token_desc.digits, "%x", n);
-		      val.set_default_fmt("h%016x");
-		    end
+		  "d": $sscanf(token_desc.digits, "%d", n);
+		  "b": $sscanf(token_desc.digits, "%b", n);
+		  "o": $sscanf(token_desc.digits, "%o", n);
+		  "h": $sscanf(token_desc.digits, "%x", n);
 		endcase
 		if(token_desc.sign == "-")
 		  n = n * -1;
@@ -281,11 +217,11 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
 	    
 	  endcase
 	
-	end
+	end // TOKEN_INT
       
       TOKEN_FLOAT:
 	begin
-	  val_real val = new();
+	  type_container#(real) val = new();
 	  real f = token_desc.digits.atoreal();
 	  if(token_desc.sign == "-")
 	    f = f * -1.0;
@@ -295,13 +231,15 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
       
       TOKEN_STRING:
 	begin
-	  val_string val = new();
+	  type_container#(string) val = new();
 	  val.set(opt_inst.lexeme);
 	  opt_inst.value = val;
 	end
       
       default:
 	begin
+	  `warning_msg("UNSUPPORTED TYPE", 
+		       {"Unsupported data tupe for command line option ", opt_inst.name});
 	end
       
     endcase
@@ -317,6 +255,9 @@ endclass
 // Is a command line option valid?  Validate against the table of
 // valid command line options.
 //----------------------------------------------------------------------
+/* verilator lint_off SIDEEFFECT */
+// Dear Verilator team, What does "Expression side effect may be
+// mishandled" mean?
 class validate_opt extends fcn#(cl_opt_instance);
 
   function void f(cl_opt_instance t);
@@ -325,6 +266,9 @@ class validate_opt extends fcn#(cl_opt_instance);
     
     // Look up the command line option
     cl_opt_desc opt = cl_mgr::find(t.name);
+    // Transfer the fmt from the option descriptor to the option
+    // instance.
+    t.fmt = opt.fmt;
 
     // Is it a valid option?
     if(opt == cl_opt_traits::empty) begin
@@ -332,55 +276,51 @@ class validate_opt extends fcn#(cl_opt_instance);
     end
 
     err = 0;
-    case(opt.arg_type)
-      ARG_INT:
+    case(opt.th)
+      type_handle#(int8_t)::get(),
+      type_handle#(int16_t)::get(),
+      type_handle#(int32_t)::get(),
+      type_handle#(int64_t)::get(),
+      type_handle#(uint8_t)::get(),
+      type_handle#(uint16_t)::get(),
+      type_handle#(uint32_t)::get(),
+      type_handle#(uint64_t)::get():
 	begin
 	  if(t.token != TOKEN_INT)
 	    err = 1;
 	end
       
-      ARG_FLOAT:
+      type_handle#(real)::get():
 	begin
 	  if(t.token != TOKEN_FLOAT)
 	    err = 1;
 	end
   
-      ARG_LOGIC:
+      type_handle#(logic)::get():
 	begin
 	   if(t.token != TOKEN_LOGIC)
 	     err = 1;
 	end
       
-      ARG_SWITCH:
+      type_handle#(bit)::get():
 	begin
 	  if(t.token != TOKEN_ON && t.token != TOKEN_OFF &&
 	     t.token != TOKEN_INT && t.lexeme != null)
 	    err = 1;
 	end
       
-      ARG_TIME:
+      type_handle#(time)::get():
 	begin
 	  if(t.token != TOKEN_TIME)
 	    err = 1;
 	end
       
-      ARG_NUM:
+      type_handle#(string)::get():
 	begin
-	  if(t.token != TOKEN_INT || t.token != TOKEN_FLOAT)
+	  if(t.token != TOKEN_STRING && t.token != TOKEN_ID)
 	    err = 1;
 	end
       
-      ARG_STRING:
-	begin
-	  if(t.token != TOKEN_STRING)
-	    err = 1;
-	end
-      
-      ARG_ID:
-	begin
-	  if(t.token != TOKEN_ID)
-	    err = 1;
-	end       
     endcase
 
     if(err) begin
@@ -390,6 +330,7 @@ class validate_opt extends fcn#(cl_opt_instance);
     end
     
   endfunction
+/* verilator lint_on SIDEEFFECT */
   
 endclass
 
@@ -405,8 +346,6 @@ endclass
 class populate_resource_db extends fcn#(cl_opt_instance);
 
   function void f(cl_opt_instance t);
-
-    $display("populating %s", t.name);
 
     case(t.value.get_type_handle())
       
@@ -518,21 +457,19 @@ class cl_parse;
   // Drive the command line parsing process.
   //--------------------------------------------------------------------
   function void parse();
-    
-    vector_string vec;
+
+    // Vectors    
+    vector_string vec;    // List of raw option strings
+    opt_vector_t opt_vec; // List of option instances
+
+    // Iterators
     list_string_iterator iter;
-    parse_opt parse;
-    opt_vector_t opt_vec;
-    
     opt_iterator_t opt_iter;
+
+    // Function classes
+    parse_opt parse;
     print_opt print;
-
-    //opt_map_t opt_map;
-//    map_opt putmap;
-//    opt_map_iter_t opt_map_iter;
-
     validate_opt validate;
-
     populate_resource_db populate;
 
     //------------------------------------------------------------------
@@ -546,43 +483,24 @@ class cl_parse;
     opt_vec = new();   // Vector of parsed arguments
     accum#(string, string_traits, opt_vector_t)::accumulate(iter, parse, opt_vec);
 
-    // Save these lines for debugging.  They traverse the vector of
-    // option instances to print each one.
-    opt_iter = new(opt_vec);
-    print = new();
-    // $display("--> pass 1: parse");
-    // algo#(cl_opt_instance, cl_opt_inst_traits)::for_each(opt_iter, print);
-
     //------------------------------------------------------------------
     // Second pass. Validate the options.
-    
+
+    opt_iter = new(opt_vec);
     validate = new();
-    //$display("\n--> pass 2: validate");
     algo#(cl_opt_instance, cl_opt_inst_traits)::for_each(opt_iter, validate);
 
-    // //------------------------------------------------------------------
-    // // Third pass. Put all the parsed args into a multimap.  The map
-    // // does not preserve overall order of command line options, but it
-    // // does preserve the order of appearance of options with the same
-    // // name.  The multimap is searchable.
-    
-    // opt_map = new();
-    // putmap = new();
-    // opt_map_iter = new(opt_map);
-    // accum#(cl_opt_instance, cl_opt_inst_traits, opt_map_t)::accumulate(opt_iter,
-    // 								       putmap,
-    // 								       opt_map);
+    //------------------------------------------------------------------
+    // Third pass. Populate values into the option instances.
 
-    // Save these lines for debugging.  They print the parsed and
-    // validated args from the multimap.
-    //$display("\n--> pass 3: map");
-    //algo#(cl_opt_instance, cl_opt_inst_traits)::for_each(opt_map_iter, print);
-
-    $display("\n--> pass 3: populate resource database");
     populate = new();
     algo#(cl_opt_instance, cl_opt_inst_traits)::for_each(opt_iter, populate);
 
-    uvm_resource_db#(bit)::dump();
+    // Print the list of options
+    $display("\n--- Parsed Command Line Options  ---");
+    print = new();
+    algo#(cl_opt_instance, cl_opt_inst_traits)::for_each(opt_iter, print);
+    $display("--- END Parsed Command Line Options  ---");
 
   endfunction
 

@@ -32,29 +32,12 @@
 module top;
 
   `include "uvm_macros.svh"
-  `include "svx_macros.svh"  
-
   import uvm_pkg::*;
-  import svx::*;
-  import svx_uvm_pkg::*;
-
-  cl_parse clp;
+  import test_pkg::*;
 
   initial begin
-    // populate possible command line options
-    cl_mgr::add("abc", ARG_INT);
-    cl_mgr::add("def", ARG_INT);
-    cl_mgr::add("xyz", ARG_FLOAT);
-    cl_mgr::add("fred", ARG_SWITCH);
-    cl_mgr::add("ddd", ARG_INT);
-    cl_mgr::add("str", ARG_STRING);
-    cl_mgr::add("fritz", ARG_ID);
-
-    // Just for hoots let's see what's in the option table.
-    // cl_mgr::dump();
-    
-    clp = new();
-    clp.parse();
+    run_test();
   end
 
 endmodule
+

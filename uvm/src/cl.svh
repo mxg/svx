@@ -26,19 +26,6 @@
 // permissions and limitations under the License.
 //======================================================================
 
-typedef enum uint32_t { ARG_INT,
-			ARG_FLOAT,
-			ARG_LOGIC,
-			ARG_SWITCH,
-			ARG_TIME,
-			ARG_NUM,
-			ARG_STRING,
-			ARG_ID
-		      } arg_t;
-
-// Define traits for the arg_t enum
-typedef base_unsigned_int_traits#(arg_t)  arg_traits;
-
 //----------------------------------------------------------------------
 // cl_opt_desc
 //
@@ -47,11 +34,15 @@ typedef base_unsigned_int_traits#(arg_t)  arg_traits;
 //----------------------------------------------------------------------
 class cl_opt_desc;
   string name;
-  arg_t arg_type;
+  type_handle_base th;
   bit multiple;
+  type_container_base default_value; // not sure this is needed...
+  string fmt;
 
   function void print();
-    $write("%12s: %s", name, arg_type.name());
+    $write("%12s: %s (fmt=%s)", name, th.get_typename(), fmt);
+    if(default_value != null)
+      $write(" = %s (fmt=%s)", default_value.val2str(fmt), fmt);
     if(multiple)
       $display(" (multiple ok)");
     else
@@ -65,6 +56,8 @@ typedef class_traits#(cl_opt_desc) cl_opt_traits;
 
 //----------------------------------------------------------------------
 // print_cl_opt
+//
+// A function class for printing cl_opt_desc objects.
 //----------------------------------------------------------------------
 class print_cl_opt extends fcn#(cl_opt_desc);
   function void f(cl_opt_desc opt);
@@ -72,6 +65,57 @@ class print_cl_opt extends fcn#(cl_opt_desc);
   endfunction
 endclass
 
+//----------------------------------------------------------------------
+// fmt_table
+//
+// A table of format strings used to print values of various data
+// types.  The class should not be instantiated. For internal use
+// only.
+//----------------------------------------------------------------------
+class fmt_table;
+
+  local static map#(type_handle_base, string, string_traits) fmt_map;
+
+  // Populate the table at static initialization time (before time 0).
+  static local bit is_populated = populate_table();
+
+  // Constructor is local because this class should never be
+  // instantiated.
+  local function new();
+  endfunction
+
+  static function bit populate_table();
+    fmt_map = new();
+    void'(fmt_map.insert(type_handle#(string)::get(), "%s"));
+    void'(fmt_map.insert(type_handle#(real)::get(), "%g"));
+    void'(fmt_map.insert(type_handle#(bit)::get(), "%b"));
+    void'(fmt_map.insert(type_handle#(int8_t)::get(), "%0d"));
+    void'(fmt_map.insert(type_handle#(int16_t)::get(), "%0d"));
+    void'(fmt_map.insert(type_handle#(int32_t)::get(), "%0d"));
+    void'(fmt_map.insert(type_handle#(int64_t)::get(), "%0d"));
+    void'(fmt_map.insert(type_handle#(uint8_t)::get(), "%0d"));
+    void'(fmt_map.insert(type_handle#(uint16_t)::get(), "%0d"));
+    void'(fmt_map.insert(type_handle#(uint32_t)::get(), "%0d"));
+    void'(fmt_map.insert(type_handle#(uint64_t)::get(), "%0d"));
+    void'(fmt_map.insert(type_handle#(byte)::get(), "%0d"));
+    void'(fmt_map.insert(type_handle#(shortint)::get(), "%0d"));
+    void'(fmt_map.insert(type_handle#(longint)::get(), "%0d"));
+    void'(fmt_map.insert(type_handle#(byte unsigned)::get(), "%0d"));
+    void'(fmt_map.insert(type_handle#(shortint unsigned)::get(), "%0d"));
+    void'(fmt_map.insert(type_handle#(longint unsigned)::get(), "%0d"));
+    void'(fmt_map.insert(type_handle#(logic)::get(), "%b"));
+    void'(fmt_map.insert(type_handle#(integer)::get(), "%x"));
+    return 1;
+  endfunction
+
+  // Retrieve a format string based on data type
+  static function string get_fmt(type_handle_base th);
+    string fmt = fmt_map.get(th);
+    return fmt;
+  endfunction
+
+endclass
+  
 //----------------------------------------------------------------------
 // cl_mgr
 //
@@ -83,7 +127,6 @@ class cl_mgr;
 
   typedef map_iterator #(string, cl_opt_desc, cl_opt_traits) map_iter_t;
 
-  local static cl_mgr inst;
   local static map#(string, cl_opt_desc, cl_opt_traits) opt_map;
 
   //--------------------------------------------------------------------
@@ -96,27 +139,11 @@ class cl_mgr;
   endfunction
 
   //--------------------------------------------------------------------
-  // get
-  //
-  // Retrieve a handle to the singleton instance
-  //--------------------------------------------------------------------
-  static function cl_mgr get();
-    if(inst == null)
-      inst = new();
-    return inst;
-  endfunction
-  
-  //--------------------------------------------------------------------
   // add
   //
   // Add a new command line option to the list of options
   //--------------------------------------------------------------------
-  static function void add(string name, arg_t arg_type, bit multi = 0);
-    cl_opt_desc opt = new();
-    opt.name = name;
-    opt.arg_type = arg_type;
-    opt.multiple = multi;
-    
+  static function void add(string name, cl_opt_desc opt);
     if(opt_map == null)
       opt_map = new();
     void'(opt_map.insert(name, opt));
@@ -137,7 +164,45 @@ class cl_mgr;
   static function void dump();
     map_iter_t iter = new(opt_map);
     print_cl_opt print = new();
+    $display("\n--- Command Line Option Table ---");
     algo#(cl_opt_desc, cl_opt_traits)::for_each(iter, print);
+    $display("--- END Command Line Option Table ---");
   endfunction
 
 endclass
+
+//----------------------------------------------------------------------
+// cl
+//
+// A convenience layer for adding new items to the cl_mgr.
+//----------------------------------------------------------------------
+class cl #(type T=int);
+
+  static function void add(string name, string fmt="");
+    cl_opt_desc opt = new();
+    opt.name = name;
+    opt.th = type_handle#(T)::get();
+    opt.fmt = (fmt == "") ? fmt_table::get_fmt(opt.th) : fmt;
+    cl_mgr::add(name, opt);
+  endfunction
+
+  static function void add_with_default(string name, T def, string fmt="");
+    cl_opt_desc opt = new();
+    type_container#(T) val = new();
+
+    opt.name = name;
+    opt.th = type_handle#(T)::get();
+    opt.fmt = (fmt == "") ? fmt_table::get_fmt(opt.th) : fmt;
+    val.set(def);
+    val.set_default_fmt(fmt);
+    opt.default_value = val;
+    cl_mgr::add(name, opt);
+
+    // Put the default value into the resource database
+    uvm_resource_db#(T)::set("CL::", name, def, null);
+  endfunction
+
+endclass
+
+    
+    

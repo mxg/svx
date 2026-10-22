@@ -30,11 +30,13 @@
 TOP		= ../../..
 TOP_MODULE	= top
 
+TEST		= test
+
 SV_INC		:= +incdir+.
-SV_SRC		+= top.sv
+SV_SRC		+= top.sv test_pkg.sv
 
 UVM		= 1
 
-RUN_OPTS	= +abc=45 +def=3003 +abc=-198 +xyz=-4.5e-6 +fred +ddd=4b1010 +def=16hf72c +xyz=.92 +def=16b1001011000111010 +abc=12he78 +str=\"qrstuvw\" +fritz=gripple +ddd=64hf00f7016deadbeef +fred=off
+RUN_OPTS	= +name=freddy +size=48 +offset=4 +freq=1.5e9 +x_mode +z_mode=off +channels=8 +bias=-10 +base=32h7fff624c
 
 include ${TOP}/make/makefile

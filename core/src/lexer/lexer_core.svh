@@ -510,7 +510,6 @@ endfunction
                 begin
                   if(!`isdigit(c)) begin
                     if(c != 0) putc();
-                    token_desc.kind = TOKEN_KIND_INT;
 		    token_desc.digits = s.substr(first_digit, p-1);
                     return TOKEN_INT;
                   end
@@ -559,7 +558,6 @@ endfunction
                 begin
                   if(!`isdigit(c) && c != "_") begin
                     if(c != 0) putc();
-                    token_desc.kind = TOKEN_KIND_INT;
 		    token_desc.digits = s.substr(first_digit, p-1);
                     return TOKEN_INT;
                   end
@@ -739,7 +737,6 @@ endfunction
           begin
             if( !`isxdigit(c) && c != "_" && !`islogic(c)) begin
               if(c != 0) putc();
-              token_desc.kind = TOKEN_KIND_HEX;
 	      token_desc.digits = s.substr(first_digit, p-1);
               return token_desc.is_logic ? TOKEN_LOGIC : TOKEN_INT;
             end
@@ -765,7 +762,6 @@ endfunction
             if( !`isodigit(c) && c !== "_" && !`islogic(c)) begin
               if(c != 0) putc();
               lexeme = get_lexeme();
-              token_desc.kind = TOKEN_KIND_OCT;
 	      token_desc.digits = s.substr(first_digit, p-1);
               return token_desc.is_logic ? TOKEN_LOGIC : TOKEN_INT;
             end
@@ -789,7 +785,6 @@ endfunction
           begin
             if(! (c == "0" || c == "1")  && !`islogic(c)) begin
               if(c != 0) putc();
-              token_desc.kind = TOKEN_KIND_BIN;
 	      token_desc.digits = s.substr(first_digit, p-1);
               return token_desc.is_logic ? TOKEN_LOGIC : TOKEN_INT;
             end
