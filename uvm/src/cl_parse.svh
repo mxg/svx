@@ -96,164 +96,60 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
       opt_inst.lexeme = lex.get_lexeme();
     end
     td = lex.get_token_descriptor();
-    setval(opt_inst, td);
+    opt_inst.td = td;
   endfunction
 
-  //--------------------------------------------------------------------
-  // setval
-  //
-  // Convert the parsed value into an internal value suitable for
-  // using in computations. Refine the information in cl_opt_instance
-  // using information from the token_descriptor, Cl_opt_instance
-  // objects are kept around for fiurther processing,
-  // token_descriptors are discarded.
-  //
-  // The straight-line code in this function is straightfoward, but
-  // the code is a bit unwieldy.  Perhaps we can find a more compact
-  // way to do the same thing.
-  //--------------------------------------------------------------------
-  function void setval(cl_opt_instance opt_inst, token_descriptor token_desc);
+endclass
 
-/* verilator lint_off CASEINCOMPLETE */    
-    case(opt_inst.token)
+//----------------------------------------------------------------------
+// validate_int
+//
+// Validate integer types -- helper class for validate_opt.  For
+// internal use. Not to be instantiated.
+//----------------------------------------------------------------------
+class validate_int#(type T=int);
+  
+  static function bit validate(cl_opt_desc opt, cl_opt_instance inst);
 
-      TOKEN_OFF:
-	begin
-	  type_container#(bit) val = new();
-	  val.set(0);
-	  opt_inst.value = val;
-	end
-
-      TOKEN_ON:
-	begin
-	  type_container#(bit) val = new();
-	  val.set(1);
-	  opt_inst.value = val;
-	end
-      
-      TOKEN_ID:
-	begin
-	  type_container#(string) val = new();
-	  val.set(opt_inst.lexeme);
-	  opt_inst.value = val;
-	end
-      
-      TOKEN_INT:
-	begin
-	  uint32_t size = token_desc.size;
-	  if(size == 0)
-	    size = 32;
-	  case(1)
-	    // 8-bint integers
-	    size <= 8:
-	      begin
-		type_container#(int8_t) val = new();
-		int8_t n;
-		case(token_desc.base)
-		  "d": n = int8_t'(token_desc.digits.atoi());
-		  "b": n = int8_t'(token_desc.digits.atobin());
-		  "o": n = int8_t'(token_desc.digits.atooct());
-		  "h": n = int8_t'(token_desc.digits.atohex());
-		endcase
-		if(token_desc.sign == "-")
-		  n = n * -1;
-		val.set(n);
-		opt_inst.value = val;
-	      end
-
-	    // 16-bit integers
-	    size > 8 && size <= 16:
-              begin
-		type_container#(int16_t) val = new();
-		int16_t n;
-		case(token_desc.base)
-		  "d": n = int16_t'(token_desc.digits.atoi());
-		  "b": n = int16_t'(token_desc.digits.atobin());
-		  "o": n = int16_t'(token_desc.digits.atooct());
-		  "h": n = int16_t'(token_desc.digits.atohex());
-		endcase
-		if(token_desc.sign == "-")
-		  n = n * -1;
-		val.set(n);
-		opt_inst.value = val;
-	      end
-
-	    // 32-bit integers
-	    size > 16 && size <= 32:
-              begin
-		type_container#(int32_t) val = new();
-		int32_t n;
-		case(token_desc.base)
-		  "d": n = token_desc.digits.atoi();
-		  "b": n = token_desc.digits.atobin();
-		  "o": n = token_desc.digits.atooct();
-		  "h": n = token_desc.digits.atohex();
-		endcase
-		if(token_desc.sign == "-")
-		  n = n * -1;
-		val.set(n);
-		opt_inst.value = val;
-	      end
-
-	    // 64-bit integer
-	    size > 32 && size <= 64:
-	      begin
-		type_container#(int64_t) val = new();
-		int64_t n;
-		case(token_desc.base)
-		  "d": $sscanf(token_desc.digits, "%d", n);
-		  "b": $sscanf(token_desc.digits, "%b", n);
-		  "o": $sscanf(token_desc.digits, "%o", n);
-		  "h": $sscanf(token_desc.digits, "%x", n);
-		endcase
-		if(token_desc.sign == "-")
-		  n = n * -1;
-		val.set(n);
-		opt_inst.value = val;
-	      end
-	    default:
-	      begin
-	      end
-	    
-	  endcase
-	
-	end // TOKEN_INT
-      
-      TOKEN_FLOAT:
-	begin
-	  type_container#(real) val = new();
-	  real f = token_desc.digits.atoreal();
-	  if(token_desc.sign == "-")
-	    f = f * -1.0;
-	  val.set(f);
-	  opt_inst.value = val;
-	end
-      
-      TOKEN_STRING:
-	begin
-	  type_container#(string) val = new();
-	  val.set(opt_inst.lexeme);
-	  opt_inst.value = val;
-	end
-      
-      default:
-	begin
-	  `warning_msg("UNSUPPORTED TYPE", 
-		       {"Unsupported data tupe for command line option ", opt_inst.name});
-	end
-      
-    endcase
+    bit err;
+    type_container#(T) val = new();
+    token_descriptor td = inst.td;
+    T n;
     
-/* verilator lint_on CASEINCOMPLETE */    
-  endfunction
+    if(inst.token != TOKEN_INT) begin
+      err = 1;
+      `error_msg("INVALID VALUE", "Invalid command line option value");
+    end
+    if(td.size > $bits(T)) begin
+      err = 1;    
+      `error_msg("INVALID SIZE", "Invalid size of command line option value");
+    end
 
+/* verilator lint_off CASEINCOMPLETE */
+    case(td.base)
+      "d": n = T'(td.digits.atoi());
+      "b": n = T'(td.digits.atobin());
+      "o": n = T'(td.digits.atooct());
+      "h": n = T'(td.digits.atohex());
+    endcase  
+/* verilator lint_on CASEINCOMPLETE */
+    
+    if(td.sign == "-")
+      n = n * -1;    
+    val.set(n);
+    inst.value = val;
+
+    return err;
+  endfunction
+  
 endclass
 
 //----------------------------------------------------------------------
 // validate_opt
 //
 // Is a command line option valid?  Validate against the table of
-// valid command line options.
+// valid command line options.  Convert lexeme into an internal
+// representation.
 //----------------------------------------------------------------------
 /* verilator lint_off SIDEEFFECT */
 // Dear Verilator team, What does "Expression side effect may be
@@ -263,6 +159,7 @@ class validate_opt extends fcn#(cl_opt_instance);
   function void f(cl_opt_instance t);
 
     bit err;
+    token_descriptor td = t.td;
     
     // Look up the command line option
     cl_opt_desc opt = cl_mgr::find(t.name);
@@ -277,48 +174,94 @@ class validate_opt extends fcn#(cl_opt_instance);
 
     err = 0;
     case(opt.th)
-      type_handle#(int8_t)::get(),
-      type_handle#(int16_t)::get(),
-      type_handle#(int32_t)::get(),
-      type_handle#(int64_t)::get(),
-      type_handle#(uint8_t)::get(),
-      type_handle#(uint16_t)::get(),
-      type_handle#(uint32_t)::get(),
+      type_handle#(byte)::get():
+	err = validate_int#(byte)::validate(opt, t);
+      
+      type_handle#(byte unsigned)::get():
+	err = validate_int#(byte)::validate(opt, t);
+      
+      type_handle#(shortint)::get():
+	err = validate_int#(shortint)::validate(opt, t);
+      
+      type_handle#(shortint unsigned)::get():
+	err = validate_int#(shortint unsigned)::validate(opt, t);
+      
+      type_handle#(int)::get():
+	err = validate_int#(int)::validate(opt, t);
+      
+      type_handle#(int unsigned)::get():
+	err = validate_int#(int unsigned)::validate(opt, t);
+      
+      type_handle#(longint)::get():
+	err = validate_int#(longint)::validate(opt, t);
+      
+      type_handle#(longint unsigned)::get():
+	err = validate_int#(longint unsigned)::validate(opt, t);
+      
+      type_handle#(int8_t)::get():
+	  err = validate_int#(int8_t)::validate(opt, t);
+
+      type_handle#(int16_t)::get():
+	  err = validate_int#(int16_t)::validate(opt, t);
+
+      type_handle#(int32_t)::get():
+	  err = validate_int#(int32_t)::validate(opt, t);
+
+      type_handle#(int64_t)::get():
+	  err = validate_int#(int64_t)::validate(opt, t);
+      
+      type_handle#(uint8_t)::get():
+	  err = validate_int#(uint8_t)::validate(opt, t);
+
+      type_handle#(uint16_t)::get():
+	  err = validate_int#(uint16_t)::validate(opt, t);
+
+      type_handle#(uint32_t)::get():
+	  err = validate_int#(uint32_t)::validate(opt, t);
+
       type_handle#(uint64_t)::get():
-	begin
-	  if(t.token != TOKEN_INT)
-	    err = 1;
-	end
+	  err = validate_int#(uint64_t)::validate(opt, t);
       
       type_handle#(real)::get():
 	begin
 	  if(t.token != TOKEN_FLOAT)
 	    err = 1;
+	  else begin
+	    type_container#(real) val = new();
+	    real f = td.digits.atoreal();
+	    if(td.sign == "-")
+	      f = f * -1.0;
+	    val.set(f);
+	    t.value = val;
+	  end
 	end
   
-      type_handle#(logic)::get():
-	begin
-	   if(t.token != TOKEN_LOGIC)
-	     err = 1;
-	end
-      
       type_handle#(bit)::get():
 	begin
+	  bit b;
 	  if(t.token != TOKEN_ON && t.token != TOKEN_OFF &&
 	     t.token != TOKEN_INT && t.lexeme != null)
 	    err = 1;
-	end
-      
-      type_handle#(time)::get():
-	begin
-	  if(t.token != TOKEN_TIME)
-	    err = 1;
+	  else begin
+	    type_container#(bit) val = new();
+	    if(t.token == TOKEN_ON || t.lexeme == null)
+	      b = 1;
+	    else
+	      b = 0;
+	    val.set(b);
+	    t.value = val;
+	  end
 	end
       
       type_handle#(string)::get():
 	begin
 	  if(t.token != TOKEN_STRING && t.token != TOKEN_ID)
 	    err = 1;
+	  else begin
+	    type_container#(string) val = new();
+	    val.set(t.lexeme);
+	    t.value = val;
+	  end
 	end
       
     endcase
@@ -355,7 +298,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	  type_container#(bit) value;
 	  if(!$cast(value, t.value))
 	    `error_msg("CAST", {"Cannot cast command line option to bit for ", t.name});
-	  uvm_resource_db#(bit)::set("CL::", t.name, value.get());
+	  uvm_resource_db#(bit)::set_override("CL::*", t.name, value.get());
 	end
 
       // string
@@ -364,7 +307,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	  type_container#(string) value;
 	  if(!$cast(value, t.value))
 	    `error_msg("CAST", {"Cannot cast command line option to string for ", t.name});
-	  uvm_resource_db#(string)::set("CL::", t.name, value.get());
+	  uvm_resource_db#(string)::set_override("CL::*", t.name, value.get());
 	end
 
       // int8_t
@@ -373,7 +316,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	  type_container#(int8_t) value;
 	  if(!$cast(value, t.value))
 	    `error_msg("CAST", {"Cannot cast command line option to int8_t for ", t.name});
-	  uvm_resource_db#(int8_t)::set("CL::", t.name, value.get());
+	  uvm_resource_db#(int8_t)::set_override("CL::*", t.name, value.get());
 	end
 
       // int16_t
@@ -382,7 +325,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	  type_container#(int16_t) value;
 	  if(!$cast(value, t.value))
 	    `error_msg("CAST", {"Cannot cast command line option to int16_t for ", t.name});
-	  uvm_resource_db#(int16_t)::set("CL::", t.name, value.get());
+	  uvm_resource_db#(int16_t)::set_override("CL::*", t.name, value.get());
 	end
 
       // int32_t
@@ -391,7 +334,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	  type_container#(int32_t) value;
 	  if(!$cast(value, t.value))
 	    `error_msg("CAST", {"Cannot cast command line option to int32_t for ", t.name});
-	  uvm_resource_db#(int32_t)::set("CL::", t.name, value.get());
+	  uvm_resource_db#(int32_t)::set_override("CL::*", t.name, value.get());
 	end
 
       // int64_t
@@ -400,16 +343,52 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	  type_container#(int64_t) value;
 	  if(!$cast(value, t.value))
 	    `error_msg("CAST", {"Cannot cast command line option to int64_t for ", t.name});
-	  uvm_resource_db#(int64_t)::set("CL::", t.name, value.get());
+	  uvm_resource_db#(int64_t)::set_override("CL::*", t.name, value.get());
 	end
 
+     // uint8_t
+      type_handle#(uint8_t)::get():
+	begin
+	  type_container#(uint8_t) value;
+	  if(!$cast(value, t.value))
+	    `error_msg("CAST", {"Cannot cast command line option to uint8_t for ", t.name});
+	  uvm_resource_db#(uint8_t)::set_override("CL::*", t.name, value.get());
+	end
+
+      // uint16_t
+      type_handle#(uint16_t)::get():
+	begin
+	  type_container#(uint16_t) value;
+	  if(!$cast(value, t.value))
+	    `error_msg("CAST", {"Cannot cast command line option to uint16_t for ", t.name});
+	  uvm_resource_db#(uint16_t)::set_override("CL::*", t.name, value.get());
+	end
+
+      // uint32_t
+      type_handle#(uint32_t)::get():
+	begin
+	  type_container#(uint32_t) value;
+	  if(!$cast(value, t.value))
+	    `error_msg("CAST", {"Cannot cast command line option to uint32_t for ", t.name});
+	  uvm_resource_db#(uint32_t)::set_override("CL::*", t.name, value.get());
+	end
+
+      // uint64_t
+      type_handle#(uint64_t)::get():
+	begin
+	  type_container#(uint64_t) value;
+	  if(!$cast(value, t.value))
+	    `error_msg("CAST", {"Cannot cast command line option to uint64_t for ", t.name});
+	  uvm_resource_db#(uint64_t)::set_override("CL::*", t.name, value.get());
+	end
+      
       // real
       type_handle#(real)::get():
 	begin
 	  type_container#(real) value;
 	  if(!$cast(value, t.value))
 	    `error_msg("CAST", {"Cannot cast command line option to real for ", t.name});
-	  uvm_resource_db#(real)::set("CL::", t.name, value.get());
+	  uvm_resource_db#(real)::set_override("CL::*", t.name, value.get());
 	end
 
       default:
@@ -491,7 +470,7 @@ class cl_parse;
     algo#(cl_opt_instance, cl_opt_inst_traits)::for_each(opt_iter, validate);
 
     //------------------------------------------------------------------
-    // Third pass. Populate values into the option instances.
+    // Third pass. Populate values into the resource database
 
     populate = new();
     algo#(cl_opt_instance, cl_opt_inst_traits)::for_each(opt_iter, populate);

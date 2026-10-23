@@ -37,6 +37,7 @@ class cl_opt_instance;
   token_t token;
   string fmt;
   type_container_base value;
+  token_descriptor td;
 
   function void print();
     if(value == null)

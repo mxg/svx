@@ -44,15 +44,16 @@ class test extends uvm_component;
     
     // populate the command line option table with all possible
     // command line options.
-    cl#(uint32_t)::add("size");
+    cl#(uint32_t)::add_with_default("size", 4);
     cl#(int16_t)::add("offset");
-    cl#(real)::add("freq");
-    cl#(bit)::add("x_mode");
-    cl#(bit)::add("z_mode");
+    cl#(real)::add_with_default("freq", 2.875e9);
+    cl#(bit)::add_with_default("x_mode", 0);
+    cl#(bit)::add_with_default("z_mode", 0);
     cl#(uint32_t)::add_with_default("channels", 4);
     cl#(string)::add_with_default("name", "<none>");
     cl#(int32_t)::add_with_default("bias", 0);
     cl#(uint32_t)::add("base", "%8x");
+    cl#(string)::add("file");
 
     // Just for hoots let's see what's in the option table.
     cl_mgr::dump();
@@ -70,26 +71,33 @@ class test extends uvm_component;
   endfunction
 
   task run_phase(uvm_phase phase);
+    string name;
     uint32_t size;
-    int32_t offset;
+    int16_t offset;
     real freq;
     bit	 x_mode;
     bit	 z_mode;
     int32_t channels;
     int32_t bias;
     int32_t base;
+    string file;
 
     phase.raise_objection(this);
 
     $display("\n--- Command line options stored in the resource database ---");
     
     // Let's see if everything is in the resoure database.
-    if(!uvm_resource_db#(int32_t)::read_by_name("CL::", "size", size, this))
+    if(!uvm_resource_db#(string)::read_by_name("CL::", "name", name, this))
+      `uvm_error("NOT FOUND", "Not found in the resource database: name")
+    else
+      $display("name = %0d", name);
+
+    if(!uvm_resource_db#(uint32_t)::read_by_name("CL::", "size", size, this))
       `uvm_error("NOT FOUND", "Not found in the resource database: size")
     else
       $display("size = %0d", size);
 
-    if(!uvm_resource_db#(int32_t)::read_by_name("CL::", "offset", offset, this))
+    if(!uvm_resource_db#(int16_t)::read_by_name("CL::", "offset", offset, this))
       `uvm_error("NOT FOUND", "Not found in the resource database: offset")
     else
       $display("offset = %0d", offset);
@@ -109,7 +117,7 @@ class test extends uvm_component;
     else
       $display("z_mode = %s", ((z_mode==1) ? "ON" : "OFF"));
 
-    if(!uvm_resource_db#(int32_t)::read_by_name("CL::", "channels", channels, this))
+    if(!uvm_resource_db#(uint32_t)::read_by_name("CL::", "channels", channels, this))
       `uvm_error("NOT FOUND", "Not found in the resource database: channels")
     else
       $display("channels = %0d", channels);
@@ -119,11 +127,16 @@ class test extends uvm_component;
     else
       $display("bias = %0d", bias);
 
-    if(!uvm_resource_db#(int32_t)::read_by_name("CL::", "base", base, this))
+    if(!uvm_resource_db#(uint32_t)::read_by_name("CL::", "base", base, this))
       `uvm_error("NOT FOUND", "Not found in the resource database: base")
     else
       $display("base = %8x", base);    
 
+    if(!uvm_resource_db#(string)::read_by_name("CL::", "file", file, this))
+      `uvm_error("NOT FOUND", "Not found in the resource database: file")
+    else
+      $display("file = %s", file);    
+    
     $display("--- End Command line options ---");
     
     phase.drop_objection(this);

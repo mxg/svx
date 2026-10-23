@@ -42,7 +42,7 @@ class cl_opt_desc;
   function void print();
     $write("%12s: %s (fmt=%s)", name, th.get_typename(), fmt);
     if(default_value != null)
-      $write(" = %s (fmt=%s)", default_value.val2str(fmt), fmt);
+      $write(" = %s", default_value.val2str());
     if(multiple)
       $display(" (multiple ok)");
     else
@@ -100,8 +100,10 @@ class fmt_table;
     void'(fmt_map.insert(type_handle#(byte)::get(), "%0d"));
     void'(fmt_map.insert(type_handle#(shortint)::get(), "%0d"));
     void'(fmt_map.insert(type_handle#(longint)::get(), "%0d"));
+    void'(fmt_map.insert(type_handle#(int)::get(), "%0d"));
     void'(fmt_map.insert(type_handle#(byte unsigned)::get(), "%0d"));
     void'(fmt_map.insert(type_handle#(shortint unsigned)::get(), "%0d"));
+    void'(fmt_map.insert(type_handle#(int unsigned)::get(), "%0d"));
     void'(fmt_map.insert(type_handle#(longint unsigned)::get(), "%0d"));
     void'(fmt_map.insert(type_handle#(logic)::get(), "%b"));
     void'(fmt_map.insert(type_handle#(integer)::get(), "%x"));
@@ -199,7 +201,7 @@ class cl #(type T=int);
     cl_mgr::add(name, opt);
 
     // Put the default value into the resource database
-    uvm_resource_db#(T)::set("CL::", name, def, null);
+    uvm_resource_db#(T)::set("CL::*", name, def, null);
   endfunction
 
 endclass

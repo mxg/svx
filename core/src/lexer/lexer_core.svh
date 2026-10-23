@@ -144,7 +144,7 @@ class lexer_core;
     end
 
     // A double quote indicates the beginning of a string.  Gobble up
-    // all characters until then next double quote
+    // all characters until the next double quote.
     if(c == "\"") begin
       for(c = getc(); c != "\"" && c != 0; c = getc());
       return (c == 0) ? TOKEN_ERROR : TOKEN_STRING;

@@ -37,6 +37,6 @@ SV_SRC		+= top.sv test_pkg.sv
 
 UVM		= 1
 
-RUN_OPTS	= +name=freddy +size=48 +offset=4 +freq=1.5e9 +x_mode +z_mode=off +channels=8 +bias=-10 +base=32h7fff624c
+RUN_OPTS	= +name=freddy +offset=4 +freq=1.5e9 +x_mode +channels=8 +bias=-10 +base=32h7fff624c +file=\"a/b/c/d\"
 
 include ${TOP}/make/makefile
