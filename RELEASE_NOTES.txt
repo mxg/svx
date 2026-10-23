@@ -11,6 +11,10 @@ October 2026
 * Added get_item to map#() and multimap(). These functions return a
   pair#() that contains the key and the data item.
 
+* ADDED: Command line parser.  You can specify a list of command line
+  options in a table.  THowse options are recognised on the commnand
+  line.  The values of each option is stored in the resource database.
+
 * Enable compilation of UVM in the makefile system. Using IEEE
   1800.2-2020 standard as implemented in the Accellera kit version
   1800.2-2020.3.2.

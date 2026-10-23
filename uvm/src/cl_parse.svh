@@ -60,7 +60,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     token = lex.get_token();
     if(token != TOKEN_ID) begin
       string msg = {"Invalid command line option: ", opt};
-      `error_msg("INVALID OPT", msg);
+      `uvm_error("INVALID OPT", msg)
       return;
     end
 
@@ -107,7 +107,7 @@ endclass
 // Validate integer types -- helper class for validate_opt.  For
 // internal use. Not to be instantiated.
 //----------------------------------------------------------------------
-class validate_int#(type T=int);
+class validate_int#(type T=int, type P=void_traits);
   
   static function bit validate(cl_opt_desc opt, cl_opt_instance inst);
 
@@ -118,21 +118,32 @@ class validate_int#(type T=int);
     
     if(inst.token != TOKEN_INT) begin
       err = 1;
-      `error_msg("INVALID VALUE", "Invalid command line option value");
+      `uvm_error("INVALID VALUE", "Invalid command line option value")
     end
     if(td.size > $bits(T)) begin
       err = 1;    
-      `error_msg("INVALID SIZE", "Invalid size of command line option value");
+      `uvm_error("INVALID SIZE", "Invalid size of command line option value")
     end
 
 /* verilator lint_off CASEINCOMPLETE */
     case(td.base)
-      "d": n = T'(td.digits.atoi());
-      "b": n = T'(td.digits.atobin());
-      "o": n = T'(td.digits.atooct());
-      "h": n = T'(td.digits.atohex());
-    endcase  
+      "d": $sscanf(td.digits, "%d", n);
+      "b": $sscanf(td.digits, "%b", n);
+      "o": $sscanf(td.digits, "%o", n);
+      "h": $sscanf(td.digits, "%h", n);
+      default:
+	begin
+	  `uvm_error("INVALID BASE", "Invalid base for option value")
+	  err = 1;
+	end
+    endcase
 /* verilator lint_on CASEINCOMPLETE */
+
+    // Check the sign
+    if(P::is_unsigned == true && td.sign == "-") begin
+      `uvm_error("INVALID SIGN", "Invalid sign on unsigned command line option")
+      err = 1;
+    end
     
     if(td.sign == "-")
       n = n * -1;    
@@ -169,58 +180,58 @@ class validate_opt extends fcn#(cl_opt_instance);
 
     // Is it a valid option?
     if(opt == cl_opt_traits::empty) begin
-      `error_msg("INVALID OPT", {"Invalid command line option: ", t.name});
+      `uvm_error("INVALID OPT", {"Invalid command line option: ", t.name})
     end
 
     err = 0;
     case(opt.th)
       type_handle#(byte)::get():
-	err = validate_int#(byte)::validate(opt, t);
+	err = validate_int#(byte, byte_traits)::validate(opt, t);
       
       type_handle#(byte unsigned)::get():
-	err = validate_int#(byte)::validate(opt, t);
+	err = validate_int#(byte unsigned, byte_unsigned_traits)::validate(opt, t);
       
       type_handle#(shortint)::get():
-	err = validate_int#(shortint)::validate(opt, t);
+	err = validate_int#(shortint, shortint_traits)::validate(opt, t);
       
       type_handle#(shortint unsigned)::get():
-	err = validate_int#(shortint unsigned)::validate(opt, t);
+	err = validate_int#(shortint unsigned, shortint_unsigned_traits)::validate(opt, t);
       
       type_handle#(int)::get():
-	err = validate_int#(int)::validate(opt, t);
+	err = validate_int#(int, int_traits)::validate(opt, t);
       
       type_handle#(int unsigned)::get():
-	err = validate_int#(int unsigned)::validate(opt, t);
+	err = validate_int#(int unsigned, int_unsigned_traits)::validate(opt, t);
       
       type_handle#(longint)::get():
-	err = validate_int#(longint)::validate(opt, t);
+	err = validate_int#(longint, longint_traits)::validate(opt, t);
       
       type_handle#(longint unsigned)::get():
-	err = validate_int#(longint unsigned)::validate(opt, t);
+	err = validate_int#(longint unsigned, longint_unsigned_traits)::validate(opt, t);
       
       type_handle#(int8_t)::get():
-	  err = validate_int#(int8_t)::validate(opt, t);
+	  err = validate_int#(int8_t, int8_traits)::validate(opt, t);
 
       type_handle#(int16_t)::get():
-	  err = validate_int#(int16_t)::validate(opt, t);
+	  err = validate_int#(int16_t, int16_traits)::validate(opt, t);
 
       type_handle#(int32_t)::get():
-	  err = validate_int#(int32_t)::validate(opt, t);
+	  err = validate_int#(int32_t, int32_traits)::validate(opt, t);
 
       type_handle#(int64_t)::get():
-	  err = validate_int#(int64_t)::validate(opt, t);
+	  err = validate_int#(int64_t, int64_traits)::validate(opt, t);
       
       type_handle#(uint8_t)::get():
-	  err = validate_int#(uint8_t)::validate(opt, t);
+	  err = validate_int#(uint8_t, uint8_traits)::validate(opt, t);
 
       type_handle#(uint16_t)::get():
-	  err = validate_int#(uint16_t)::validate(opt, t);
+	  err = validate_int#(uint16_t, uint16_traits)::validate(opt, t);
 
       type_handle#(uint32_t)::get():
-	  err = validate_int#(uint32_t)::validate(opt, t);
+	  err = validate_int#(uint32_t, uint32_traits)::validate(opt, t);
 
       type_handle#(uint64_t)::get():
-	  err = validate_int#(uint64_t)::validate(opt, t);
+	  err = validate_int#(uint64_t, uint64_traits)::validate(opt, t);
       
       type_handle#(real)::get():
 	begin
@@ -269,7 +280,7 @@ class validate_opt extends fcn#(cl_opt_instance);
     if(err) begin
       string msg = $sformatf("Invalid argument for command line option: +%s%s",
 			     t.name, ((t.lexeme == null) ? "" : {" = ", t.lexeme}));
-      `error_msg("INVALID ARGUMENT", msg);
+      `uvm_error("INVALID ARGUMENT", msg)
     end
     
   endfunction
@@ -297,7 +308,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(bit) value;
 	  if(!$cast(value, t.value))
-	    `error_msg("CAST", {"Cannot cast command line option to bit for ", t.name});
+	    `uvm_error("CAST", {"Cannot cast command line option to bit for ", t.name})
 	  uvm_resource_db#(bit)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -306,7 +317,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(string) value;
 	  if(!$cast(value, t.value))
-	    `error_msg("CAST", {"Cannot cast command line option to string for ", t.name});
+	    `uvm_error("CAST", {"Cannot cast command line option to string for ", t.name})
 	  uvm_resource_db#(string)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -315,7 +326,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(int8_t) value;
 	  if(!$cast(value, t.value))
-	    `error_msg("CAST", {"Cannot cast command line option to int8_t for ", t.name});
+	    `uvm_error("CAST", {"Cannot cast command line option to int8_t for ", t.name})
 	  uvm_resource_db#(int8_t)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -324,7 +335,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(int16_t) value;
 	  if(!$cast(value, t.value))
-	    `error_msg("CAST", {"Cannot cast command line option to int16_t for ", t.name});
+	    `uvm_error("CAST", {"Cannot cast command line option to int16_t for ", t.name})
 	  uvm_resource_db#(int16_t)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -333,7 +344,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(int32_t) value;
 	  if(!$cast(value, t.value))
-	    `error_msg("CAST", {"Cannot cast command line option to int32_t for ", t.name});
+	    `uvm_error("CAST", {"Cannot cast command line option to int32_t for ", t.name})
 	  uvm_resource_db#(int32_t)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -342,7 +353,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(int64_t) value;
 	  if(!$cast(value, t.value))
-	    `error_msg("CAST", {"Cannot cast command line option to int64_t for ", t.name});
+	    `uvm_error("CAST", {"Cannot cast command line option to int64_t for ", t.name})
 	  uvm_resource_db#(int64_t)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -351,7 +362,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(uint8_t) value;
 	  if(!$cast(value, t.value))
-	    `error_msg("CAST", {"Cannot cast command line option to uint8_t for ", t.name});
+	    `uvm_error("CAST", {"Cannot cast command line option to uint8_t for ", t.name})
 	  uvm_resource_db#(uint8_t)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -360,7 +371,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(uint16_t) value;
 	  if(!$cast(value, t.value))
-	    `error_msg("CAST", {"Cannot cast command line option to uint16_t for ", t.name});
+	    `uvm_error("CAST", {"Cannot cast command line option to uint16_t for ", t.name})
 	  uvm_resource_db#(uint16_t)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -369,7 +380,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(uint32_t) value;
 	  if(!$cast(value, t.value))
-	    `error_msg("CAST", {"Cannot cast command line option to uint32_t for ", t.name});
+	    `uvm_error("CAST", {"Cannot cast command line option to uint32_t for ", t.name})
 	  uvm_resource_db#(uint32_t)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -378,7 +389,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(uint64_t) value;
 	  if(!$cast(value, t.value))
-	    `error_msg("CAST", {"Cannot cast command line option to uint64_t for ", t.name});
+	    `uvm_error("CAST", {"Cannot cast command line option to uint64_t for ", t.name})
 	  uvm_resource_db#(uint64_t)::set_override("CL::*", t.name, value.get());
 	end
       
@@ -387,13 +398,12 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(real) value;
 	  if(!$cast(value, t.value))
-	    `error_msg("CAST", {"Cannot cast command line option to real for ", t.name});
+	    `uvm_error("CAST", {"Cannot cast command line option to real for ", t.name})
 	  uvm_resource_db#(real)::set_override("CL::*", t.name, value.get());
 	end
 
       default:
-	`error_msg("UNSUPPORTED TYPE", "Cannot convert command line option value");
-
+	`uvm_error("UNSUPPORTED TYPE", "Cannot convert command line option value")
     endcase
     
       
