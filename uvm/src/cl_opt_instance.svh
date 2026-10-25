@@ -63,7 +63,7 @@ endclass
 typedef class_traits#(cl_opt_instance) cl_opt_inst_traits;
 
 // A type representing a vector of cl_opt_instances.  The intermediate
-// represention of the command line is a vector of command line
+// representation of the command line is a vector of command line
 // descriptors.  The vector is used to generate internal configuration
 // information.
 typedef vector#(cl_opt_instance, cl_opt_inst_traits) opt_vector_t;

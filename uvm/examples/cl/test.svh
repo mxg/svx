@@ -92,7 +92,7 @@ class test extends uvm_component;
 
     $display("\n--- Command line options stored in the resource database ---");
     
-    // Let's see if everything is in the resoure database.
+    // Let's see if everything is in the resource database.
     if(!uvm_resource_db#(string)::read_by_name("CL::", "name", name, this))
       `uvm_error("NOT FOUND", "Not found in the resource database: name")
     else

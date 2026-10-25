@@ -39,7 +39,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
   // f
   //
   // Primary function for functor-like class.  Its job is to parse a
-  // single command line opotion.
+  // single command line option.
   //--------------------------------------------------------------------
   virtual function void f(string opt, ref opt_vector_t opt_list);
     token_t token;
@@ -51,8 +51,6 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     lex.start(opt);
     // Valid options start with '+'.
     token = lex.get_token();
-    // Uncomment the following statement for debugging the command
-    // line parser.
     if(token != TOKEN_PLUS)
       return;
 
@@ -82,7 +80,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
 
     // If the form of the option is +<name> and NOT +<name>=<value>
     // then the option is a switch. Supplying the switch on the
-    // comnmand line without a value means the switch is being turned
+    // command line without a value means the switch is being turned
     // on.
     if(token != TOKEN_EQUAL) begin
       lex.put_token(lex.get_lexeme());

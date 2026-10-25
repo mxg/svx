@@ -36,7 +36,7 @@ class cl_opt_desc;
   string name;
   type_handle_base th;
   bit multiple;
-  type_container_base default_value; // not sure this is needed...
+  type_container_base default_value;
   string fmt;
 
   function void print();
@@ -76,7 +76,7 @@ endclass
 // ----------------------------------------------------------------------
 class fmt_table;
 
-  local static map#(type_handle_base, string, string_traits) fmt_map;
+  static local map#(type_handle_base, string, string_traits) fmt_map;
 
   // Populate the table at static initialization time (before time 0).
   static local bit is_populated = populate_table();

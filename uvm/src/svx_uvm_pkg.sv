@@ -40,4 +40,4 @@ package svx_uvm_pkg;
   `include "cl_opt_instance.svh"
   `include "cl_parse.svh"
 
-endpackage;
+endpackage

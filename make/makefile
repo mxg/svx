@@ -38,7 +38,7 @@ V               = @
 
 VERILATOR       := /usr/local/bin/verilator
 SVUNIT_INSTALL	?= /home/mark-glasser/projects/svunit
-UVM_HOME	:= /home/mark-glasser/projects/uvm/1800.2-2020.3.2
+UVM_HOME	?= /home/mark-glasser/projects/uvm/1800.2-2020.3.2
 
 CXX		:= /usr/bin/c++
 CXXFLAGS        := -std=c++17 -O2
