@@ -104,8 +104,24 @@ class lexer_core;
   // (lexp) and the current character pointed to by p.
   //--------------------------------------------------------------------
   function string get_lexeme();
-    string lexeme = s.substr(lexp, p-1);
+    string lexeme;
+    if(p >= s.len())
+      lexeme = s.substr(lexp, s.len()-1);
+    else
+      lexeme = s.substr(lexp, p-1);
     return lexeme; 
+  endfunction
+
+  //--------------------------------------------------------------------
+  // function: get_digits
+  //--------------------------------------------------------------------
+  function string get_digits();
+    string digits;
+    if(p >= s.len())
+      digits = s.substr(first_digit, s.len()-1);
+    else
+      digits = s.substr(first_digit, p-1);
+    return digits;
   endfunction
 
   //--------------------------------------------------------------------
@@ -118,7 +134,7 @@ class lexer_core;
     byte c;
 
     // skip whitespace
-    for(c = getc(); `isspace(c); c = getc() );
+    for(c = getc(); `isspace(c) && c != 0; c = getc() );
 
     mark_lexeme();
 
@@ -126,9 +142,8 @@ class lexer_core;
     // An id can begin with a letter or an underbar and contains
     // letters, numbers, and underbars.
     if(`isalpha(c) || c == "_") begin
+      for(c = getc(); (`isalnum(c) || (c == "_")) && (c != 0); c = getc());
       putc();
-      for(c = getc(); `isalnum(c) || (c == "_"); c = getc());
-      if(c != 0) putc();
       case(get_lexeme())
         "off"   : return TOKEN_OFF;
         "OFF"   : return TOKEN_OFF;
@@ -138,6 +153,7 @@ class lexer_core;
         "TRUE"  : return TOKEN_ON;
         "false" : return TOKEN_OFF;
         "FALSE" : return TOKEN_OFF;
+	""      : return TOKEN_EOL;
         default : return TOKEN_ID;
       endcase
       // We should not reach this point
@@ -152,7 +168,7 @@ class lexer_core;
 
     // Single quoted string
     if(c == "\'") begin
-      for(c = getc(); c != "\'"; c = getc());
+      for(c = getc(); c != "\'" && c != 0; c = getc());
       return TOKEN_STRING;
     end
 
@@ -244,11 +260,10 @@ class lexer_core;
   local function byte getc();
     byte b;
 
-    if(s.len() > 0 && p < s.len()) begin
-      b = s[p];
+    if(p < s.len())
+      return s[p++];
+    if(p == s.len())
       p++;
-      return b;
-    end
 
     return 0; // 0 is end-of-line (EOL)
 
@@ -261,13 +276,9 @@ class lexer_core;
   // next character returned by getc().
   //--------------------------------------------------------------------
   local function void putc();
-    if(p > 0) begin
-      if(p < s.len())
-        p--;
-      else
-        p = s.len() - 1;
-    end
-endfunction
+    if(p > 0)
+      p--;
+  endfunction
 
   //--------------------------------------------------------------------
   // function: put_token
@@ -296,9 +307,10 @@ endfunction
   // care not to go past the end of the input string.
   //--------------------------------------------------------------------
   local function void mark_lexeme();
-    lexp = p;
     if(p > 0)
-      lexp--;
+      lexp = p -1;
+    else
+      lexp = 0;
   endfunction
 
   //--------------------------------------------------------------------
@@ -365,7 +377,7 @@ endfunction
       // This is a useful statement for debugging, so we'll leave it
       // here.  Uncomment when you want to see the state transitions the
       // lexer goes through for parsing numbers.
-      // $display("state = %s : c = %s", state.name(), c);
+      //$display("state = %s : c = %s", state.name(), c);
 
       case(state)
         STATE_START:
@@ -510,7 +522,7 @@ endfunction
                 begin
                   if(!`isdigit(c)) begin
                     if(c != 0) putc();
-		    token_desc.digits = s.substr(first_digit, p-1);
+		    token_desc.digits = get_digits();
                     return TOKEN_INT;
                   end
                 end
@@ -558,7 +570,7 @@ endfunction
                 begin
                   if(!`isdigit(c) && c != "_") begin
                     if(c != 0) putc();
-		    token_desc.digits = s.substr(first_digit, p-1);
+		    token_desc.digits = get_digits();
                     return TOKEN_INT;
                   end
                  end
@@ -596,7 +608,7 @@ endfunction
                 begin
                   if(!`isdigit(c)) begin
                     if(c != 0) putc();
-		    token_desc.digits = s.substr(first_digit, p-1);
+		    token_desc.digits = get_digits();
 		    token_desc.base = "f";
                     return TOKEN_FLOAT;
                   end
@@ -625,7 +637,7 @@ endfunction
               default:
                 begin
                   if(!`isdigit(c)) begin
-		    token_desc.digits = s.substr(first_digit, p-1);
+		    token_desc.digits = get_digits();
 		    token_desc.base = "f";
                     return TOKEN_FLOAT;
 		  end
@@ -635,7 +647,7 @@ endfunction
 
         STATE_EXPONENT:
           // We encountered an exponent marker.  Let's get the exponent
-          // digits.  Byt the way, and exponent may be signed.
+          // digits.  By the way, and exponent may be signed.
           begin
 	    case(1)
               (c == "+" || c == "-"): state = STATE_EXP_SIGN;
@@ -672,7 +684,8 @@ endfunction
               default:
                 begin
                   if(!`isdigit(c)) begin
-		    token_desc.digits = s.substr(first_digit, p-1);
+		    if(c != 0) putc();
+		    token_desc.digits = get_digits();
 		    token_desc.base = "f";
                     return TOKEN_FLOAT;
                   end
@@ -737,7 +750,7 @@ endfunction
           begin
             if( !`isxdigit(c) && c != "_" && !`islogic(c)) begin
               if(c != 0) putc();
-	      token_desc.digits = s.substr(first_digit, p-1);
+	      token_desc.digits = get_digits();
               return token_desc.is_logic ? TOKEN_LOGIC : TOKEN_INT;
             end
             token_desc.is_logic |= `islogic(c);
@@ -762,7 +775,7 @@ endfunction
             if( !`isodigit(c) && c !== "_" && !`islogic(c)) begin
               if(c != 0) putc();
               lexeme = get_lexeme();
-	      token_desc.digits = s.substr(first_digit, p-1);
+	      token_desc.digits = get_digits();
               return token_desc.is_logic ? TOKEN_LOGIC : TOKEN_INT;
             end
             token_desc.is_logic |= `islogic(c);
@@ -785,7 +798,7 @@ endfunction
           begin
             if(! (c == "0" || c == "1")  && !`islogic(c)) begin
               if(c != 0) putc();
-	      token_desc.digits = s.substr(first_digit, p-1);
+	      token_desc.digits = get_digits();
               return token_desc.is_logic ? TOKEN_LOGIC : TOKEN_INT;
             end
             token_desc.is_logic |= `islogic(c);

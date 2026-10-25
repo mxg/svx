@@ -60,7 +60,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     token = lex.get_token();
     if(token != TOKEN_ID) begin
       string msg = {"Invalid command line option: ", opt};
-      `uvm_error("INVALID OPT", msg)
+      `uvm_error("SVX/CAL/PARSE", msg)
       return;
     end
 
@@ -92,11 +92,29 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     else begin
       // Option has the form +<name>=<value>
       token = lex.get_token();
-      opt_inst.token = token;
-      opt_inst.lexeme = lex.get_lexeme();
+      if(token == TOKEN_EOL) begin
+	string msg;
+	$sformat(msg, "Missing value for command line option +%s", opt_inst.name);
+	`uvm_error("SVX/CL/PARSE", msg)
+      end
+      else begin
+	opt_inst.token = token;
+	opt_inst.lexeme = lex.get_lexeme();
+      end
     end
     td = lex.get_token_descriptor();
     opt_inst.td = td;
+
+    // Check for extraneous characters
+    token = lex.get_token();
+    if(token != TOKEN_EOL) begin
+      string msg;
+      $sformat(msg, "Extraneous characters after value for command line option +%s",
+	       opt_inst.name);
+      `uvm_error("SX/CL/PARSE", msg)
+    end
+    else
+      lex.put_token(lex.get_lexeme());
   endfunction
 
 endclass
@@ -104,28 +122,32 @@ endclass
 //----------------------------------------------------------------------
 // validate_int
 //
-// Validate integer types -- helper class for validate_opt.  For
-// internal use. Not to be instantiated.
+// Validate integer types -- helper class for validate_opt.  Returns
+// if the validation fails, 1 otherwise.
+//
+// For internal use. Not to be instantiated.
 //----------------------------------------------------------------------
 class validate_int#(type T=int, type P=void_traits);
   
   static function bit validate(cl_opt_desc opt, cl_opt_instance inst);
 
-    bit err;
     type_container#(T) val = new();
     token_descriptor td = inst.td;
     T n;
-    
+    string msg;
+
     if(inst.token != TOKEN_INT) begin
-      err = 1;
-      `uvm_error("INVALID VALUE", "Invalid command line option value")
+      $sformat(msg, "Invalid command line option value +%s. Expected %s integer",
+		opt.name, (P::is_signed) ? "a signed" : "an unsigned");
+      `uvm_error("SVX/CL/PARSE", msg)
+      return 0;
     end
     if(td.size > $bits(T)) begin
-      err = 1;    
-      `uvm_error("INVALID SIZE", "Invalid size of command line option value")
+      $sformat(msg, "Invalid size of the value for command line option +%s. Value must be an integer less than %0d bits", opt.name, $bits(T));
+      `uvm_error("SVX/CL/PARSE", msg)
+      return 0;
     end
 
-/* verilator lint_off CASEINCOMPLETE */
     case(td.base)
       "d": $sscanf(td.digits, "%d", n);
       "b": $sscanf(td.digits, "%b", n);
@@ -133,16 +155,17 @@ class validate_int#(type T=int, type P=void_traits);
       "h": $sscanf(td.digits, "%h", n);
       default:
 	begin
-	  `uvm_error("INVALID BASE", "Invalid base for option value")
-	  err = 1;
+	  $sformat(msg, "Value of option +%s has an invalid base %s", opt.name, td.base);
+	  `uvm_error("SVFX/XL/PARSE", msg)
+	  return 0;
 	end
     endcase
-/* verilator lint_on CASEINCOMPLETE */
 
     // Check the sign
     if(P::is_unsigned == true && td.sign == "-") begin
-      `uvm_error("INVALID SIGN", "Invalid sign on unsigned command line option")
-      err = 1;
+      $sformat(msg, "Option %s is unsigned so it cannot have a negative value", opt.name);
+      `uvm_error("SVX/CL/PARSE", msg)
+      return 0;
     end
     
     if(td.sign == "-")
@@ -150,7 +173,7 @@ class validate_int#(type T=int, type P=void_traits);
     val.set(n);
     inst.value = val;
 
-    return err;
+    return 1;
   endfunction
   
 endclass
@@ -165,78 +188,98 @@ endclass
 /* verilator lint_off SIDEEFFECT */
 // Dear Verilator team, What does "Expression side effect may be
 // mishandled" mean?
-class validate_opt extends fcn#(cl_opt_instance);
+class validate_opt extends accum_fcn#(cl_opt_instance, uint32_t);
 
-  function void f(cl_opt_instance t);
+  function void f(cl_opt_instance t, ref uint32_t errs);
 
-    bit err;
+    string msg;
     token_descriptor td = t.td;
     
     // Look up the command line option
     cl_opt_desc opt = cl_mgr::find(t.name);
+    // Is it a valid option?
+    if(opt == cl_opt_traits::empty) begin
+      `uvm_error("SVX/CL/PARSE", {"Invalid command line option: ", t.name})
+      errs++;
+      return;
+    end
+
     // Transfer the fmt from the option descriptor to the option
     // instance.
     t.fmt = opt.fmt;
 
-    // Is it a valid option?
-    if(opt == cl_opt_traits::empty) begin
-      `uvm_error("INVALID OPT", {"Invalid command line option: ", t.name})
-    end
-
-    err = 0;
     case(opt.th)
       type_handle#(byte)::get():
-	err = validate_int#(byte, byte_traits)::validate(opt, t);
+	if(!validate_int#(byte, byte_traits)::validate(opt, t))
+	  errs++;
       
       type_handle#(byte unsigned)::get():
-	err = validate_int#(byte unsigned, byte_unsigned_traits)::validate(opt, t);
+	if(!validate_int#(byte unsigned, byte_unsigned_traits)::validate(opt, t))
+	  errs++;
       
       type_handle#(shortint)::get():
-	err = validate_int#(shortint, shortint_traits)::validate(opt, t);
+	if(!validate_int#(shortint, shortint_traits)::validate(opt, t))
+	  errs++;
       
       type_handle#(shortint unsigned)::get():
-	err = validate_int#(shortint unsigned, shortint_unsigned_traits)::validate(opt, t);
+	if(!validate_int#(shortint unsigned, shortint_unsigned_traits)::validate(opt, t))
+	  errs++;
       
       type_handle#(int)::get():
-	err = validate_int#(int, int_traits)::validate(opt, t);
+	if(!validate_int#(int, int_traits)::validate(opt, t))
+	  errs++;
       
       type_handle#(int unsigned)::get():
-	err = validate_int#(int unsigned, int_unsigned_traits)::validate(opt, t);
+	if(!validate_int#(int unsigned, int_unsigned_traits)::validate(opt, t))
+	  errs++;
       
       type_handle#(longint)::get():
-	err = validate_int#(longint, longint_traits)::validate(opt, t);
+	if(!validate_int#(longint, longint_traits)::validate(opt, t))
+	  errs++;
       
       type_handle#(longint unsigned)::get():
-	err = validate_int#(longint unsigned, longint_unsigned_traits)::validate(opt, t);
+	if(!validate_int#(longint unsigned, longint_unsigned_traits)::validate(opt, t))
+	  errs++;
       
       type_handle#(int8_t)::get():
-	  err = validate_int#(int8_t, int8_traits)::validate(opt, t);
+	  if(!validate_int#(int8_t, int8_traits)::validate(opt, t))
+	    errs++;
 
       type_handle#(int16_t)::get():
-	  err = validate_int#(int16_t, int16_traits)::validate(opt, t);
+	  if(!validate_int#(int16_t, int16_traits)::validate(opt, t))
+	    errs++;
 
       type_handle#(int32_t)::get():
-	  err = validate_int#(int32_t, int32_traits)::validate(opt, t);
+	  if(!validate_int#(int32_t, int32_traits)::validate(opt, t))
+	    errs++;
 
       type_handle#(int64_t)::get():
-	  err = validate_int#(int64_t, int64_traits)::validate(opt, t);
+	  if(!validate_int#(int64_t, int64_traits)::validate(opt, t))
+	    errs++;
       
       type_handle#(uint8_t)::get():
-	  err = validate_int#(uint8_t, uint8_traits)::validate(opt, t);
+	  if(!validate_int#(uint8_t, uint8_traits)::validate(opt, t))
+	    errs++;
 
       type_handle#(uint16_t)::get():
-	  err = validate_int#(uint16_t, uint16_traits)::validate(opt, t);
+	  if(!validate_int#(uint16_t, uint16_traits)::validate(opt, t))
+	    errs++;
 
       type_handle#(uint32_t)::get():
-	  err = validate_int#(uint32_t, uint32_traits)::validate(opt, t);
+	  if(!validate_int#(uint32_t, uint32_traits)::validate(opt, t))
+	    errs++;
 
       type_handle#(uint64_t)::get():
-	  err = validate_int#(uint64_t, uint64_traits)::validate(opt, t);
+	  if(!validate_int#(uint64_t, uint64_traits)::validate(opt, t))
+	    errs++;
       
       type_handle#(real)::get():
 	begin
-	  if(t.token != TOKEN_FLOAT)
-	    err = 1;
+	  if(t.token != TOKEN_FLOAT) begin
+	    errs++;
+	    $sformat(msg, "Command line option +%s must have a floating point value.", opt.name);
+	    `uvm_error("SVX/CL/PARSE", msg)
+	  end
 	  else begin
 	    type_container#(real) val = new();
 	    real f = td.digits.atoreal();
@@ -250,24 +293,33 @@ class validate_opt extends fcn#(cl_opt_instance);
       type_handle#(bit)::get():
 	begin
 	  bit b;
-	  if(t.token != TOKEN_ON && t.token != TOKEN_OFF &&
-	     t.token != TOKEN_INT && t.lexeme != null)
-	    err = 1;
-	  else begin
-	    type_container#(bit) val = new();
-	    if(t.token == TOKEN_ON || t.lexeme == null)
-	      b = 1;
-	    else
+	  type_container#(bit) val = new();
+
+	  if(t.token == TOKEN_ON || t.lexeme == null ||
+	     (t.token == TOKEN_INT && (t.lexeme.atoi() == 1)))
+	    b = 1;
+	  else
+	    if(t.token == TOKEN_OFF ||
+	     (t.token == TOKEN_INT && (t.lexeme.atoi() == 0)))
 	      b = 0;
-	    val.set(b);
-	    t.value = val;
+	  else begin
+	    errs++;
+	    $sformat(msg, "Command line option +%s must have an ON/OFF value.", opt.name);
+	    `uvm_error("SVX/CL/PARSE", msg)
+	    return;
 	  end
+
+	  val.set(b);
+	  t.value = val;
 	end
       
       type_handle#(string)::get():
 	begin
-	  if(t.token != TOKEN_STRING && t.token != TOKEN_ID)
-	    err = 1;
+	  if(t.token != TOKEN_STRING && t.token != TOKEN_ID) begin
+	    errs++;
+	    $sformat(msg, "Command line option +%s must have a string value.", opt.name);
+	    `uvm_error("SVX/CXL/PARSE", msg)
+	  end
 	  else begin
 	    type_container#(string) val = new();
 	    val.set(t.lexeme);
@@ -277,12 +329,6 @@ class validate_opt extends fcn#(cl_opt_instance);
       
     endcase
 
-    if(err) begin
-      string msg = $sformatf("Invalid argument for command line option: +%s%s",
-			     t.name, ((t.lexeme == null) ? "" : {" = ", t.lexeme}));
-      `uvm_error("INVALID ARGUMENT", msg)
-    end
-    
   endfunction
 /* verilator lint_on SIDEEFFECT */
   
@@ -308,7 +354,8 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(bit) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error("CAST", {"Cannot cast command line option to bit for ", t.name})
+	    `uvm_error("SVX/CL/PARSE",
+		       {"Cannot cast command line option to bit for ", t.name})
 	  uvm_resource_db#(bit)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -317,7 +364,8 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(string) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error("CAST", {"Cannot cast command line option to string for ", t.name})
+	    `uvm_error("SVX/CL/PARSE",
+		       {"Cannot cast command line option to string for ", t.name})
 	  uvm_resource_db#(string)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -326,7 +374,8 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(int8_t) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error("CAST", {"Cannot cast command line option to int8_t for ", t.name})
+	    `uvm_error("SVX/CL/PARSE",
+		       {"Cannot cast command line option to int8_t for ", t.name})
 	  uvm_resource_db#(int8_t)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -335,7 +384,8 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(int16_t) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error("CAST", {"Cannot cast command line option to int16_t for ", t.name})
+	    `uvm_error("SVX/CL/PARSE",
+		       {"Cannot cast command line option to int16_t for ", t.name})
 	  uvm_resource_db#(int16_t)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -344,7 +394,8 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(int32_t) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error("CAST", {"Cannot cast command line option to int32_t for ", t.name})
+	    `uvm_error("SVX/CL/PARSE",
+		       {"Cannot cast command line option to int32_t for ", t.name})
 	  uvm_resource_db#(int32_t)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -353,7 +404,8 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(int64_t) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error("CAST", {"Cannot cast command line option to int64_t for ", t.name})
+	    `uvm_error("SVX/CL/PARSE",
+		       {"Cannot cast command line option to int64_t for ", t.name})
 	  uvm_resource_db#(int64_t)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -362,7 +414,8 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(uint8_t) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error("CAST", {"Cannot cast command line option to uint8_t for ", t.name})
+	    `uvm_error("SVX/CL/PARSE", 
+		       {"Cannot cast command line option to uint8_t for ", t.name})
 	  uvm_resource_db#(uint8_t)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -371,7 +424,8 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(uint16_t) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error("CAST", {"Cannot cast command line option to uint16_t for ", t.name})
+	    `uvm_error("SVX/CL/PARSE",
+		       {"Cannot cast command line option to uint16_t for ", t.name})
 	  uvm_resource_db#(uint16_t)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -380,7 +434,8 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(uint32_t) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error("CAST", {"Cannot cast command line option to uint32_t for ", t.name})
+	    `uvm_error("SVX/CL/PARSE",
+		       {"Cannot cast command line option to uint32_t for ", t.name})
 	  uvm_resource_db#(uint32_t)::set_override("CL::*", t.name, value.get());
 	end
 
@@ -389,7 +444,8 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(uint64_t) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error("CAST", {"Cannot cast command line option to uint64_t for ", t.name})
+	    `uvm_error("SVX/CL/PARSE",
+		       {"Cannot cast command line option to uint64_t for ", t.name})
 	  uvm_resource_db#(uint64_t)::set_override("CL::*", t.name, value.get());
 	end
       
@@ -398,12 +454,13 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(real) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error("CAST", {"Cannot cast command line option to real for ", t.name})
+	    `uvm_error("SVX/CL/PARSE",
+		       {"Cannot cast command line option to real for ", t.name})
 	  uvm_resource_db#(real)::set_override("CL::*", t.name, value.get());
 	end
 
       default:
-	`uvm_error("UNSUPPORTED TYPE", "Cannot convert command line option value")
+	`uvm_error("SVX/CL/PARSE", "Unsupported type: cannot convert command line option value")
     endcase
     
       
@@ -447,6 +504,8 @@ class cl_parse;
   //--------------------------------------------------------------------
   function void parse();
 
+    uint32_t errs;
+
     // Vectors    
     vector_string vec;    // List of raw option strings
     opt_vector_t opt_vec; // List of option instances
@@ -475,12 +534,21 @@ class cl_parse;
     //------------------------------------------------------------------
     // Second pass. Validate the options.
 
+    errs = 0;
     opt_iter = new(opt_vec);
     validate = new();
-    algo#(cl_opt_instance, cl_opt_inst_traits)::for_each(opt_iter, validate);
+    accum#(cl_opt_instance, cl_opt_inst_traits, uint32_t)::accumulate(opt_iter, 
+								      validate, 
+								      errs);
 
     //------------------------------------------------------------------
     // Third pass. Populate values into the resource database
+
+    if(errs > 0) begin
+      `uvm_error("SVX/CL/PARSES",
+		 "Errors in the command line prevent further processing of the options")
+      return;
+    end
 
     populate = new();
     algo#(cl_opt_instance, cl_opt_inst_traits)::for_each(opt_iter, populate);

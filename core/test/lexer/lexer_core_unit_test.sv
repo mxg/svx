@@ -133,6 +133,7 @@ module lexer_core_unit_test;
 
     token = lex.get_token();
     lexeme = lex.get_lexeme();
+    $display("token = %s lexeme = %s", token, lexeme);
     `FAIL_IF(token != compare_token)
     if(compare_lexeme != "")
       `FAIL_UNLESS_STR_EQUAL(lexeme, compare_lexeme)

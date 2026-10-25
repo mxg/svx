@@ -21,7 +21,7 @@
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIOns OF ANY KIND, either express or
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
 // implied.  See the License for the specific language governing
 // permissions and limitations under the License.
 //======================================================================
@@ -57,7 +57,7 @@ class test extends uvm_component;
     cl#(uint64_t)::add("data", "%16x");
     cl#(int64_t)::add("bignum");
 
-    // Just for hoots let's see what's in the option table.
+    // Just hoots let's see what's in the option table.
     cl_mgr::dump();
 
     // parse the options.
@@ -79,9 +79,9 @@ class test extends uvm_component;
     real freq;
     bit	 x_mode;
     bit	 z_mode;
-    int32_t channels;
+    uint32_t channels;
     int32_t bias;
-    int32_t base;
+    uint32_t base;
     string file;
     uint64_t data;
     int64_t bignum;
@@ -94,7 +94,7 @@ class test extends uvm_component;
     if(!uvm_resource_db#(string)::read_by_name("CL::", "name", name, this))
       `uvm_error("NOT FOUND", "Not found in the resource database: name")
     else
-      $display("name = %0d", name);
+      $display("name = %s", name);
 
     if(!uvm_resource_db#(uint32_t)::read_by_name("CL::", "size", size, this))
       `uvm_error("NOT FOUND", "Not found in the resource database: size")

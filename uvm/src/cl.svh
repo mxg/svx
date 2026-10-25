@@ -69,9 +69,11 @@ endclass
 // fmt_table
 //
 // A table of format strings used to print values of various data
-// types.  The class should not be instantiated. For internal use
-// only.
-//----------------------------------------------------------------------
+// types. In addition to holding format strings, this table serves as
+// the list of data types supported by the command line processor.
+//
+// The class should not be instantiated. For internal use only.
+// ----------------------------------------------------------------------
 class fmt_table;
 
   local static map#(type_handle_base, string, string_traits) fmt_map;
@@ -105,12 +107,10 @@ class fmt_table;
     void'(fmt_map.insert(type_handle#(shortint unsigned)::get(), "%0d"));
     void'(fmt_map.insert(type_handle#(int unsigned)::get(), "%0d"));
     void'(fmt_map.insert(type_handle#(longint unsigned)::get(), "%0d"));
-    void'(fmt_map.insert(type_handle#(logic)::get(), "%b"));
-    void'(fmt_map.insert(type_handle#(integer)::get(), "%x"));
     return 1;
   endfunction
 
-  // Retrieve a format string based on data type
+  // Retrieve a format string based on data type.
   static function string get_fmt(type_handle_base th);
     string fmt = fmt_map.get(th);
     return fmt;
@@ -124,6 +124,9 @@ endclass
 // Command Line option manager contains the map of command line option
 // descriptors.  This is the set of all possible command line options
 // that are available.
+//
+// All the functions and data structures are static so there's no need
+// to instantiate this class.
 //----------------------------------------------------------------------
 class cl_mgr;
 
@@ -155,7 +158,7 @@ class cl_mgr;
   // find
   //--------------------------------------------------------------------
   static function cl_opt_desc find(string name);
-    return opt_map.get(name);
+    return (opt_map == null) ? null : opt_map.get(name);
   endfunction
 
   //--------------------------------------------------------------------
@@ -180,23 +183,55 @@ endclass
 //----------------------------------------------------------------------
 class cl #(type T=int);
 
+  //--------------------------------------------------------------------
+  // add
+  //--------------------------------------------------------------------
   static function void add(string name, string fmt="");
+
+    string new_fmt;
+    
     cl_opt_desc opt = new();
     opt.name = name;
     opt.th = type_handle#(T)::get();
-    opt.fmt = (fmt == "") ? fmt_table::get_fmt(opt.th) : fmt;
+    
+    new_fmt = fmt_table::get_fmt(opt.th);
+    if(new_fmt == string_traits::empty) begin
+      string msg;
+      $sformat(msg, "Unsupported command line option data type: %s",
+	       opt.th.get_typename());
+      `uvm_error("CL_INVALID_TYPE", msg);
+      return;
+    end
+
+    opt.fmt = (fmt == "") ? new_fmt : fmt;
     cl_mgr::add(name, opt);
   endfunction
 
+  //--------------------------------------------------------------------
+  // add_with_default
+  //--------------------------------------------------------------------
   static function void add_with_default(string name, T def, string fmt="");
+
+    string new_fmt;
+
     cl_opt_desc opt = new();
     type_container#(T) val = new();
 
     opt.name = name;
     opt.th = type_handle#(T)::get();
-    opt.fmt = (fmt == "") ? fmt_table::get_fmt(opt.th) : fmt;
+
+    new_fmt = fmt_table::get_fmt(opt.th);
+    if(new_fmt == string_traits::empty) begin
+      string msg;
+      $sformat(msg, "Unsupported command line option data type: %s",
+	       opt.th.get_typename());
+      `uvm_error("CL_INVALID_TYPE", msg);
+      return;
+    end
+    
+    opt.fmt = (fmt == "") ? new_fmt : fmt;
     val.set(def);
-    val.set_default_fmt(fmt);
+    val.set_default_fmt(opt.fmt);
     opt.default_value = val;
     cl_mgr::add(name, opt);
 
