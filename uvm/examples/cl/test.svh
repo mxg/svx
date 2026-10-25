@@ -56,6 +56,7 @@ class test extends uvm_component;
     cl#(string)::add("file");
     cl#(uint64_t)::add("data", "%16x");
     cl#(int64_t)::add("bignum");
+    cl#(int8_t)::add("smallnum");
 
     // Just hoots let's see what's in the option table.
     cl_mgr::dump();
@@ -85,6 +86,7 @@ class test extends uvm_component;
     string file;
     uint64_t data;
     int64_t bignum;
+    int8_t smallnum;
 
     phase.raise_objection(this);
 
@@ -150,6 +152,11 @@ class test extends uvm_component;
       `uvm_error("NOT FOUND", "Not found in the resource database: bignum")
     else
       $display("bignum = %0d", bignum);        
+    
+    if(!uvm_resource_db#(int8_t)::read_by_name("CL::", "smallnum", smallnum, this))
+      `uvm_error("NOT FOUND", "Not found in the resource database: smallnum")
+    else
+      $display("smallnum = %0d", smallnum);        
     
     $display("--- End Command line options ---");
     

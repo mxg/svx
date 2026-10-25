@@ -131,43 +131,69 @@ class validate_int#(type T=int, type P=void_traits);
   
   static function bit validate(cl_opt_desc opt, cl_opt_instance inst);
 
+    const uint32_t W = $bits(T);
     type_container#(T) val = new();
     token_descriptor td = inst.td;
     T n;
     string msg;
+    bit [127:0]	mag, limit;    
 
+    // Is the argument an integer?
     if(inst.token != TOKEN_INT) begin
       $sformat(msg, "Invalid command line option value +%s. Expected %s integer",
-		opt.name, (P::is_signed) ? "a signed" : "an unsigned");
+	       opt.name,
+	       (P::is_signed) ? "a signed" : "an unsigned");
       `uvm_error("SVX/CL/PARSE", msg)
       return 0;
     end
-    if(td.size > $bits(T)) begin
-      $sformat(msg, "Invalid size of the value for command line option +%s. Value must be an integer less than %0d bits", opt.name, $bits(T));
+
+    // Does the argument fit into the data type?
+    if(td.size > W) begin
+      $sformat(msg,
+	       {"Invalid size of the value for command line option +%s. ",
+		"Value must be an integer less than %0d bits"},
+	       opt.name, $bits(T));
       `uvm_error("SVX/CL/PARSE", msg)
       return 0;
     end
 
     case(td.base)
-      "d": $sscanf(td.digits, "%d", n);
-      "b": $sscanf(td.digits, "%b", n);
-      "o": $sscanf(td.digits, "%o", n);
-      "h": $sscanf(td.digits, "%h", n);
+      "d", "D": $sscanf(td.digits, "%d", mag);
+      "b", "B": $sscanf(td.digits, "%b", mag);
+      "o", "O": $sscanf(td.digits, "%o", mag);
+      "h", "H": $sscanf(td.digits, "%h", mag);
       default:
 	begin
 	  $sformat(msg, "Value of option +%s has an invalid base %s", opt.name, td.base);
-	  `uvm_error("SVFX/XL/PARSE", msg)
+	  `uvm_error("SVX/CL/PARSE", msg)
 	  return 0;
 	end
     endcase
 
+    // Note: We only support a max of 64-bit arguments.  So 128 bits
+    // is large enough to see if the conversion fits.
+    if (P::is_signed == true)
+      limit = (128'(1) << (W-1)) - (td.sign == "-" ? 0 : 1);
+    else
+      limit = (128'(1) << W) - 1;
+    if (mag > limit) begin
+      string msg;
+      $sformat(msg, {"Argument for command line option +%s ",
+		     "does not fit into the data type for this option"}, 
+	       opt.name);
+      `uvm_error("SVX/CL/PARSE", msg)
+    end
+
     // Check the sign
     if(P::is_unsigned == true && td.sign == "-") begin
-      $sformat(msg, "Option %s is unsigned so it cannot have a negative value", opt.name);
+      $sformat(msg, {"Command line option +%s is unsigned ",
+		     "so it cannot have a negative value"}, 
+	       opt.name);
       `uvm_error("SVX/CL/PARSE", msg)
       return 0;
     end
-    
+
+    n = T'(mag);
     if(td.sign == "-")
       n = n * -1;    
     val.set(n);

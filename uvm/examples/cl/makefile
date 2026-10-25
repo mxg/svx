@@ -37,7 +37,7 @@ SV_SRC		+= top.sv test_pkg.sv
 
 UVM		= 1
 
-RUN_OPTS	= +name=freddy +offset=4 +freq=1.5e9 +x_mode +channels=8 +bias=-10 +base=32h7fff624c +file=\"a/b/c/d\" +data=64h6f7200137090bbc6 +bignum=-12000
+RUN_OPTS	= +name=freddy +offset=4 +freq=1.5e9 +x_mode +channels=8 +bias=-100 +base=32h7fff624c +file=\"a/b/c/d\" +data=64h6f7200137090bbc6 +bignum=-12000 +smallnum=200
 
 #RUN_OPTS	= +freq=1.5e6 +x_mode
 
