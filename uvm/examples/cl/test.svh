@@ -53,10 +53,11 @@ class test extends uvm_component;
     cl#(string)::add_with_default("name", "<none>");
     cl#(int32_t)::add_with_default("bias", 0);
     cl#(uint32_t)::add("base", "%8x");
-    cl#(string)::add("file");
     cl#(uint64_t)::add("data", "%16x");
     cl#(int64_t)::add("bignum");
     cl#(int8_t)::add("smallnum");
+    cl#(string)::add("file");
+    cl#(string)::set_filename("file");
 
     // Just hoots let's see what's in the option table.
     cl_mgr::dump();

@@ -169,7 +169,7 @@ class lexer_core;
     // Single quoted string
     if(c == "\'") begin
       for(c = getc(); c != "\'" && c != 0; c = getc());
-      return TOKEN_STRING;
+      return (c == 0) ? TOKEN_ERROR : TOKEN_STRING;
     end
 
     // if we have a digit or a plus or minus then the next token could
@@ -810,4 +810,67 @@ class lexer_core;
 
   endfunction
 
+  //--------------------------------------------------------------------
+  // lex_filename
+  //--------------------------------------------------------------------
+  function token_t lex_filename();
+
+    typedef enum {
+		  STATE_START,
+		  STATE_DOUBLE_QUOTE,
+		  STATE_SINGLE_QUOTE,
+		  STATE_NO_QUOTE
+		  } state_t;    
+
+    byte c;
+    state_t state = STATE_START;
+
+    // skip whitespace
+    for(c = getc(); `isspace(c) && c != 0; c = getc() );
+
+    mark_lexeme();
+    
+    forever begin
+
+      case(state)
+	STATE_START:
+	  begin
+	    case(c)
+	      "\"":    state = STATE_DOUBLE_QUOTE;
+	      "\'":    state = STATE_SINGLE_QUOTE;
+	      0:       return TOKEN_EOL;
+	      default: state = STATE_NO_QUOTE;
+	    endcase
+	  end
+
+	STATE_SINGLE_QUOTE:
+	  begin
+	    if(c == "\'")
+	      return TOKEN_STRING;
+	    if(c == 0)
+	      return TOKEN_ERROR;
+	  end
+
+	STATE_DOUBLE_QUOTE:
+	  begin
+	    if(c == "\"")
+	      return TOKEN_STRING;
+	    if(c == 0)
+	      return TOKEN_ERROR;
+	  end
+
+	STATE_NO_QUOTE:
+	  begin
+	    if(c == 0)
+	      return TOKEN_STRING;
+	  end
+
+      endcase
+
+      c = getc();
+
+    end
+
+  endfunction
+  
 endclass

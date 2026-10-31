@@ -35,6 +35,8 @@
 //----------------------------------------------------------------------
 class parse_opt extends accum_fcn#(string, opt_vector_t);
 
+  bit has_errors;
+
   //--------------------------------------------------------------------
   // f
   //
@@ -46,6 +48,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     token_descriptor td;
     string lexeme;
     cl_opt_instance opt_inst;
+    cl_opt_desc opt_desc;
     lexer_core lex = new();
 
     lex.start(opt);
@@ -59,6 +62,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     if(token != TOKEN_ID) begin
       string msg = {"Invalid command line option: ", opt};
       `uvm_error("SVX/CAL/PARSE", msg)
+      has_errors = 1;
       return;
     end
 
@@ -67,14 +71,19 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     if(lexeme.substr(0,3) == "UVM_" || lexeme.substr(0,3) == "uvm_")
       return;
 
+    // Skip unknown options
+    opt_desc = cl_mgr::find(lex.get_lexeme());
+    if(opt_desc == cl_opt_traits::empty) begin
+      string msg = {"Skipping unknown command line option: ", lex.get_lexeme()};
+      `uvm_info("SVX/CL/PARSE", msg, UVM_NONE)
+      return;
+    end
+
     // Create the option descriptor and begin populating it.  Add it
     // to the option list.
     opt_inst = new();
     opt_inst.name = lexeme;
     opt_list.appendc(opt_inst);
-
-    // The value of an option is separated from the name with an '='.
-    token = lex.get_token();
 
     // Get the value
 
@@ -82,24 +91,50 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     // then the option is a switch. Supplying the switch on the
     // command line without a value means the switch is being turned
     // on.
+    token = lex.get_token();
     if(token != TOKEN_EQUAL) begin
-      lex.put_token(lex.get_lexeme());
+      if(opt_desc.th != type_handle#(bit)::get()) begin
+	  string msg;
+	  $sformat(msg, "Missing value for command line option +%s", opt_inst.name);
+	  `uvm_error("SVX/CL/PARSE", msg)
+	  has_errors = 1;
+	  return;
+	end
+
+      // No value means the command line option is a switch.
       opt_inst.token = TOKEN_ON;
       opt_inst.lexeme = "ON";
+      return;
     end
-    else begin
-      // Option has the form +<name>=<value>
+
+    // Option has the form +<name>=<value>
+    // Get the value token after the equal sign
+    // Are we looking for a filename?
+    if(opt_desc.filename == true)
+      token = lex.lex_filename();
+    else
       token = lex.get_token();
-      if(token == TOKEN_EOL) begin
-	string msg;
-	$sformat(msg, "Missing value for command line option +%s", opt_inst.name);
-	`uvm_error("SVX/CL/PARSE", msg)
-      end
-      else begin
-	opt_inst.token = token;
-	opt_inst.lexeme = lex.get_lexeme();
-      end
+
+    if(token == TOKEN_ERROR) begin
+      string msg;
+      $sformat(msg, "Parsing error at command line option +%s", opt_inst.name);
+      `uvm_error("SVX/CL/PARSE", msg)
+      has_errors = 1;
+      return;
     end
+
+    if(token == TOKEN_EOL) begin
+      // Oops -- the value token is missing
+      string msg;
+      $sformat(msg, "Missing value for command line option +%s", opt_inst.name);
+      `uvm_error("SVX/CL/PARSE", msg)
+      has_errors = 1;
+      return;
+    end
+
+    // Collect up some information from the lexer
+    opt_inst.token = token;
+    opt_inst.lexeme = lex.get_lexeme();
     td = lex.get_token_descriptor();
     opt_inst.td = td;
 
@@ -110,9 +145,10 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
       $sformat(msg, "Extraneous characters after value for command line option +%s",
 	       opt_inst.name);
       `uvm_error("SX/CL/PARSE", msg)
+      has_errors = 1;
+      return;
     end
-    else
-      lex.put_token(lex.get_lexeme());
+    lex.put_token(lex.get_lexeme());
   endfunction
 
 endclass
@@ -120,7 +156,7 @@ endclass
 //----------------------------------------------------------------------
 // validate_int
 //
-// Validate integer types -- helper class for validate_opt.  Returns
+// Validate integer types -- helper class for validate_opt.  Returns 0
 // if the validation fails, 1 otherwise.
 //
 // For internal use. Not to be instantiated.
@@ -138,8 +174,8 @@ class validate_int#(type T=int, type P=void_traits);
 
     // Is the argument an integer?
     if(inst.token != TOKEN_INT) begin
-      $sformat(msg, "Invalid command line option value +%s. Expected %s integer",
-	       opt.name,
+      $sformat(msg, "Invalid command line option value for +%s = %s. Expected %s integer",
+	       opt.name, inst.lexeme,
 	       (P::is_signed) ? "a signed" : "an unsigned");
       `uvm_error("SVX/CL/PARSE", msg)
       return 0;
@@ -180,6 +216,7 @@ class validate_int#(type T=int, type P=void_traits);
 		     "does not fit into the data type for this option"}, 
 	       opt.name);
       `uvm_error("SVX/CL/PARSE", msg)
+      return 0;
     end
 
     // Check the sign
@@ -223,8 +260,8 @@ class validate_opt extends accum_fcn#(cl_opt_instance, uint32_t);
     cl_opt_desc opt = cl_mgr::find(t.name);
     // Is it a valid option?
     if(opt == cl_opt_traits::empty) begin
-      `uvm_error("SVX/CL/PARSE", {"Invalid command line option: ", t.name})
-      errs++;
+      `uvm_info("SVX/CL/PARSE",
+		{"skipping invalid command line option: ", t.name}, UVM_NONE)
       return;
     end
 
@@ -299,19 +336,34 @@ class validate_opt extends accum_fcn#(cl_opt_instance, uint32_t);
       
       type_handle#(real)::get():
 	begin
-	  if(t.token != TOKEN_FLOAT) begin
-	    errs++;
-	    $sformat(msg, "Command line option +%s must have a floating point value.", opt.name);
-	    `uvm_error("SVX/CL/PARSE", msg)
-	  end
-	  else begin
-	    type_container#(real) val = new();
-	    real f = td.digits.atoreal();
-	    if(td.sign == "-")
-	      f = f * -1.0;
-	    val.set(f);
-	    t.value = val;
-	  end
+	  case(t.token)
+	    TOKEN_FLOAT:
+	      begin
+		type_container#(real) val = new();
+		real f = td.digits.atoreal();
+		if(td.sign == "-")
+		  f = -f;
+		val.set(f);
+		t.value = val;
+	      end
+	    TOKEN_INT:
+	      begin
+		type_container#(real) val = new();
+		int64_t n;
+		$sscanf(td.digits, "%d", n); // assume decimal
+		if(td.sign == "-")
+		  n = -n;
+		val.set($itor(n));
+		t.value = val;
+	      end
+	    default:
+	      begin	      
+		errs++;
+		$sformat(msg, "Command line option +%s must have a floating point value.",
+			 opt.name);
+		`uvm_error("SVX/CL/PARSE", msg)
+	      end
+	  endcase
 	end
   
       type_handle#(bit)::get():
@@ -555,6 +607,12 @@ class cl_parse;
     opt_vec = new();   // Vector of parsed arguments
     accum#(string, string_traits, opt_vector_t)::accumulate(iter, parse, opt_vec);
 
+    if(parse.has_errors) begin
+      `uvm_error("SVX/CL/PARSE",
+		 "Errors in the command line prevent further processing of the options")
+      return;
+    end
+    
     //------------------------------------------------------------------
     // Second pass. Validate the options.
 
@@ -569,7 +627,7 @@ class cl_parse;
     // Third pass. Populate values into the resource database
 
     if(errs > 0) begin
-      `uvm_error("SVX/CL/PARSES",
+      `uvm_error("SVX/CL/PARSE",
 		 "Errors in the command line prevent further processing of the options")
       return;
     end

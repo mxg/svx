@@ -38,6 +38,7 @@ class cl_opt_desc;
   bit multiple;
   type_container_base default_value;
   string fmt;
+  bit filename;
 
   function void print();
     $write("%12s: %s (fmt=%s)", name, th.get_typename(), fmt);
@@ -158,7 +159,7 @@ class cl_mgr;
   // find
   //--------------------------------------------------------------------
   static function cl_opt_desc find(string name);
-    return (opt_map == null) ? null : opt_map.get(name);
+    return (opt_map == null) ? cl_opt_traits::empty : opt_map.get(name);
   endfunction
 
   //--------------------------------------------------------------------
@@ -167,8 +168,17 @@ class cl_mgr;
   // Dump the list of command line options
   //--------------------------------------------------------------------
   static function void dump();
-    map_iter_t iter = new(opt_map);
-    print_cl_opt print = new();
+    map_iter_t iter;
+    print_cl_opt print;
+    
+    if(opt_map == null) begin
+      `uvm_warning("SVX//PARSE", "Option map is empty");
+      return;
+    end
+    
+    iter = new(opt_map);
+    print = new();
+    
     $display("\n--- Command Line Option Table ---");
     algo#(cl_opt_desc, cl_opt_traits)::for_each(iter, print);
     $display("--- END Command Line Option Table ---");
@@ -239,7 +249,19 @@ class cl #(type T=int);
     uvm_resource_db#(T)::set("CL::*", name, def, null);
   endfunction
 
-endclass
+  //--------------------------------------------------------------------
+  // set_filename
+  //
+  // Turn on the filename flag to tell the lexer to look for a
+  // filename token.
+  //--------------------------------------------------------------------
+  static function void set_filename(string name);
+    cl_opt_desc opt;
 
-    
-    
+    opt = cl_mgr::find(name);
+    if(opt == cl_opt_traits::empty)
+      return;
+    opt.filename = 1;
+  endfunction
+
+endclass
