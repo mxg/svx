@@ -52,6 +52,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     cl_opt_instance opt_inst;
     cl_opt_desc opt_desc;
     lexer_core lex = new();
+    string msg;
 
     lex.start(opt);
     // Valid options start with '+'.
@@ -62,7 +63,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     // Get the option name
     token = lex.get_token();
     if(token != TOKEN_ID) begin
-      string msg = {"Invalid command line option: ", opt};
+      msg = {"Invalid command line option: ", opt};
       `uvm_error(MSG_LABEL, msg)
       has_errors = 1;
       return;
@@ -76,7 +77,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     // Skip unknown options
     opt_desc = cl_mgr::find(lex.get_lexeme());
     if(opt_desc == cl_opt_traits::empty) begin
-      string msg = {"Skipping unknown command line option: ", lex.get_lexeme()};
+      msg = {"Skipping unknown command line option: ", lex.get_lexeme()};
       `uvm_info("SVX/CL/PARSE", msg, UVM_NONE)
       return;
     end
@@ -96,19 +97,25 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     token = lex.get_token();
     if(token != TOKEN_EQUAL) begin
       if(opt_desc.th != type_handle#(bit)::get()) begin
-	  string msg;
 	  $sformat(msg, "Missing value for command line option +%s", opt_inst.name);
 	  `uvm_error(MSG_LABEL, msg)
 	  has_errors = 1;
 	  return;
-	end
+      end
+
+      // A switch must end right after its name.
+      if(token != TOKEN_EOL) begin
+	$sformat(msg, "Extraneous characters after command line option +%s", opt_inst.name);
+	`uvm_error(MSG_LABEL, msg)
+	has_errors = 1;
+	return;
+      end
 
       // No value means the command line option is a switch.
       opt_inst.token = TOKEN_ON;
       opt_inst.lexeme = "ON";
-
-      check_for_extra_chars(lex, opt_inst.name);
       return;
+      
     end
 
     // Option has the form +<name>=<value>
@@ -120,7 +127,6 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
       token = lex.get_token();
 
     if(token == TOKEN_ERROR) begin
-      string msg;
       $sformat(msg, "Parsing error at command line option +%s", opt_inst.name);
       `uvm_error(MSG_LABEL, msg)
       has_errors = 1;
@@ -129,7 +135,6 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
 
     if(token == TOKEN_EOL) begin
       // Oops -- the value token is missing
-      string msg;
       $sformat(msg, "Missing value for command line option +%s", opt_inst.name);
       `uvm_error(MSG_LABEL, msg)
       has_errors = 1;
@@ -185,7 +190,7 @@ class validate_int#(type T=int, type P=void_traits);
     T n;
     string msg;
     bit [127:0]	mag, limit;  
-    integer	err;  
+    integer n_chars;
 
     // Is the argument an integer?
     if(inst.token != TOKEN_INT) begin
@@ -206,12 +211,12 @@ class validate_int#(type T=int, type P=void_traits);
       return 0;
     end
 
-    err = 1;
+    n_chars = 1;
     case(td.base)
-      "d", "D": err = $sscanf(td.digits, "%d", mag);
-      "b", "B": err = $sscanf(td.digits, "%b", mag);
-      "o", "O": err = $sscanf(td.digits, "%o", mag);
-      "h", "H": err = $sscanf(td.digits, "%h", mag);
+      "d", "D": n_chars = $sscanf(td.digits, "%d", mag);
+      "b", "B": n_chars = $sscanf(td.digits, "%b", mag);
+      "o", "O": n_chars = $sscanf(td.digits, "%o", mag);
+      "h", "H": n_chars = $sscanf(td.digits, "%h", mag);
       default:
 	begin
 	  $sformat(msg, "Value of option +%s has an invalid base %s", opt.name, td.base);
@@ -220,7 +225,7 @@ class validate_int#(type T=int, type P=void_traits);
 	end
     endcase
 
-    if(err == 0) begin
+    if(n_chars == 0) begin
       $sformat(msg, "Invalid numerical argument for +%s = %s", 
 	       inst.name, inst.lexeme);
       `uvm_error(MSG_LABEL, msg)
@@ -417,10 +422,7 @@ class validate_opt extends accum_fcn#(cl_opt_instance, uint32_t);
 	      begin
 		type_container#(bit) bitval;
 		if(!validate_int#(bit, bit_traits)::validate(opt, t)) begin
-		  $sformat(msg, "Invalid numeric type for command line option +%s", 
-			   opt.name);
-		  `uvm_error(MSG_LABEL, msg)
-		  errs++;
+		  errs++; // Error has already been reported.
 		  return;
 		end
 		// This $cast should never fail, but we check just in

@@ -58,17 +58,14 @@ class test extends uvm_component;
     cl#(int8_t)::add("smallnum");
     cl#(string)::add("file");
 
-    // Just hoots let's see what's in the option table.
-    cl_mgr::dump();
-
     // parse the options.
     clp.parse();
 
     // Let's look at the resource database It should contain all the
     // parsed options plus all the defaults.
-    $display("\n--- Resource Database ---");
-    uvm_resource_db#(bit)::dump();
-    $display("--- END Resource Database ---");
+    // $display("\n--- Resource Database ---");
+    // uvm_resource_db#(bit)::dump();
+    // $display("--- END Resource Database ---");
 
     
   endfunction
