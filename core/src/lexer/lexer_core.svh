@@ -153,6 +153,10 @@ class lexer_core;
         "TRUE"  : return TOKEN_ON;
         "false" : return TOKEN_OFF;
         "FALSE" : return TOKEN_OFF;
+	"yes"   : return TOKEN_ON;
+	"YES"   : return TOKEN_ON;
+	"no"    : return TOKEN_OFF;
+	"NO"    : return TOKEN_OFF;
         default : return TOKEN_ID;
       endcase
       // We should not reach this point
