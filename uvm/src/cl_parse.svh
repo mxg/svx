@@ -26,8 +26,6 @@
 // permissions and limitations under the License.
 //======================================================================
 
-const string MSG_LABEL = "SVX/CL/PARSE";
-
 //----------------------------------------------------------------------
 // parse_opt
 //
@@ -64,7 +62,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     token = lex.get_token();
     if(token != TOKEN_ID) begin
       msg = {"Invalid command line option: ", opt};
-      `uvm_error(MSG_LABEL, msg)
+      `uvm_error(SVX_CL_MSG_ID, msg)
       has_errors = 1;
       return;
     end
@@ -98,7 +96,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     if(token != TOKEN_EQUAL) begin
       if(opt_desc.th != type_handle#(bit)::get()) begin
 	  $sformat(msg, "Missing value for command line option +%s", opt_inst.name);
-	  `uvm_error(MSG_LABEL, msg)
+	  `uvm_error(SVX_CL_MSG_ID, msg)
 	  has_errors = 1;
 	  return;
       end
@@ -106,7 +104,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
       // A switch must end right after its name.
       if(token != TOKEN_EOL) begin
 	$sformat(msg, "Extraneous characters after command line option +%s", opt_inst.name);
-	`uvm_error(MSG_LABEL, msg)
+	`uvm_error(SVX_CL_MSG_ID, msg)
 	has_errors = 1;
 	return;
       end
@@ -128,7 +126,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
 
     if(token == TOKEN_ERROR) begin
       $sformat(msg, "Parsing error at command line option +%s", opt_inst.name);
-      `uvm_error(MSG_LABEL, msg)
+      `uvm_error(SVX_CL_MSG_ID, msg)
       has_errors = 1;
       return;
     end
@@ -136,7 +134,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     if(token == TOKEN_EOL) begin
       // Oops -- the value token is missing
       $sformat(msg, "Missing value for command line option +%s", opt_inst.name);
-      `uvm_error(MSG_LABEL, msg)
+      `uvm_error(SVX_CL_MSG_ID, msg)
       has_errors = 1;
       return;
     end
@@ -166,7 +164,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     
     $sformat(msg, "Extraneous characters after value for command line option +%s",
 	     name);
-    `uvm_error(MSG_LABEL, msg)
+    `uvm_error(SVX_CL_MSG_ID, msg)
     has_errors = 1;
   endfunction
 
@@ -189,15 +187,18 @@ class validate_int#(type T=int, type P=void_traits);
     token_descriptor td = inst.td;
     T n;
     string msg;
-    bit [127:0]	mag, limit;  
+    int128_t mag;
+    int128_t limit;  
     integer n_chars;
+    int32_t len;
+    bit too_long;
 
     // Is the argument an integer?
     if(inst.token != TOKEN_INT) begin
-      $sformat(msg, "Invalid command line option value for +%s = %s. Expected %s integer",
+      $sformat(msg, "Invalid command line option value for +%s = %s. Expected %s integer.",
 	       opt.name, inst.lexeme,
 	       (P::is_signed) ? "a signed" : "an unsigned");
-      `uvm_error(MSG_LABEL, msg)
+      `uvm_error(SVX_CL_MSG_ID, msg)
       return 0;
     end
 
@@ -205,12 +206,38 @@ class validate_int#(type T=int, type P=void_traits);
     if(td.size > W) begin
       $sformat(msg,
 	       {"Invalid size of the value for command line option +%s. ",
-		"Value must be an integer whose size is no more than %0d bits"},
+		"Value must be an integer whose size is no more than %0d bits."},
 	       opt.name, $bits(T));
-      `uvm_error(MSG_LABEL, msg)
+      `uvm_error(SVX_CL_MSG_ID, msg)
       return 0;
     end
 
+    // Did the user supply too many digits?
+    len = td.digits.len();
+    case(td.base)
+      "d", "D": too_long = (len > 20);
+      "b", "B": too_long = (len > 64);
+      "o", "O": too_long = (len > 22);
+      "h", "H": too_long = (len > 16);
+      default:  too_long = (len > 20);
+    endcase
+    if(too_long) begin
+      $sformat(msg, {"Too many digits for option +%s. ",
+		     "Integers can be a maximum of 64 bits."},
+	       opt.name);
+      `uvm_error(SVX_CL_MSG_ID, msg);
+      return 0;
+    end
+
+    // Does the value doesn't fit in its stated size?
+    if(td.size > 0 && (mag >> td.size) != 0)  begin
+      $sformat(msg, "The value for +%s doesn't fit into %0d bits.",
+	       opt.name, td.size);
+      `uvm_error(SVX_CL_MSG_ID, msg);
+      return 0;
+    end
+
+    // Convert digit string to an internal representation.
     n_chars = 1;
     case(td.base)
       "d", "D": n_chars = $sscanf(td.digits, "%d", mag);
@@ -219,30 +246,30 @@ class validate_int#(type T=int, type P=void_traits);
       "h", "H": n_chars = $sscanf(td.digits, "%h", mag);
       default:
 	begin
-	  $sformat(msg, "Value of option +%s has an invalid base %s", opt.name, td.base);
-	  `uvm_error(MSG_LABEL, msg)
+	  $sformat(msg, "Value of option +%s has an invalid base %s.", opt.name, td.base);
+	  `uvm_error(SVX_CL_MSG_ID, msg)
 	  return 0;
 	end
     endcase
 
     if(n_chars == 0) begin
-      $sformat(msg, "Invalid numerical argument for +%s = %s", 
+      $sformat(msg, "Invalid numerical argument for +%s = %s.", 
 	       inst.name, inst.lexeme);
-      `uvm_error(MSG_LABEL, msg)
+      `uvm_error(SVX_CL_MSG_ID, msg)
       return 0;
     end
 
     // Note: We only support a max of 64-bit arguments.  So 128 bits
     // is large enough to see if the conversion fits.
-    if (P::is_signed == true)
+    if (P::is_signed)
       limit = (128'(1) << (W-1)) - (td.sign == "-" ? 0 : 1);
     else
       limit = (128'(1) << W) - 1;
     if (mag > limit) begin
       $sformat(msg, {"Argument for command line option +%s ",
-		     "does not fit into the data type for this option"}, 
+		     "does not fit into the data type for this option."}, 
 	       opt.name);
-      `uvm_error(MSG_LABEL, msg)
+      `uvm_error(SVX_CL_MSG_ID, msg)
       return 0;
     end
 
@@ -251,7 +278,7 @@ class validate_int#(type T=int, type P=void_traits);
       $sformat(msg, {"Command line option +%s is unsigned ",
 		     "so it cannot have a negative value"}, 
 	       opt.name);
-      `uvm_error(MSG_LABEL, msg)
+      `uvm_error(SVX_CL_MSG_ID, msg)
       return 0;
     end
 
@@ -382,17 +409,17 @@ class validate_opt extends accum_fcn#(cl_opt_instance, uint32_t);
 		int64_t n;
 		// Validate the integer value
 		if(!validate_int#(int64_t, int64_traits)::validate(opt, t)) begin
-		  $sformat(msg, "Invalid numeric type for command line option +%s", 
+		  $sformat(msg, "Invalid numeric type for command line option +%s.", 
 			   opt.name);
-		  `uvm_error(MSG_LABEL, msg)
+		  `uvm_error(SVX_CL_MSG_ID, msg)
 		  errs++;
 		  return;
 		end
 		// This $cast should never fail, but we check just in
 		// case.
 		 if(!$cast(intval, t.value)) begin
-		   $sformat(msg, "Numeric conversion error for option +%s", opt.name);
-		  `uvm_error(MSG_LABEL, msg)
+		   $sformat(msg, "Numeric conversion error for option +%s.", opt.name);
+		  `uvm_error(SVX_CL_MSG_ID, msg)
 		   errs++;
 		   return;
 		 end
@@ -405,7 +432,7 @@ class validate_opt extends accum_fcn#(cl_opt_instance, uint32_t);
 		errs++;
 		$sformat(msg, "Command line option +%s must have a floating point value.",
 			 opt.name);
-		`uvm_error(MSG_LABEL, msg)
+		`uvm_error(SVX_CL_MSG_ID, msg)
 	      end
 	  endcase
 	end
@@ -428,8 +455,8 @@ class validate_opt extends accum_fcn#(cl_opt_instance, uint32_t);
 		// This $cast should never fail, but we check just in
 		// case.
 		if(!$cast(bitval, t.value)) begin
-		  $sformat(msg, "Numeric conversion error for option +%s", opt.name);
-		  `uvm_error(MSG_LABEL, msg)
+		  $sformat(msg, "Numeric conversion error for option +%s.", opt.name);
+		  `uvm_error(SVX_CL_MSG_ID, msg)
 		  errs++;
 		  return;
 		end
@@ -440,7 +467,7 @@ class validate_opt extends accum_fcn#(cl_opt_instance, uint32_t);
 		errs++;
 		$sformat(msg, "Command line option +%s must have an ON/OFF value.",
 			 opt.name);
-		`uvm_error(MSG_LABEL, msg)
+		`uvm_error(SVX_CL_MSG_ID, msg)
 		return;
 	      end
 	  endcase
@@ -453,7 +480,7 @@ class validate_opt extends accum_fcn#(cl_opt_instance, uint32_t);
 	  if(t.token != TOKEN_STRING && t.token != TOKEN_ID) begin
 	    errs++;
 	    $sformat(msg, "Command line option +%s must have a string value.", opt.name);
-	    `uvm_error(MSG_LABEL, msg)
+	    `uvm_error(SVX_CL_MSG_ID, msg)
 	  end
 	  else begin
 	    type_container#(string) val = new();
@@ -489,7 +516,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(bit) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error(MSG_LABEL,
+	    `uvm_error(SVX_CL_MSG_ID,
 		       {"Cannot cast command line option to bit for ", t.name})
 	  uvm_resource_db#(bit)::set_override("CL::*", t.name, value.get());
 	end
@@ -499,7 +526,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(string) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error(MSG_LABEL,
+	    `uvm_error(SVX_CL_MSG_ID,
 		       {"Cannot cast command line option to string for ", t.name})
 	  uvm_resource_db#(string)::set_override("CL::*", t.name, value.get());
 	end
@@ -509,7 +536,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(int8_t) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error(MSG_LABEL,
+	    `uvm_error(SVX_CL_MSG_ID,
 		       {"Cannot cast command line option to int8_t for ", t.name})
 	  uvm_resource_db#(int8_t)::set_override("CL::*", t.name, value.get());
 	end
@@ -519,7 +546,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(int16_t) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error(MSG_LABEL,
+	    `uvm_error(SVX_CL_MSG_ID,
 		       {"Cannot cast command line option to int16_t for ", t.name})
 	  uvm_resource_db#(int16_t)::set_override("CL::*", t.name, value.get());
 	end
@@ -529,7 +556,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(int32_t) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error(MSG_LABEL,
+	    `uvm_error(SVX_CL_MSG_ID,
 		       {"Cannot cast command line option to int32_t for ", t.name})
 	  uvm_resource_db#(int32_t)::set_override("CL::*", t.name, value.get());
 	end
@@ -539,7 +566,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(int64_t) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error(MSG_LABEL,
+	    `uvm_error(SVX_CL_MSG_ID,
 		       {"Cannot cast command line option to int64_t for ", t.name})
 	  uvm_resource_db#(int64_t)::set_override("CL::*", t.name, value.get());
 	end
@@ -549,7 +576,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(uint8_t) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error(MSG_LABEL, 
+	    `uvm_error(SVX_CL_MSG_ID, 
 		       {"Cannot cast command line option to uint8_t for ", t.name})
 	  uvm_resource_db#(uint8_t)::set_override("CL::*", t.name, value.get());
 	end
@@ -559,7 +586,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(uint16_t) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error(MSG_LABEL,
+	    `uvm_error(SVX_CL_MSG_ID,
 		       {"Cannot cast command line option to uint16_t for ", t.name})
 	  uvm_resource_db#(uint16_t)::set_override("CL::*", t.name, value.get());
 	end
@@ -569,7 +596,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(uint32_t) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error(MSG_LABEL,
+	    `uvm_error(SVX_CL_MSG_ID,
 		       {"Cannot cast command line option to uint32_t for ", t.name})
 	  uvm_resource_db#(uint32_t)::set_override("CL::*", t.name, value.get());
 	end
@@ -579,7 +606,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(uint64_t) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error(MSG_LABEL,
+	    `uvm_error(SVX_CL_MSG_ID,
 		       {"Cannot cast command line option to uint64_t for ", t.name})
 	  uvm_resource_db#(uint64_t)::set_override("CL::*", t.name, value.get());
 	end
@@ -589,13 +616,13 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	begin
 	  type_container#(real) value;
 	  if(!$cast(value, t.value))
-	    `uvm_error(MSG_LABEL,
+	    `uvm_error(SVX_CL_MSG_ID,
 		       {"Cannot cast command line option to real for ", t.name})
 	  uvm_resource_db#(real)::set_override("CL::*", t.name, value.get());
 	end
 
       default:
-	`uvm_error(MSG_LABEL, "Unsupported type: cannot convert command line option value")
+	`uvm_error(SVX_CL_MSG_ID, "Unsupported type: cannot convert command line option value.")
     endcase
     
   endfunction
@@ -666,8 +693,8 @@ class cl_parse;
     accum#(string, string_traits, opt_vector_t)::accumulate(iter, parse, opt_vec);
 
     if(parse.has_errors) begin
-      `uvm_error(MSG_LABEL,
-		 "Errors in the command line prevent further processing of the options")
+      `uvm_error(SVX_CL_MSG_ID,
+		 "Errors in the command line prevent further processing of the options.")
       return;
     end
     
@@ -685,8 +712,8 @@ class cl_parse;
     // Third pass. Populate values into the resource database
 
     if(errs > 0) begin
-      `uvm_error(MSG_LABEL,
-		 "Errors in the command line prevent further processing of the options")
+      `uvm_error(SVX_CL_MSG_ID,
+		 "Errors in the command line prevent further processing of the options.")
       return;
     end
 

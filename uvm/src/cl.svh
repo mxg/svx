@@ -26,6 +26,8 @@
 // permissions and limitations under the License.
 //======================================================================
 
+localparam string SVX_CL_MSG_ID= "SVX/CL/PARSE";
+
 //----------------------------------------------------------------------
 // cl_opt_desc
 //
@@ -208,7 +210,7 @@ class cl #(type T=int);
       string msg;
       $sformat(msg, "Unsupported command line option data type: %s",
 	       opt.th.get_typename());
-      `uvm_error("CL_INVALID_TYPE", msg);
+      `uvm_error(SVX_CL_MSG_ID, msg);
       return;
     end
 
@@ -234,7 +236,7 @@ class cl #(type T=int);
       string msg;
       $sformat(msg, "Unsupported command line option data type: %s",
 	       opt.th.get_typename());
-      `uvm_error("CL_INVALID_TYPE", msg);
+      `uvm_error(SVX_CL_MSG_ID, msg);
       return;
     end
     
