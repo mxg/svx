@@ -41,7 +41,7 @@ typedef int                  int32_t;
 typedef int unsigned         uint32_t;
 typedef longint              int64_t;
 typedef longint unsigned     uint64_t;
-typedef bit [127:0]          int128_t;
+typedef bit signed [127:0]   int128_t;
 typedef bit unsigned [127:0] uint128_t;
 
 // Represents sizes of various things.

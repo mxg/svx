@@ -187,8 +187,8 @@ class validate_int#(type T=int, type P=void_traits);
     token_descriptor td = inst.td;
     T n;
     string msg;
-    int128_t mag;
-    int128_t limit;  
+    uint128_t mag;
+    uint128_t limit;  
     integer n_chars;
     int32_t len;
     bit too_long;
@@ -213,7 +213,11 @@ class validate_int#(type T=int, type P=void_traits);
     end
 
     // Did the user supply too many digits?
-    len = td.digits.len();
+    // Count the digits without the underscores. Skip leading 0s.
+    len = 0;
+    foreach (td.digits[i])
+      if(td.digits[i] != "_" && (len > 0 || td.digits[i] != "0"))
+	len++;
     case(td.base)
       "d", "D": too_long = (len > 20);
       "b", "B": too_long = (len > 64);
@@ -225,15 +229,7 @@ class validate_int#(type T=int, type P=void_traits);
       $sformat(msg, {"Too many digits for option +%s. ",
 		     "Integers can be a maximum of 64 bits."},
 	       opt.name);
-      `uvm_error(SVX_CL_MSG_ID, msg);
-      return 0;
-    end
-
-    // Does the value doesn't fit in its stated size?
-    if(td.size > 0 && (mag >> td.size) != 0)  begin
-      $sformat(msg, "The value for +%s doesn't fit into %0d bits.",
-	       opt.name, td.size);
-      `uvm_error(SVX_CL_MSG_ID, msg);
+      `uvm_error(SVX_CL_MSG_ID, msg)
       return 0;
     end
 
@@ -255,6 +251,14 @@ class validate_int#(type T=int, type P=void_traits);
     if(n_chars == 0) begin
       $sformat(msg, "Invalid numerical argument for +%s = %s.", 
 	       inst.name, inst.lexeme);
+      `uvm_error(SVX_CL_MSG_ID, msg)
+      return 0;
+    end
+
+    // Does the value doesn't fit in its stated size?
+    if(td.size > 0 && (mag >> td.size) != 0)  begin
+      $sformat(msg, "The value for +%s doesn't fit into %0d bits.",
+	       opt.name, td.size);
       `uvm_error(SVX_CL_MSG_ID, msg)
       return 0;
     end
