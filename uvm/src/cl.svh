@@ -38,7 +38,6 @@ class cl_opt_desc;
   bit multiple;
   type_container_base default_value;
   string fmt;
-  bit filename;
 
   function void print();
     $write("%12s: %s (fmt=%s)", name, th.get_typename(), fmt);
@@ -247,21 +246,6 @@ class cl #(type T=int);
 
     // Put the default value into the resource database
     uvm_resource_db#(T)::set("CL::*", name, def, null);
-  endfunction
-
-  //--------------------------------------------------------------------
-  // set_filename
-  //
-  // Turn on the filename flag to tell the lexer to look for a
-  // filename token.
-  //--------------------------------------------------------------------
-  static function void set_filename(string name);
-    cl_opt_desc opt;
-
-    opt = cl_mgr::find(name);
-    if(opt == cl_opt_traits::empty)
-      return;
-    opt.filename = 1;
   endfunction
 
 endclass

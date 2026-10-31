@@ -61,7 +61,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     token = lex.get_token();
     if(token != TOKEN_ID) begin
       string msg = {"Invalid command line option: ", opt};
-      `uvm_error("SVX/CAL/PARSE", msg)
+      `uvm_error("SVX/CL/PARSE", msg)
       has_errors = 1;
       return;
     end
@@ -104,13 +104,15 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
       // No value means the command line option is a switch.
       opt_inst.token = TOKEN_ON;
       opt_inst.lexeme = "ON";
+
+      check_for_extra_chars(lex, opt_inst.name);
       return;
     end
 
     // Option has the form +<name>=<value>
     // Get the value token after the equal sign
     // Are we looking for a filename?
-    if(opt_desc.filename == true)
+    if(opt_desc.th == type_handle#(string)::get())
       token = lex.lex_filename();
     else
       token = lex.get_token();
@@ -138,17 +140,27 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     td = lex.get_token_descriptor();
     opt_inst.td = td;
 
-    // Check for extraneous characters
+    check_for_extra_chars(lex, opt_inst.name);
+  endfunction
+
+  //--------------------------------------------------------------------
+  // check_for_exrtra_chars
+  //
+  // Like the name says...
+  //--------------------------------------------------------------------  
+  function void check_for_extra_chars(lexer_core lex, string name);
+
+    token_t token;
+    string msg;
+
     token = lex.get_token();
-    if(token != TOKEN_EOL) begin
-      string msg;
-      $sformat(msg, "Extraneous characters after value for command line option +%s",
-	       opt_inst.name);
-      `uvm_error("SX/CL/PARSE", msg)
-      has_errors = 1;
+    if(token == TOKEN_EOL)
       return;
-    end
-    lex.put_token(lex.get_lexeme());
+    
+    $sformat(msg, "Extraneous characters after value for command line option +%s",
+	     name);
+    `uvm_error("SVX/CL/PARSE", msg)
+    has_errors = 1;
   endfunction
 
 endclass
@@ -170,7 +182,8 @@ class validate_int#(type T=int, type P=void_traits);
     token_descriptor td = inst.td;
     T n;
     string msg;
-    bit [127:0]	mag, limit;    
+    bit [127:0]	mag, limit;  
+    integer	err;  
 
     // Is the argument an integer?
     if(inst.token != TOKEN_INT) begin
@@ -191,11 +204,12 @@ class validate_int#(type T=int, type P=void_traits);
       return 0;
     end
 
+    err = 1;
     case(td.base)
-      "d", "D": $sscanf(td.digits, "%d", mag);
-      "b", "B": $sscanf(td.digits, "%b", mag);
-      "o", "O": $sscanf(td.digits, "%o", mag);
-      "h", "H": $sscanf(td.digits, "%h", mag);
+      "d", "D": err = $sscanf(td.digits, "%d", mag);
+      "b", "B": err = $sscanf(td.digits, "%b", mag);
+      "o", "O": err = $sscanf(td.digits, "%o", mag);
+      "h", "H": err = $sscanf(td.digits, "%h", mag);
       default:
 	begin
 	  $sformat(msg, "Value of option +%s has an invalid base %s", opt.name, td.base);
@@ -204,6 +218,13 @@ class validate_int#(type T=int, type P=void_traits);
 	end
     endcase
 
+    if(err == 0) begin
+      $sformat(msg, "Invalid numerical argument for +%s = %s", 
+	       inst.name, inst.lexeme);
+      `uvm_error("SVX/CL/PARSE", msg)
+      return 0;
+    end
+
     // Note: We only support a max of 64-bit arguments.  So 128 bits
     // is large enough to see if the conversion fits.
     if (P::is_signed == true)
@@ -211,7 +232,6 @@ class validate_int#(type T=int, type P=void_traits);
     else
       limit = (128'(1) << W) - 1;
     if (mag > limit) begin
-      string msg;
       $sformat(msg, {"Argument for command line option +%s ",
 		     "does not fit into the data type for this option"}, 
 	       opt.name);
@@ -371,7 +391,7 @@ class validate_opt extends accum_fcn#(cl_opt_instance, uint32_t);
 	  bit b;
 	  type_container#(bit) val = new();
 
-	  if(t.token == TOKEN_ON || t.lexeme == null ||
+	  if(t.token == TOKEN_ON ||
 	     (t.token == TOKEN_INT && (t.lexeme.atoi() == 1)))
 	    b = 1;
 	  else
@@ -394,7 +414,7 @@ class validate_opt extends accum_fcn#(cl_opt_instance, uint32_t);
 	  if(t.token != TOKEN_STRING && t.token != TOKEN_ID) begin
 	    errs++;
 	    $sformat(msg, "Command line option +%s must have a string value.", opt.name);
-	    `uvm_error("SVX/CXL/PARSE", msg)
+	    `uvm_error("SVX/CL/PARSE", msg)
 	  end
 	  else begin
 	    type_container#(string) val = new();
@@ -539,8 +559,7 @@ class populate_resource_db extends fcn#(cl_opt_instance);
 	`uvm_error("SVX/CL/PARSE", "Unsupported type: cannot convert command line option value")
     endcase
     
-      
-    endfunction
+  endfunction
 /* verilator lint_on SIDEEFFECT */
 
 endclass

@@ -57,7 +57,6 @@ class test extends uvm_component;
     cl#(int64_t)::add("bignum");
     cl#(int8_t)::add("smallnum");
     cl#(string)::add("file");
-    cl#(string)::set_filename("file");
 
     // Just hoots let's see what's in the option table.
     cl_mgr::dump();

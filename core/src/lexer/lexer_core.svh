@@ -153,7 +153,6 @@ class lexer_core;
         "TRUE"  : return TOKEN_ON;
         "false" : return TOKEN_OFF;
         "FALSE" : return TOKEN_OFF;
-	""      : return TOKEN_EOL;
         default : return TOKEN_ID;
       endcase
       // We should not reach this point
@@ -872,5 +871,5 @@ class lexer_core;
     end
 
   endfunction
-  
+
 endclass
