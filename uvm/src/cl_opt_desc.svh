@@ -88,7 +88,7 @@ endclass
 //----------------------------------------------------------------------
 // cl_opt_desc
 //----------------------------------------------------------------------
-class cl_opt_desc#(type T=int) extends cl_opt_desc_base;
+virtual class cl_opt_desc#(type T=int) extends cl_opt_desc_base;
 
   type_container#(T) default_value;
 
@@ -98,6 +98,7 @@ class cl_opt_desc#(type T=int) extends cl_opt_desc_base;
 
   virtual function cl_opt_instance_base create_instance(string name);
     cl_opt_instance#(T) opt_inst = new(name);
+    opt_inst.opt_desc = this;
     return opt_inst;
   endfunction
 
@@ -109,10 +110,6 @@ class cl_opt_desc#(type T=int) extends cl_opt_desc_base;
     type_container#(T) v;
     if ($cast(v, inst.get_value()))
       uvm_resource_db#(T)::set_override("CL::*", inst.get_name(), v.get());
-  endfunction
-
-  virtual function void set_default(T d);
-    uvm_resource_db#(T)::set_override("CL::*", name, d);
   endfunction
 
   virtual function type_container_base get_default_value();
@@ -141,32 +138,21 @@ endclass
 //----------------------------------------------------------------------
 class validate_int#(type T=int, type P=void_traits);
   
-  static function bit validate(cl_opt_desc_base opt, cl_opt_instance_base inst);
+  static function bit validate(cl_opt_instance_base inst, output T n);
 
     const uint32_t W = $bits(T);
-    type_container#(T) val = new();
-    cl_opt_instance#(T) opt_inst;
     token_descriptor td = inst.td;
-    T n;
     string msg;
     uint128_t mag;
     uint128_t limit;  
     integer n_chars;
     int32_t len;
     bit too_long;
-
-    if(!$cast(opt_inst, inst)) begin
-      $sformat(msg, "Cannot convert command line option +%s to %s", 
-	       inst.get_name(),
-	       $typename(T));
-      `uvm_error(SVX_CL_MSG_ID, msg)
-      return 0;
-    end
-
+ 
     // Is the argument an integer?
     if(inst.token != TOKEN_INT) begin
       $sformat(msg, "Invalid command line option value for +%s = %s. Expected %s integer.",
-               opt.get_name(), inst.lexeme,
+               inst.get_name(), inst.lexeme,
                (P::is_signed) ? "a signed" : "an unsigned");
       `uvm_error(SVX_CL_MSG_ID, msg)
       return 0;
@@ -177,7 +163,7 @@ class validate_int#(type T=int, type P=void_traits);
       $sformat(msg,
                {"Invalid size of the value for command line option +%s. ",
                 "Value must be an integer whose size is no more than %0d bits."},
-               opt.get_name(), $bits(T));
+               inst.get_name(), $bits(T));
       `uvm_error(SVX_CL_MSG_ID, msg)
       return 0;
     end
@@ -198,7 +184,7 @@ class validate_int#(type T=int, type P=void_traits);
     if(too_long) begin
       $sformat(msg, {"Too many digits for option +%s. ",
                      "Integers can be a maximum of 64 bits."},
-               opt.get_name());
+               inst.get_name());
       `uvm_error(SVX_CL_MSG_ID, msg)
       return 0;
     end
@@ -212,7 +198,8 @@ class validate_int#(type T=int, type P=void_traits);
       "h", "H": n_chars = $sscanf(td.digits, "%h", mag);
       default:
         begin
-          $sformat(msg, "Value of option +%s has an invalid base %s.", opt.get_name(), td.base);
+          $sformat(msg, "Value of option +%s has an invalid base %s.", 
+		   inst.get_name(), td.base);
           `uvm_error(SVX_CL_MSG_ID, msg)
           return 0;
         end
@@ -228,7 +215,7 @@ class validate_int#(type T=int, type P=void_traits);
     // Does the value doesn't fit in its stated size?
     if(td.size > 0 && (mag >> td.size) != 0)  begin
       $sformat(msg, "The value for +%s doesn't fit into %0d bits.",
-               opt.get_name(), td.size);
+               inst.get_name(), td.size);
       `uvm_error(SVX_CL_MSG_ID, msg)
       return 0;
     end
@@ -242,16 +229,16 @@ class validate_int#(type T=int, type P=void_traits);
     if (mag > limit) begin
       $sformat(msg, {"Argument for command line option +%s ",
                      "does not fit into the data type for this option."}, 
-               opt.get_name());
+               inst.get_name());
       `uvm_error(SVX_CL_MSG_ID, msg)
       return 0;
     end
 
     // Check the sign
-    if(P::is_unsigned == true && td.sign == "-") begin
+    if(P::is_unsigned && td.sign == "-") begin
       $sformat(msg, {"Command line option +%s is unsigned ",
                      "so it cannot have a negative value"}, 
-               opt.get_name());
+               inst.get_name());
       `uvm_error(SVX_CL_MSG_ID, msg)
       return 0;
     end
@@ -259,9 +246,7 @@ class validate_int#(type T=int, type P=void_traits);
     n = T'(mag);
     if(td.sign == "-")
       n = -n;
-    val.set(n);
-    opt_inst.value = val;
-
+    // n is the final value returned through the output arg.
     return 1;
   endfunction
 
@@ -272,26 +257,39 @@ endclass
 //
 // For all integer types.
 //----------------------------------------------------------------------
-class cl_opt_int_desc#(type T=int) extends cl_opt_desc#(T);
+class cl_opt_int_desc#(type T=int, type P=void_traits) extends cl_opt_desc#(T);
   
   function new(string _name);
     super.new(_name);
     fmt = "%0d";
   endfunction
 
-  virtual function cl_opt_instance_base create_instance(string name);
-    cl_opt_instance#(T) opt_inst = new(name);
-    return opt_inst;
-  endfunction
-
   virtual function bit validate_and_convert(cl_opt_instance_base inst);
-    return validate_int#(T)::validate(this, inst);
-  endfunction
-
-  virtual function void set_default(T d);
-    default_value = new();
-    default_value.set(d);
-    uvm_resource_db#(T)::set("CL::*", name, d);
+    T n;
+    cl_opt_instance#(T) opt_inst;
+    type_container#(T) val;
+    string msg;
+    
+    if(!$cast(opt_inst, inst)) begin
+      $sformat(msg, "Cannot convert command line option +%s to %s", 
+	       inst.get_name(),
+	       $typename(T));
+      `uvm_error(SVX_CL_MSG_ID, msg)
+      return 0;
+    end
+    
+    if(!validate_int#(T,P)::validate(inst, n)) begin
+      $sformat(msg, "Invalid numeric type for command line option +%s.", 
+               name);
+      `uvm_error(SVX_CL_MSG_ID, msg)
+      return 0;
+    end
+    
+    val = new();
+    val.set(n);
+    opt_inst.value = val;
+    return 1;
+    
   endfunction
 
 endclass
@@ -304,11 +302,6 @@ class cl_opt_real_desc extends cl_opt_desc#(real);
   function new(string _name);
     super.new(_name);
     fmt = "%g";
-  endfunction
-
-  virtual function cl_opt_instance_base create_instance(string name);
-    cl_opt_instance#(real) opt_inst = new(name);
-    return opt_inst;
   endfunction
 
   virtual function bit validate_and_convert(cl_opt_instance_base inst);
@@ -340,24 +333,16 @@ class cl_opt_real_desc extends cl_opt_desc#(real);
         // and then convert that to a real.
         begin
           int64_t n;
-          type_container#(int64_t) intval;
-          realval = new();
           // Validate the integer value
-          if(!validate_int#(int64_t, int64_traits)::validate(this, inst)) begin
+          if(!validate_int#(int64_t, int64_traits)::validate(inst, n)) begin
             $sformat(msg, "Invalid numeric type for command line option +%s.", 
                      name);
             `uvm_error(SVX_CL_MSG_ID, msg)
             return 0;
           end
-          // This $cast should never fail, but we check just in
-          // case.
-          if(!$cast(intval, inst.get_value())) begin
-            $sformat(msg, "Numeric conversion error for option +%s.", name);
-            `uvm_error(SVX_CL_MSG_ID, msg)
-            return 0;
-          end
           // Convert 64-bit integer to real
-          realval.set($itor(intval.get()));
+          realval = new();
+          realval.set($itor(n));
           opt_inst.value = realval;
 	  return 1;
         end
@@ -375,10 +360,6 @@ class cl_opt_real_desc extends cl_opt_desc#(real);
     
   endfunction
 
-  virtual function void set_default(real d);
-    uvm_resource_db#(real)::set("CL::*", name, d);
-  endfunction
-  
 endclass
 
 //----------------------------------------------------------------------
@@ -391,11 +372,6 @@ class cl_opt_string_desc extends cl_opt_desc#(string);
     fmt = "%s";
   endfunction
 
-  virtual function cl_opt_instance_base create_instance(string name);
-    cl_opt_instance#(string) opt_inst = new(name);
-    return opt_inst;
-  endfunction
-
   virtual function bit validate_and_convert(cl_opt_instance_base inst);
     
     type_container#(string) stringval = new();
@@ -403,7 +379,7 @@ class cl_opt_string_desc extends cl_opt_desc#(string);
     string msg;
 
     if(!$cast(opt_inst, inst)) begin
-      $sformat(msg, "Cannot convert command line option +%s to real", inst.get_name());
+      $sformat(msg, "Cannot convert command line option +%s to string", inst.get_name());
       `uvm_error(SVX_CL_MSG_ID, msg)
       return 0;
     end
@@ -419,9 +395,6 @@ class cl_opt_string_desc extends cl_opt_desc#(string);
     return 1;
   endfunction
 
-  virtual function void set_default(string d);
-    uvm_resource_db#(string)::set("CL::*", name, d);
-  endfunction
 endclass  
 
 //----------------------------------------------------------------------
@@ -431,43 +404,25 @@ class cl_opt_bit_desc extends cl_opt_desc#(bit);
   
   function new(string _name);
     super.new(_name);
-    fmt = "%s";
-  endfunction
-
-  virtual function cl_opt_instance_base create_instance(string name);
-    cl_opt_instance#(bit) opt_inst = new(name);
-    return opt_inst;
+    fmt = "%b";
   endfunction
 
   virtual function bit validate_and_convert(cl_opt_instance_base inst);
     bit   b;
-    type_container#(bit) val = new();
+    type_container#(bit) val;
     cl_opt_instance#(bit) opt_inst;
     string msg;
-    
-    if(!$cast(opt_inst, inst)) begin
-      $sformat(msg, "Cannot convert command line option +%s to real", inst.get_name());
-      `uvm_error(SVX_CL_MSG_ID, msg)
-      return 0;
-    end
     
     case(inst.token)
       TOKEN_ON:   b = 1;
       TOKEN_OFF : b = 0;
       TOKEN_INT:
         begin
-          type_container#(bit) intval;
-          if(!validate_int#(bit, bit_traits)::validate(this, inst)) begin
-            return 0;
-          end
-          // This $cast should never fail, but we check just in
-          // case.
-          if(!$cast(intval, inst.get_value())) begin
-            $sformat(msg, "Numeric conversion error for option +%s.", name);
+          if(!validate_int#(bit, bit_traits)::validate(inst, b)) begin
+	    $sformat(msg, "Unable to convert argument to bit for option %s", name);
             `uvm_error(SVX_CL_MSG_ID, msg)
-            return 0;
-          end
-          b = intval.get();
+	    return 0;
+	  end
         end
       default:
         begin
@@ -478,14 +433,17 @@ class cl_opt_bit_desc extends cl_opt_desc#(bit);
         end
     endcase
 
+    if(!$cast(opt_inst, inst)) begin
+      $sformat(msg, "Cannot convert command line option +%s to bit", inst.get_name());
+      `uvm_error(SVX_CL_MSG_ID, msg)
+      return 0;
+    end
+    
+    val = new();
     val.set(b);
     opt_inst.value = val;
     return 1;
 
-  endfunction
-  
-  virtual function void set_default(bit d);
-    uvm_resource_db#(bit)::set("CL::*", name, d);
   endfunction
   
 endclass  

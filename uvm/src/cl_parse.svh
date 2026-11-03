@@ -76,7 +76,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     opt_desc = cl_mgr::find(lexeme);
     if(opt_desc == cl_opt_traits::empty) begin
       msg = {"Skipping unknown command line option: ", lex.get_lexeme()};
-      `uvm_info("SVX/CL/PARSE", msg, UVM_NONE)
+      `uvm_info(SVX_CL_MSG_ID, msg, UVM_NONE)
       return;
     end
 
@@ -94,7 +94,8 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     token = lex.get_token();
     if(token != TOKEN_EQUAL) begin
       if(opt_desc.get_type_handle() != type_handle#(bit)::get()) begin
-	  $sformat(msg, "Missing value for command line option +%s", opt_inst.get_name());
+	  $sformat(msg, "Missing value for command line option +%s", 
+		   opt_inst.get_name());
 	  `uvm_error(SVX_CL_MSG_ID, msg)
 	  has_errors = 1;
 	  return;
@@ -102,7 +103,8 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
 
       // A switch must end right after its name.
       if(token != TOKEN_EOL) begin
-	$sformat(msg, "Extraneous characters after command line option +%s", opt_inst.get_name());
+	$sformat(msg, "Extraneous characters after command line option +%s", 
+		 opt_inst.get_name());
 	`uvm_error(SVX_CL_MSG_ID, msg)
 	has_errors = 1;
 	return;
@@ -187,7 +189,7 @@ class validate_opt extends accum_fcn#(cl_opt_instance_base, uint32_t);
     cl_opt_desc_base opt = cl_mgr::find(inst.get_name());
     // Is it a valid option?
     if(opt == cl_opt_traits::empty) begin
-      `uvm_info("SVX/CL/PARSE",
+      `uvm_info(SVX_CL_MSG_ID,
 		{"skipping invalid command line option: ", inst.get_name()}, UVM_NONE)
       return;
     end
@@ -212,20 +214,8 @@ endclass
 class populate_resource_db extends fcn#(cl_opt_instance_base);
 
   function void f(cl_opt_instance_base inst);
-
-    // Look up the command line option
-    cl_opt_desc_base opt = cl_mgr::find(inst.get_name());
-    // Is it a valid option?  At this point the lookup should never
-    // fail because it was checked during the validate phase, but we
-    // check just to be sure.
-    if(opt == cl_opt_traits::empty) begin
-      `uvm_info("SVX/CL/PARSE",
-		{"skipping invalid command line option: ", inst.get_name()}, UVM_NONE)
-      return;
-    end
-
+    cl_opt_desc_base opt = inst.opt_desc;
     opt.publish(inst);
-    
   endfunction
 
 endclass

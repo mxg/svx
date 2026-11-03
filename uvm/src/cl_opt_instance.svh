@@ -26,12 +26,15 @@
 // permissions and limitations under the License.
 //======================================================================
 
+typedef class cl_opt_desc_base;
+
 virtual class cl_opt_instance_base;
   protected string name;
   string lexeme;
   token_t token;
   string fmt;
   token_descriptor td;
+  cl_opt_desc_base opt_desc;
 
   function new(string _name);
     name = _name;

@@ -79,7 +79,7 @@ class cl_mgr;
     print_cl_opt print;
     
     if(opt_map == null) begin
-      `uvm_warning(SVX_CL_MSG_ID, "Option map is empty");
+      `uvm_warning(SVX_CL_MSG_ID, "Option map is empty")
       return;
     end
     
@@ -123,97 +123,97 @@ class opt_factory;
    
       type_handle#(int8_t)::get():
 	begin
-	  cl_opt_int_desc#(int8_t) opt = new(name);
+	  cl_opt_int_desc#(int8_t, int8_traits) opt = new(name);
 	  return opt;
 	end
    
       type_handle#(int16_t)::get():
 	begin
-	  cl_opt_int_desc#(int16_t) opt = new(name);
+	  cl_opt_int_desc#(int16_t, int16_traits) opt = new(name);
 	  return opt;
 	end
    
       type_handle#(int32_t)::get():
 	begin
-	  cl_opt_int_desc#(int32_t) opt = new(name);
+	  cl_opt_int_desc#(int32_t, int32_traits) opt = new(name);
 	  return opt;
 	end
    
       type_handle#(int64_t)::get():
 	begin
-	  cl_opt_int_desc#(int64_t) opt = new(name);
+	  cl_opt_int_desc#(int64_t, int64_traits) opt = new(name);
 	  return opt;
 	end
    
       type_handle#(uint8_t)::get():
 	begin
-	  cl_opt_int_desc#(uint8_t) opt = new(name);
+	  cl_opt_int_desc#(uint8_t, uint8_traits) opt = new(name);
 	  return opt;
 	end
    
       type_handle#(uint16_t)::get():
 	begin
-	  cl_opt_int_desc#(uint16_t) opt = new(name);
+	  cl_opt_int_desc#(uint16_t, uint16_traits) opt = new(name);
 	  return opt;
 	end
    
       type_handle#(uint32_t)::get():
 	begin
-	  cl_opt_int_desc#(uint32_t) opt = new(name);
+	  cl_opt_int_desc#(uint32_t, uint32_traits) opt = new(name);
 	  return opt;
 	end
    
       type_handle#(uint64_t)::get():
 	begin
-	  cl_opt_int_desc#(uint64_t) opt = new(name);
+	  cl_opt_int_desc#(uint64_t, uint64_traits) opt = new(name);
 	  return opt;
 	end
    
       type_handle#(byte)::get():
 	begin
-	  cl_opt_int_desc#(byte) opt = new(name);
+	  cl_opt_int_desc#(byte, byte_traits) opt = new(name);
 	  return opt;
 	end
    
       type_handle#(shortint)::get():
 	begin
-	  cl_opt_int_desc#(shortint) opt = new(name);
+	  cl_opt_int_desc#(shortint, shortint_traits) opt = new(name);
 	  return opt;
 	end
       
       type_handle#(longint)::get():
 	begin
-	  cl_opt_int_desc#(longint) opt = new(name);
+	  cl_opt_int_desc#(longint, longint_traits) opt = new(name);
 	  return opt;
 	end
    
       type_handle#(int)::get():
 	begin
-	  cl_opt_int_desc#(int) opt = new(name);
+	  cl_opt_int_desc#(int, int_traits) opt = new(name);
 	  return opt;
 	end
    
       type_handle#(byte unsigned)::get():
 	begin
-	  cl_opt_int_desc#(byte unsigned) opt = new(name);
+	  cl_opt_int_desc#(byte unsigned, byte_unsigned_traits) opt = new(name);
 	  return opt;
 	end
    
       type_handle#(shortint unsigned)::get():
 	begin
-	  cl_opt_int_desc#(shortint unsigned) opt = new(name);
+	  cl_opt_int_desc#(shortint unsigned, shortint_unsigned_traits) opt = new(name);
 	  return opt;
 	end
    
       type_handle#(int unsigned)::get():
 	begin
-	  cl_opt_int_desc#(int unsigned) opt = new(name);
+	  cl_opt_int_desc#(int unsigned, int_unsigned_traits) opt = new(name);
 	  return opt;
 	end
    
       type_handle#(longint unsigned)::get():
 	begin
-	  cl_opt_int_desc#(longint unsigned) opt = new(name);
+	  cl_opt_int_desc#(longint unsigned, longint_unsigned_traits) opt = new(name);
 	  return opt;
 	end
    
@@ -281,7 +281,7 @@ class cl #(type T=int);
       $sformat(msg,
 	       "Something went wrong in creating the descriptor for option %s", 
 	       name);
-      `uvm_error(SVX_CL_MSG_ID, msg);
+      `uvm_error(SVX_CL_MSG_ID, msg)
       return;
     end
 
