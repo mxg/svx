@@ -177,13 +177,8 @@ endclass
 class validate_opt extends accum_fcn#(cl_opt_instance_base, uint32_t);
 
   function void f(cl_opt_instance_base inst, ref uint32_t errs);
-
-    // Transfer the fmt from the option descriptor to the option
-    // instance.
-    inst.fmt = inst.opt_desc.fmt;
     if(!inst.opt_desc.validate_and_convert(inst))
       errs++;
-
   endfunction
   
 endclass

@@ -26,8 +26,15 @@
 // permissions and limitations under the License.
 //======================================================================
 
+localparam string SVX_CL_MSG_ID = "SVX/CL/PARSE";
+
 typedef class cl_opt_desc_base;
 
+//----------------------------------------------------------------------
+// cl_opt_instance_base
+//
+// The base class for command line option instances
+//----------------------------------------------------------------------
 virtual class cl_opt_instance_base;
   protected string name;
   string lexeme;

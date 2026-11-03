@@ -97,6 +97,11 @@ endclass
 // opt_factory
 //
 // Factory for creating option descriptors of various types.
+//
+// The factory contains some type aliases that SHOULD have the same
+// type handle -- e.g., int and int32_t.  It's possible that some
+// compilers may not considers these the same type for the purposes of
+// creating type_handles.  The extra types are here as a precaution.
 //----------------------------------------------------------------------
 /* verilator lint_off SIDEEFFECT */
 class opt_factory;
@@ -239,7 +244,10 @@ endclass
 //----------------------------------------------------------------------
 // cl
 //
-// A convenience layer for adding new items to the cl_mgr.
+// User interface for configuring the command line parser. Add() and
+// add_with_default() provide a means to tell the parser what command
+// line options to look for, what their data types are, and whether or
+// not they have a default value.
 //----------------------------------------------------------------------
 class cl #(type T=int);
 

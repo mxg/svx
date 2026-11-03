@@ -26,8 +26,30 @@
 // permissions and limitations under the License.
 //======================================================================
 
-localparam string SVX_CL_MSG_ID = "SVX/CL/PARSE";
-
+//----------------------------------------------------------------------
+// These classes are the option descriptors.  When a new option is
+// created by cl::add() or cl::add_with_default() a new options
+// descriptor is created that is used to validate option instances.
+//
+// The descriptors are organized using a three-level inheritance
+// hierarchy.  The top-level, the base class, is used to
+// polymorphically manage the descriptors.  The next level,
+// cl_opt_desc#(T), provides the data type of the option, and the
+// lowest leaf level provides type-specific implementation of the
+// virtual functions.
+//
+// The primary virtual functions are:
+//
+// create_instance() -- Creates a new options instance object based on
+// the descriptor type.  Some information from the descriptor is
+// transferred to the instance.
+//
+// validate_and_convert() -- Validates the option value string from
+// the command line and converts it to an internal representation.
+//
+// publish() -- puts the validated option and value into the UVM
+// resource database.
+//----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
 // cl_opt_desc_base
@@ -106,7 +128,11 @@ virtual class cl_opt_desc#(type T=int) extends cl_opt_desc_base;
 
   virtual function cl_opt_instance_base create_instance(string name);
     cl_opt_instance#(T) opt_inst = new(name);
+    // Bind the option descriptor to the instance
     opt_inst.opt_desc = this;
+    // Transfer the fmt from the option descriptor to the option
+    // instance.
+    opt_inst.fmt = fmt;
     return opt_inst;
   endfunction
 
@@ -142,7 +168,7 @@ endclass
 //
 // For internal use. Not to be instantiated nor called by user code.
 //----------------------------------------------------------------------
-class validate_int#(type T=int, type P=void_traits);
+class validate_int#(type T=int, type P);
   
   static function bit validate(cl_opt_instance_base inst, output T n);
 
@@ -174,8 +200,8 @@ class validate_int#(type T=int, type P=void_traits);
       return 0;
     end
 
-    // Did the user supply too many digits?
-    // Count the digits without the underscores. Skip leading 0s.
+    // Did the user supply too many digits?  Count the digits without
+    // the underbars. Also, skip leading 0s.
     len = 0;
     foreach (td.digits[i])
       if(td.digits[i] != "_" && (len > 0 || td.digits[i] != "0"))
@@ -218,7 +244,7 @@ class validate_int#(type T=int, type P=void_traits);
       return 0;
     end
 
-    // Does the value doesn't fit in its stated size?
+    // Does the value fit in its stated size?
     if(td.size > 0 && (mag >> td.size) != 0)  begin
       $sformat(msg, "The value for +%s doesn't fit into %0d bits.",
                inst.get_name(), td.size);
@@ -285,9 +311,6 @@ class cl_opt_int_desc#(type T=int, type P=void_traits) extends cl_opt_desc#(T);
     end
     
     if(!validate_int#(T,P)::validate(inst, n)) begin
-      $sformat(msg, "Invalid numeric type for command line option +%s.", 
-               name);
-      `uvm_error(SVX_CL_MSG_ID, msg)
       return 0;
     end
     
@@ -362,7 +385,7 @@ class cl_opt_real_desc extends cl_opt_desc#(real);
         end
     endcase
 
-      return 1;
+    // Not reached.
     
   endfunction
 
@@ -380,7 +403,7 @@ class cl_opt_string_desc extends cl_opt_desc#(string);
 
   virtual function bit validate_and_convert(cl_opt_instance_base inst);
     
-    type_container#(string) stringval = new();
+    type_container#(string) stringval;
     cl_opt_instance#(string) opt_inst;
     string msg;
 
@@ -390,7 +413,7 @@ class cl_opt_string_desc extends cl_opt_desc#(string);
       return 0;
     end
     
-    if(inst.token != TOKEN_STRING && inst.token != TOKEN_ID) begin
+    if(inst.token != TOKEN_STRING) begin
       $sformat(msg, "Command line option +%s must have a string value.", name);
       `uvm_error(SVX_CL_MSG_ID, msg)
       return 0;
@@ -401,6 +424,16 @@ class cl_opt_string_desc extends cl_opt_desc#(string);
     return 1;
   endfunction
 
+  //--------------------------------------------------------------------
+  // lex_value
+  //
+  // Strings are retrieved from the lexer using lex_filename.  This
+  // looks at the characters on the command line a bit differently
+  // than when looking for an indetifier.  Lex_filename() consumes
+  // all characters up to the end of the input string (typically a
+  // single option).  This allows us to grab filenames that may have
+  // characters other than numbers, letters, and underbars.
+  //--------------------------------------------------------------------
   virtual function token_t lex_value(lexer_core lex);
       return lex.lex_filename();
   endfunction
@@ -428,11 +461,8 @@ class cl_opt_bit_desc extends cl_opt_desc#(bit);
       TOKEN_OFF : b = 0;
       TOKEN_INT:
         begin
-          if(!validate_int#(bit, bit_traits)::validate(inst, b)) begin
-	    $sformat(msg, "Unable to convert argument to bit for option %s", name);
-            `uvm_error(SVX_CL_MSG_ID, msg)
+          if(!validate_int#(bit, bit_traits)::validate(inst, b))
 	    return 0;
-	  end
         end
       default:
         begin
