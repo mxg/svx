@@ -55,6 +55,14 @@ virtual class cl_opt_desc_base;
     return name;
   endfunction
 
+  virtual function bit is_switch();
+    return 0;
+  endfunction
+
+  virtual function token_t lex_value(lexer_core lex);
+      return lex.get_token();
+  endfunction
+
   function void print();
     
     type_container_base def = get_default_value();
@@ -102,9 +110,7 @@ virtual class cl_opt_desc#(type T=int) extends cl_opt_desc_base;
     return opt_inst;
   endfunction
 
-  virtual function bit validate_and_convert(cl_opt_instance_base inst);
-    return 1;
-  endfunction
+  pure virtual function bit validate_and_convert(cl_opt_instance_base inst);
 
   virtual function void publish(cl_opt_instance_base inst);
     type_container#(T) v;
@@ -395,6 +401,10 @@ class cl_opt_string_desc extends cl_opt_desc#(string);
     return 1;
   endfunction
 
+  virtual function token_t lex_value(lexer_core lex);
+      return lex.lex_filename();
+  endfunction
+
 endclass  
 
 //----------------------------------------------------------------------
@@ -445,5 +455,10 @@ class cl_opt_bit_desc extends cl_opt_desc#(bit);
     return 1;
 
   endfunction
+
+  function bit is_switch();
+    return 1;
+  endfunction
+  
   
 endclass  

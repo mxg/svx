@@ -93,7 +93,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     // on.
     token = lex.get_token();
     if(token != TOKEN_EQUAL) begin
-      if(opt_desc.get_type_handle() != type_handle#(bit)::get()) begin
+      if(!opt_desc.is_switch()) begin
 	  $sformat(msg, "Missing value for command line option +%s", 
 		   opt_inst.get_name());
 	  `uvm_error(SVX_CL_MSG_ID, msg)
@@ -120,11 +120,7 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     // Option has the form +<name>=<value>
     // Get the value token after the equal sign
     // Are we looking for a filename?
-    if(opt_desc.get_type_handle() == type_handle#(string)::get())
-      token = lex.lex_filename();
-    else
-      token = lex.get_token();
-
+    token = opt_desc.lex_value(lex);
     if(token == TOKEN_ERROR) begin
       $sformat(msg, "Parsing error at command line option +%s", opt_inst.get_name());
       `uvm_error(SVX_CL_MSG_ID, msg)
@@ -182,23 +178,10 @@ class validate_opt extends accum_fcn#(cl_opt_instance_base, uint32_t);
 
   function void f(cl_opt_instance_base inst, ref uint32_t errs);
 
-    string msg;
-    token_descriptor td = inst.td;
-    
-    // Look up the command line option
-    cl_opt_desc_base opt = cl_mgr::find(inst.get_name());
-    // Is it a valid option?
-    if(opt == cl_opt_traits::empty) begin
-      `uvm_info(SVX_CL_MSG_ID,
-		{"skipping invalid command line option: ", inst.get_name()}, UVM_NONE)
-      return;
-    end
-
     // Transfer the fmt from the option descriptor to the option
     // instance.
-    inst.fmt = opt.fmt;
-
-    if(!opt.validate_and_convert(inst))
+    inst.fmt = inst.opt_desc.fmt;
+    if(!inst.opt_desc.validate_and_convert(inst))
       errs++;
 
   endfunction
