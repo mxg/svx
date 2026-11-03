@@ -289,7 +289,7 @@ endclass
 //
 // For all integer types.
 //----------------------------------------------------------------------
-class cl_opt_int_desc#(type T=int, type P=void_traits) extends cl_opt_desc#(T);
+class cl_opt_int_desc#(type T=int, type P) extends cl_opt_desc#(T);
   
   function new(string _name);
     super.new(_name);
@@ -363,12 +363,8 @@ class cl_opt_real_desc extends cl_opt_desc#(real);
         begin
           int64_t n;
           // Validate the integer value
-          if(!validate_int#(int64_t, int64_traits)::validate(inst, n)) begin
-            $sformat(msg, "Invalid numeric type for command line option +%s.", 
-                     name);
-            `uvm_error(SVX_CL_MSG_ID, msg)
+          if(!validate_int#(int64_t, int64_traits)::validate(inst, n))
             return 0;
-          end
           // Convert 64-bit integer to real
           realval = new();
           realval.set($itor(n));
