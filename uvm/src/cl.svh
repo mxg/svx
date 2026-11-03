@@ -26,100 +26,6 @@
 // permissions and limitations under the License.
 //======================================================================
 
-localparam string SVX_CL_MSG_ID= "SVX/CL/PARSE";
-
-//----------------------------------------------------------------------
-// cl_opt_desc
-//
-// A command line option descriptor contains information about a
-// command line option that could appear.
-//----------------------------------------------------------------------
-class cl_opt_desc;
-  string name;
-  type_handle_base th;
-  bit multiple;
-  type_container_base default_value;
-  string fmt;
-
-  function void print();
-    $write("%12s: %s (fmt=%s)", name, th.get_typename(), fmt);
-    if(default_value != null)
-      $write(" = %s", default_value.val2str());
-    if(multiple)
-      $display(" (multiple ok)");
-    else
-      $display();
-  endfunction
-  
-endclass
-
-// Convenience typedef for cl_opt_desc traits
-typedef class_traits#(cl_opt_desc) cl_opt_traits;
-
-//----------------------------------------------------------------------
-// print_cl_opt
-//
-// A function class for printing cl_opt_desc objects.
-//----------------------------------------------------------------------
-class print_cl_opt extends fcn#(cl_opt_desc);
-  function void f(cl_opt_desc opt);
-    opt.print();
-  endfunction
-endclass
-
-//----------------------------------------------------------------------
-// fmt_table
-//
-// A table of format strings used to print values of various data
-// types. In addition to holding format strings, this table serves as
-// the list of data types supported by the command line processor.
-//
-// The class should not be instantiated. For internal use only.
-// ----------------------------------------------------------------------
-class fmt_table;
-
-  static local map#(type_handle_base, string, string_traits) fmt_map;
-
-  // Populate the table at static initialization time (before time 0).
-  static local bit is_populated = populate_table();
-
-  // Constructor is local because this class should never be
-  // instantiated.
-  local function new();
-  endfunction
-
-  static function bit populate_table();
-    fmt_map = new();
-    void'(fmt_map.insert(type_handle#(string)::get(), "%s"));
-    void'(fmt_map.insert(type_handle#(real)::get(), "%g"));
-    void'(fmt_map.insert(type_handle#(bit)::get(), "%b"));
-    void'(fmt_map.insert(type_handle#(int8_t)::get(), "%0d"));
-    void'(fmt_map.insert(type_handle#(int16_t)::get(), "%0d"));
-    void'(fmt_map.insert(type_handle#(int32_t)::get(), "%0d"));
-    void'(fmt_map.insert(type_handle#(int64_t)::get(), "%0d"));
-    void'(fmt_map.insert(type_handle#(uint8_t)::get(), "%0d"));
-    void'(fmt_map.insert(type_handle#(uint16_t)::get(), "%0d"));
-    void'(fmt_map.insert(type_handle#(uint32_t)::get(), "%0d"));
-    void'(fmt_map.insert(type_handle#(uint64_t)::get(), "%0d"));
-    void'(fmt_map.insert(type_handle#(byte)::get(), "%0d"));
-    void'(fmt_map.insert(type_handle#(shortint)::get(), "%0d"));
-    void'(fmt_map.insert(type_handle#(longint)::get(), "%0d"));
-    void'(fmt_map.insert(type_handle#(int)::get(), "%0d"));
-    void'(fmt_map.insert(type_handle#(byte unsigned)::get(), "%0d"));
-    void'(fmt_map.insert(type_handle#(shortint unsigned)::get(), "%0d"));
-    void'(fmt_map.insert(type_handle#(int unsigned)::get(), "%0d"));
-    void'(fmt_map.insert(type_handle#(longint unsigned)::get(), "%0d"));
-    return 1;
-  endfunction
-
-  // Retrieve a format string based on data type.
-  static function string get_fmt(type_handle_base th);
-    string fmt = fmt_map.get(th);
-    return fmt;
-  endfunction
-
-endclass
-  
 //----------------------------------------------------------------------
 // cl_mgr
 //
@@ -132,9 +38,9 @@ endclass
 //----------------------------------------------------------------------
 class cl_mgr;
 
-  typedef map_iterator #(string, cl_opt_desc, cl_opt_traits) map_iter_t;
+  typedef map_iterator #(string, cl_opt_desc_base, cl_opt_traits) map_iter_t;
 
-  local static map#(string, cl_opt_desc, cl_opt_traits) opt_map;
+  local static map#(string, cl_opt_desc_base, cl_opt_traits) opt_map;
 
   //--------------------------------------------------------------------
   // constructor
@@ -150,7 +56,7 @@ class cl_mgr;
   //
   // Add a new command line option to the list of options
   //--------------------------------------------------------------------
-  static function void add(string name, cl_opt_desc opt);
+  static function void add(string name, cl_opt_desc_base opt);
     if(opt_map == null)
       opt_map = new();
     void'(opt_map.insert(name, opt));
@@ -159,7 +65,7 @@ class cl_mgr;
   //--------------------------------------------------------------------
   // find
   //--------------------------------------------------------------------
-  static function cl_opt_desc find(string name);
+  static function cl_opt_desc_base find(string name);
     return (opt_map == null) ? cl_opt_traits::empty : opt_map.get(name);
   endfunction
 
@@ -173,7 +79,7 @@ class cl_mgr;
     print_cl_opt print;
     
     if(opt_map == null) begin
-      `uvm_warning("SVX//PARSE", "Option map is empty");
+      `uvm_warning(SVX_CL_MSG_ID, "Option map is empty");
       return;
     end
     
@@ -181,11 +87,154 @@ class cl_mgr;
     print = new();
     
     $display("\n--- Command Line Option Table ---");
-    algo#(cl_opt_desc, cl_opt_traits)::for_each(iter, print);
+    algo#(cl_opt_desc_base, cl_opt_traits)::for_each(iter, print);
     $display("--- END Command Line Option Table ---");
   endfunction
 
 endclass
+
+//----------------------------------------------------------------------
+// opt_factory
+//
+// Factory for creating option descriptors of various types.
+//----------------------------------------------------------------------
+/* verilator lint_off SIDEEFFECT */
+class opt_factory;
+
+  static function cl_opt_desc_base create(type_handle_base th, string name);
+    case(th)
+      type_handle#(string)::get():
+	begin
+	  cl_opt_string_desc opt = new(name);
+	  return opt;
+	end
+      
+      type_handle#(real)::get():
+	begin
+	  cl_opt_real_desc opt = new(name);
+	  return opt;
+	end
+   
+      type_handle#(bit)::get():
+	begin
+	  cl_opt_bit_desc opt = new(name);
+	  return opt;
+	end
+   
+      type_handle#(int8_t)::get():
+	begin
+	  cl_opt_int_desc#(int8_t) opt = new(name);
+	  return opt;
+	end
+   
+      type_handle#(int16_t)::get():
+	begin
+	  cl_opt_int_desc#(int16_t) opt = new(name);
+	  return opt;
+	end
+   
+      type_handle#(int32_t)::get():
+	begin
+	  cl_opt_int_desc#(int32_t) opt = new(name);
+	  return opt;
+	end
+   
+      type_handle#(int64_t)::get():
+	begin
+	  cl_opt_int_desc#(int64_t) opt = new(name);
+	  return opt;
+	end
+   
+      type_handle#(uint8_t)::get():
+	begin
+	  cl_opt_int_desc#(uint8_t) opt = new(name);
+	  return opt;
+	end
+   
+      type_handle#(uint16_t)::get():
+	begin
+	  cl_opt_int_desc#(uint16_t) opt = new(name);
+	  return opt;
+	end
+   
+      type_handle#(uint32_t)::get():
+	begin
+	  cl_opt_int_desc#(uint32_t) opt = new(name);
+	  return opt;
+	end
+   
+      type_handle#(uint64_t)::get():
+	begin
+	  cl_opt_int_desc#(uint64_t) opt = new(name);
+	  return opt;
+	end
+   
+      type_handle#(byte)::get():
+	begin
+	  cl_opt_int_desc#(byte) opt = new(name);
+	  return opt;
+	end
+   
+      type_handle#(shortint)::get():
+	begin
+	  cl_opt_int_desc#(shortint) opt = new(name);
+	  return opt;
+	end
+      
+      type_handle#(longint)::get():
+	begin
+	  cl_opt_int_desc#(longint) opt = new(name);
+	  return opt;
+	end
+   
+      type_handle#(int)::get():
+	begin
+	  cl_opt_int_desc#(int) opt = new(name);
+	  return opt;
+	end
+   
+      type_handle#(byte unsigned)::get():
+	begin
+	  cl_opt_int_desc#(byte unsigned) opt = new(name);
+	  return opt;
+	end
+   
+      type_handle#(shortint unsigned)::get():
+	begin
+	  cl_opt_int_desc#(shortint unsigned) opt = new(name);
+	  return opt;
+	end
+   
+      type_handle#(int unsigned)::get():
+	begin
+	  cl_opt_int_desc#(int unsigned) opt = new(name);
+	  return opt;
+	end
+   
+      type_handle#(longint unsigned)::get():
+	begin
+	  cl_opt_int_desc#(longint unsigned) opt = new(name);
+	  return opt;
+	end
+   
+      default:
+	begin
+	  string msg;
+	  $sformat(msg, "Type %s is not supported by the command line parser",
+		   th.get_typename());
+	  `uvm_error(SVX_CL_MSG_ID, msg)
+	  return null;
+	end
+      
+    endcase
+
+    // We should never get here, but this makes the compiler happy
+    return null;
+    
+  endfunction
+
+endclass
+/* verilator lint_on SIDEEFFECT */
 
 //----------------------------------------------------------------------
 // cl
@@ -199,23 +248,16 @@ class cl #(type T=int);
   //--------------------------------------------------------------------
   static function void add(string name, string fmt="");
 
-    string new_fmt;
-    
-    cl_opt_desc opt = new();
-    opt.name = name;
-    opt.th = type_handle#(T)::get();
-    
-    new_fmt = fmt_table::get_fmt(opt.th);
-    if(new_fmt == string_traits::empty) begin
-      string msg;
-      $sformat(msg, "Unsupported command line option data type: %s",
-	       opt.th.get_typename());
-      `uvm_error(SVX_CL_MSG_ID, msg);
-      return;
-    end
+    cl_opt_desc_base opt;
 
-    opt.fmt = (fmt == "") ? new_fmt : fmt;
+    opt = opt_factory::create(type_handle#(T)::get(), name);
+    if(opt == null)
+      return;
+    
+    if(fmt != "")
+      opt.fmt = fmt;
     cl_mgr::add(name, opt);
+    
   endfunction
 
   //--------------------------------------------------------------------
@@ -223,31 +265,36 @@ class cl #(type T=int);
   //--------------------------------------------------------------------
   static function void add_with_default(string name, T def, string fmt="");
 
-    string new_fmt;
+    cl_opt_desc_base opt;
+    cl_opt_desc#(T) opt_type;
+    type_container#(T) val;
 
-    cl_opt_desc opt = new();
-    type_container#(T) val = new();
+    opt = opt_factory::create(type_handle#(T)::get(), name);
+    if(opt == null)
+      return;    
 
-    opt.name = name;
-    opt.th = type_handle#(T)::get();
+    if(fmt != "")
+      opt.fmt = fmt;
 
-    new_fmt = fmt_table::get_fmt(opt.th);
-    if(new_fmt == string_traits::empty) begin
+    if(!$cast(opt_type, opt)) begin
       string msg;
-      $sformat(msg, "Unsupported command line option data type: %s",
-	       opt.th.get_typename());
+      $sformat(msg,
+	       "Something went wrong in creating the descriptor for option %s", 
+	       name);
       `uvm_error(SVX_CL_MSG_ID, msg);
       return;
     end
-    
-    opt.fmt = (fmt == "") ? new_fmt : fmt;
+
+    val = new();
     val.set(def);
     val.set_default_fmt(opt.fmt);
-    opt.default_value = val;
+    opt_type.default_value = val;
+
     cl_mgr::add(name, opt);
 
     // Put the default value into the resource database
     uvm_resource_db#(T)::set("CL::*", name, def, null);
+    
   endfunction
 
 endclass

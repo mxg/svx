@@ -36,8 +36,10 @@ package svx_uvm_pkg;
   import svx::*;
   `include "svx_macros.svh"
 
-  `include "cl.svh"
+  // Command Line Parser
   `include "cl_opt_instance.svh"
+  `include "cl_opt_desc.svh"
+  `include "cl.svh"
   `include "cl_parse.svh"
 
 endpackage
