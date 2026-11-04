@@ -207,21 +207,44 @@ class cl_parse;
 
   local uvm_cmdline_processor clp;
 
+  // Arguments supplied by set_args().  When use_supplied_args is set,
+  // these are parsed instead of the real command line.
+  local string supplied_args[$];
+  local bit use_supplied_args;
+
   function new();
     clp = uvm_cmdline_processor::get_inst();
   endfunction
 
   //--------------------------------------------------------------------
+  // set_args
+  //
+  // Supply the arguments to parse instead of reading them from the
+  // simulator command line.  This is primarily for testing: a unit
+  // test can hand the parser any command line it likes and check the
+  // results.  As with the real command line, args[0] is expected to be
+  // the program name and is ignored because it does not begin with '+'.
+  //--------------------------------------------------------------------
+  function void set_args(string args[$]);
+    supplied_args = args;
+    use_supplied_args = 1;
+  endfunction
+
+  //--------------------------------------------------------------------
   // get_args
   //
-  // Retrieve the command line args via the UVM command line
+  // Retrieve the command line args, either those supplied by
+  // set_args() or, by default, those from the UVM command line
   // processor.
   //--------------------------------------------------------------------
   local function vector_string get_args();
     string args[$];
     vector_string vec;
-    
-    clp.get_args(args);
+
+    if(use_supplied_args)
+      args = supplied_args;
+    else
+      clp.get_args(args);
     vec = vector_string::create(args);
     return vec;
   endfunction
