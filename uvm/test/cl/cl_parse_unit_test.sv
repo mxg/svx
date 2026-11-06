@@ -196,6 +196,8 @@ module cl_parse_unit_test;
     `FAIL_UNLESS(v__ == (EXPECTED))             \
   end
 
+  // Required for string arguments. CL_ACCEPT will cause a
+  // compile-time error when EXPECTED is a string.
 `define CL_ACCEPT_STRING(T, SUFFIX, EXPECTED)   \
   begin                                         \
     T v__;                                      \
@@ -315,14 +317,16 @@ module cl_parse_unit_test;
       // Missing value
       `CL_REJECT(int32_t,  "")
       `CL_REJECT(int32_t,  "=")
+      // Leading _ is not allowed.
+      `CL_REJECT(int32_t, "=_5")  
     `SVTEST_END
 
   //--------------------------------------------------------------------
   // real_values
   //--------------------------------------------------------------------
     `SVTEST(real_values)
-//      `CL_ACCEPT(real, "=1.5e9",  1.5e9)
-//      `CL_ACCEPT(real, "=-2.5",   -2.5)
+      `CL_ACCEPT(real, "=1.5e9",  1.5e9)
+      `CL_ACCEPT(real, "=-2.5",   -2.5)
       `CL_ACCEPT(real, "=2",      2.0)
       `CL_ACCEPT(real, "=32h10",  16.0)
       `CL_REJECT(real, "=abc")
@@ -336,8 +340,8 @@ module cl_parse_unit_test;
   // The switch form, on/off keywords, and 0/1 in any base.
   //--------------------------------------------------------------------
     `SVTEST(bit_values)
-//      `CL_ACCEPT(bit, "",       1)
-//      `CL_ACCEPT(bit, "=on",    1)
+      `CL_ACCEPT(bit, "",       1)
+      `CL_ACCEPT(bit, "=on",    1)
       `CL_ACCEPT(bit, "=off",   0)
       `CL_ACCEPT(bit, "=1",     1)
       `CL_ACCEPT(bit, "=0",     0)
@@ -367,8 +371,8 @@ module cl_parse_unit_test;
   // parser (that is, quotes the user escaped from the shell) are kept.
   //--------------------------------------------------------------------
     `SVTEST(string_values)
-//      `CL_ACCEPT_STRING(string, "=freddy",        "freddy")
-//      `CL_ACCEPT_STRING(string, "=a/b/c",         "a/b/c")
+      `CL_ACCEPT_STRING(string, "=freddy",        "freddy")
+      `CL_ACCEPT_STRING(string, "=a/b/c",         "a/b/c")
       `CL_ACCEPT_STRING(string, "=my-test.v",     "my-test.v")
       `CL_ACCEPT_STRING(string, "=1.hex",         "1.hex")
       `CL_ACCEPT_STRING(string, "=on",            "on")
