@@ -39,37 +39,6 @@ class test extends uvm_component;
     super.new(name, parent);
   endfunction
 
-  function void build_phase(uvm_phase phase);
-    cl_parse clp = new();
-    
-    // populate the command line option table with all possible
-    // command line options.
-    cl#(uint32_t)::add_with_default("size", 4);
-    cl#(int16_t)::add("offset");
-    cl#(real)::add_with_default("freq", 2.875e9);
-    cl#(bit)::add_with_default("x_mode", 0);
-    cl#(bit)::add_with_default("z_mode", 0);
-    cl#(uint32_t)::add_with_default("channels", 4);
-    cl#(string)::add_with_default("name", "<none>");
-    cl#(int32_t)::add_with_default("bias", 0);
-    cl#(uint32_t)::add("base", "%8x");
-    cl#(uint64_t)::add("data", "%16x");
-    cl#(int64_t)::add("bignum");
-    cl#(int8_t)::add("smallnum");
-    cl#(string)::add("file");
-
-    // parse the options.
-    clp.parse();
-
-    // Let's look at the resource database It should contain all the
-    // parsed options plus all the defaults.
-    // $display("\n--- Resource Database ---");
-    // uvm_resource_db#(bit)::dump();
-    // $display("--- END Resource Database ---");
-
-    
-  endfunction
-
   task run_phase(uvm_phase phase);
     string name;
     uint32_t size;

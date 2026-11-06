@@ -296,7 +296,6 @@ class validate_int#(type T=int, type P);
 
     mag = 0;
     foreach (digits[i]) begin
-      //byte c = digits[i];
       uint32_t c = uint32_t'(digits[i]);
 
       if (c == "_")

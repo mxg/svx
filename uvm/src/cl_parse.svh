@@ -314,12 +314,13 @@ class cl_parse;
     algo#(cl_opt_instance_base, cl_opt_inst_traits)::for_each(opt_iter,
 							      populate);
 
-    // Print the list of options
-    $display("\n--- Parsed Command Line Options  ---");
-    print = new();
-    algo#(cl_opt_instance_base, cl_opt_inst_traits)::for_each(opt_iter,
-							      print);
-    $display("--- END Parsed Command Line Options  ---");
+    // Print the list of options.  Use this for debugging the command
+    // line parser.
+    // $display("\n--- Parsed Command Line Options  ---");
+    // print = new();
+    // algo#(cl_opt_instance_base, cl_opt_inst_traits)::for_each(opt_iter,
+    // 							      print);
+    // $display("--- END Parsed Command Line Options  ---");
 
   endfunction
 

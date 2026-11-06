@@ -403,11 +403,6 @@ class lexer_core;
                   state = STATE_DIGIT;
 		  first_digit = p-1;
 		end
-	      (c == "_"):
-		begin
-                  state = STATE_UNDERBAR;
-		  first_digit = p-1;
-		end
 	      default:
                 return TOKEN_ERROR;
 	    endcase

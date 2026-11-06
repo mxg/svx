@@ -31,11 +31,43 @@
 //----------------------------------------------------------------------
 module top;
 
-  `include "uvm_macros.svh"
+`include "uvm_macros.svh"
   import uvm_pkg::*;
   import test_pkg::*;
+  import svx::*;
+  import svx_uvm_pkg::*;
+  `include "svx_macros.svh"  
+
+  //--------------------------------------------------------------------
+  // populate
+  //
+  // Populate the command line option table with all possible
+  // command line options.
+  //--------------------------------------------------------------------
+  function static void populate();
+
+    cl_parse clp = new();
+    
+    cl#(uint32_t)::add_with_default("size", 4);
+    cl#(int16_t)::add("offset");
+    cl#(real)::add_with_default("freq", 2.875e9);
+    cl#(bit)::add_with_default("x_mode", 0);
+    cl#(bit)::add_with_default("z_mode", 0);
+    cl#(uint32_t)::add_with_default("channels", 4);
+    cl#(string)::add_with_default("name", "<none>");
+    cl#(int32_t)::add_with_default("bias", 0);
+    cl#(uint32_t)::add("base", "%8x");
+    cl#(uint64_t)::add("data", "%16x");
+    cl#(int64_t)::add("bignum");
+    cl#(int8_t)::add("smallnum");
+    cl#(string)::add("file");
+    
+    // parse the options.
+    clp.parse();  
+  endfunction
 
   initial begin
+    populate();
     run_test();
   end
 
