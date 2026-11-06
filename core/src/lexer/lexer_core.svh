@@ -403,6 +403,11 @@ class lexer_core;
                   state = STATE_DIGIT;
 		  first_digit = p-1;
 		end
+	      (c == "_"):
+		begin
+                  state = STATE_UNDERBAR;
+		  first_digit = p-1;
+		end
 	      default:
                 return TOKEN_ERROR;
 	    endcase
@@ -571,12 +576,12 @@ class lexer_core;
                 end
               default:
                 begin
-                  if(!`isdigit(c) && c != "_") begin
+                  if(!`isdigit(c) && (c != "_")) begin
                     if(c != 0) putc();
 		    token_desc.digits = get_digits();
                     return TOKEN_INT;
                   end
-                 end
+                end
              endcase
           end
 

@@ -47,6 +47,4 @@ SV_SRC		:= test_utils.sv                             \
 SV_INC		:= +incdir+.                                 \
                    ${SVUNIT_INC}                             \
 
-#RUN_OPTS	:= +SVUNIT_LIST_TESTS
-
 include ${TOP}/make/makefile

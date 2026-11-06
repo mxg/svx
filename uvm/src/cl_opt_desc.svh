@@ -177,11 +177,17 @@ class validate_int#(type T=int, type P);
     string msg;
     uint128_t mag;
     uint128_t limit;  
-    integer n_chars;
+    bit num_ok;
     int32_t len;
     bit too_long;
- 
-    // Is the argument an integer?
+
+    // It appears that Verilator does not support underbars in numeric
+    // constants.
+`ifdef VERILATOR
+    td.digits = strip_underscores(td.digits);
+`endif    
+
+   // Is the argument an integer?
     if(inst.token != TOKEN_INT) begin
       $sformat(msg, "Invalid command line option value for +%s = %s. Expected %s integer.",
                inst.get_name(), inst.lexeme,
@@ -191,6 +197,8 @@ class validate_int#(type T=int, type P);
     end
 
     // Does the argument fit into the data type?
+    if(td.size == 0)
+      td.size = W;
     if(td.size > W) begin
       $sformat(msg,
                {"Invalid size of the value for command line option +%s. ",
@@ -222,12 +230,11 @@ class validate_int#(type T=int, type P);
     end
 
     // Convert digit string to an internal representation.
-    n_chars = 1;
     case(td.base)
-      "d", "D": n_chars = $sscanf(td.digits, "%d", mag);
-      "b", "B": n_chars = $sscanf(td.digits, "%b", mag);
-      "o", "O": n_chars = $sscanf(td.digits, "%o", mag);
-      "h", "H": n_chars = $sscanf(td.digits, "%h", mag);
+      "d", "D": num_ok = str_to_uint(td.digits, 10, mag);
+      "b", "B": num_ok = str_to_uint(td.digits,  2, mag);
+      "o", "O": num_ok = str_to_uint(td.digits,  8, mag);
+      "h", "H": num_ok = str_to_uint(td.digits, 16, mag);
       default:
         begin
           $sformat(msg, "Value of option +%s has an invalid base %s.", 
@@ -237,7 +244,7 @@ class validate_int#(type T=int, type P);
         end
     endcase
 
-    if(n_chars == 0) begin
+    if(!num_ok) begin
       $sformat(msg, "Invalid numerical argument for +%s = %s.", 
                inst.get_name(), inst.lexeme);
       `uvm_error(SVX_CL_MSG_ID, msg)
@@ -282,6 +289,68 @@ class validate_int#(type T=int, type P);
     return 1;
   endfunction
 
+  //----------------------------------------------------------------------
+  // strip_underscores
+  //
+  // Return s with all underscores removed.  Copies each run of
+  // characters between underscores with a single substr(), and returns
+  // s itself when it contains no underscores.
+  //----------------------------------------------------------------------
+  static function string strip_underscores(string s);
+    string r = "";
+    int	   start = 0;   // index of the first character of the current run
+    
+    for (int i = 0; i < s.len(); i++) begin
+      if (s[i] == "_") begin
+	if (i > start)
+          r = {r, s.substr(start, i - 1)};
+	start = i + 1;
+      end
+    end
+
+    // Common case: there were no underscores
+    if (start == 0)
+      return s;
+
+    // Copy the run after the last underscore
+    if (start < s.len())
+      r = {r, s.substr(start, s.len() - 1)};
+
+    return r;
+  endfunction
+
+  //----------------------------------------------------------------------
+  // str_to_uint
+  //
+  // Convert a string of digits in the given radix to an unsigned
+  // 128-bit magnitude.  Underscores are skipped.  Returns 0 if any other
+  // character is not a valid digit in the radix.  The caller's
+  // digit-count check guarantees the result fits in 128 bits.
+  //----------------------------------------------------------------------
+  static function bit str_to_uint(string digits, uint32_t radix,
+                                  output uint128_t mag);
+    uint32_t digit;
+
+    mag = 0;
+    foreach (digits[i]) begin
+      //byte c = digits[i];
+      uint32_t c = uint32_t'(digits[i]);
+
+      if (c == "_")
+	continue;
+      if (c >= "0" && c <= "9")      digit = c - "0";
+      else if (c >= "a" && c <= "f") digit = c - "a" + 10;
+	   else if (c >= "A" && c <= "F") digit = c - "A" + 10;
+		else
+		  return 0;
+      if (digit >= radix)
+	return 0;
+
+      mag = mag * uint128_t'(radix) + uint128_t'(digit);
+    end
+    return 1;
+  endfunction
+  
 endclass
 
 //----------------------------------------------------------------------

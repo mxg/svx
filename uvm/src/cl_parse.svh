@@ -26,6 +26,13 @@
 // permissions and limitations under the License.
 //======================================================================
 
+class print_arg extends fcn#(string);
+  function void f(string t);
+    $display("arg: %s", t);
+  endfunction
+endclass
+
+
 //----------------------------------------------------------------------
 // parse_opt
 //
