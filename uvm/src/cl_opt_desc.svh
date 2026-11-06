@@ -182,7 +182,7 @@ class validate_int#(type T=int, type P);
     bit too_long;
     uint32_t size = (td.size == 0) ? W : td.size;    
 
-   // Is the argument an integer?
+    // Is the argument an integer?
     if(inst.token != TOKEN_INT) begin
       $sformat(msg, "Invalid command line option value for +%s = %s. Expected %s integer.",
                inst.get_name(), inst.lexeme,
@@ -285,10 +285,11 @@ class validate_int#(type T=int, type P);
   //----------------------------------------------------------------------
   // str_to_uint
   //
-  // Convert a string of digits in the given radix to an unsigned
-  // 128-bit magnitude.  Underscores are skipped.  Returns 0 if any other
-  // character is not a valid digit in the radix.  The caller's
-  // digit-count check guarantees the result fits in 128 bits.
+  // Convert a string of digits in the given radix to a 128-bit
+  // unsigned integer representing magnitude.  Underscores are
+  // skipped.  Returns 0 if any other character is not a valid digit
+  // in the radix.  The caller's digit-count check guarantees the
+  // result fits in 128 bits.
   //----------------------------------------------------------------------
   static function bit str_to_uint(string digits, uint32_t radix,
                                   output uint128_t mag);
@@ -298,19 +299,26 @@ class validate_int#(type T=int, type P);
     foreach (digits[i]) begin
       uint32_t c = uint32_t'(digits[i]);
 
+      // Skip underscores
       if (c == "_")
 	continue;
-      if (c >= "0" && c <= "9")      digit = c - "0";
-      else if (c >= "a" && c <= "f") digit = c - "a" + 10;
-	   else if (c >= "A" && c <= "F") digit = c - "A" + 10;
-		else
-		  return 0;
+
+      case(1)
+	(c >= "0" && c <= "9"): digit = c - "0";
+	(c >= "a" && c <= "f"): digit = c - "a" + 10;
+	(c >= "A" && c <= "F"): digit = c - "A" + 10;
+	default: return 0;
+      endcase
+
+      // Is the digit valid for the specified radix?
       if (digit >= radix)
 	return 0;
 
       mag = mag * uint128_t'(radix) + uint128_t'(digit);
     end
+    
     return 1;
+    
   endfunction
   
 endclass

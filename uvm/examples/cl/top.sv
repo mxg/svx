@@ -31,12 +31,12 @@
 //----------------------------------------------------------------------
 module top;
 
-`include "uvm_macros.svh"
+  `include "uvm_macros.svh"
   import uvm_pkg::*;
-  import test_pkg::*;
   import svx::*;
   import svx_uvm_pkg::*;
   `include "svx_macros.svh"  
+  import test_pkg::*;
 
   //--------------------------------------------------------------------
   // populate
@@ -46,8 +46,13 @@ module top;
   //--------------------------------------------------------------------
   function static void populate();
 
-    cl_parse clp = new();
-    
+    // Obtain a handle to the singleton command line parser.
+    cl_parse clp = cl_parse::get();
+
+    // Add new options to the command line option table. The parameter
+    // to cl#() specifies the type of the option's value. Some have
+    // default values, some do not.  The default values are added to
+    // the UVM resource database.
     cl#(uint32_t)::add_with_default("size", 4);
     cl#(int16_t)::add("offset");
     cl#(real)::add_with_default("freq", 2.875e9);
@@ -62,11 +67,17 @@ module top;
     cl#(int8_t)::add("smallnum");
     cl#(string)::add("file");
     
-    // parse the options.
+    // Parse the options.  Each option is validated and its value (if
+    // there is one) is validated against the specified type.  The
+    // value is converted to an internal representation and the option
+    // is put into the resource database.
     clp.parse();  
   endfunction
 
   initial begin
+    // Populate the option table, parse the command line, and put the
+    // options into the resource database before run_test() executes.
+    // This makes all the options available during the build phase.
     populate();
     run_test();
   end

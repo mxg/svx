@@ -39,7 +39,13 @@ class test extends uvm_component;
     super.new(name, parent);
   endfunction
 
-  task run_phase(uvm_phase phase);
+  //--------------------------------------------------------------------
+  // build_phase
+  //
+  // Demonstrate that all the command line options are available in
+  // the resource database.
+  //--------------------------------------------------------------------
+  function void build_phase(uvm_phase phase);
     string name;
     uint32_t size;
     int16_t offset;
@@ -54,9 +60,7 @@ class test extends uvm_component;
     int64_t bignum;
     int8_t smallnum;
 
-    phase.raise_objection(this);
-
-    $display("\n--- Command line options stored in the resource database ---");
+    $display("\n--- Command Line Options stored in the resource database ---");
     
     // Let's see if everything is in the resource database.
     if(!uvm_resource_db#(string)::read_by_name("CL::", "name", name, this))
@@ -124,11 +128,9 @@ class test extends uvm_component;
     else
       $display("smallnum = %0d", smallnum);        
     
-    $display("--- End Command line options ---");
+    $display("--- End Command Line Options ---");
     
-    phase.drop_objection(this);
-    
-  endtask
+  endfunction
 
 endclass
 

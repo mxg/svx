@@ -41,6 +41,7 @@ class cl_mgr;
   typedef map_iterator #(string, cl_opt_desc_base, cl_opt_traits) map_iter_t;
 
   local static map#(string, cl_opt_desc_base, cl_opt_traits) opt_map;
+  local static bit parse_flag;
 
   //--------------------------------------------------------------------
   // constructor
@@ -49,6 +50,16 @@ class cl_mgr;
   // class.
   //--------------------------------------------------------------------
   local function new();
+endfunction
+
+
+  // Keep track of whether the parser has been called once.
+  static function void set_parse_flag();
+    parse_flag = 1;
+  endfunction
+
+  static function bit has_been_parsed();
+    return parse_flag;
   endfunction
 
   //--------------------------------------------------------------------
@@ -59,6 +70,15 @@ class cl_mgr;
   static function void add(string name, cl_opt_desc_base opt);
     if(opt_map == null)
       opt_map = new();
+    
+    if(opt_map.exists(name)) begin
+      string msg;
+      $sformat(msg, "Command line option %s already exists, cannot be added again",
+	       name);
+      `uvm_error(SVX_CL_MSG_ID, msg)
+      return;
+    end
+    
     void'(opt_map.insert(name, opt));
   endfunction
 
@@ -258,6 +278,15 @@ class cl #(type T=int);
 
     cl_opt_desc_base opt;
 
+    if(cl_mgr::has_been_parsed()) begin
+      string msg;
+      $sformat(msg, {"New options cannot be added after ",
+		     "the command line has already been parsed. ",
+		     "Option %s is ignored"}, name);
+      `uvm_warning(SVX_CL_MSG_ID, msg)
+      return;
+    end
+
     opt = opt_factory::create(type_handle#(T)::get(), name);
     if(opt == null)
       return;
@@ -276,6 +305,15 @@ class cl #(type T=int);
     cl_opt_desc_base opt;
     cl_opt_desc#(T) opt_type;
     type_container#(T) val;
+
+    if(cl_mgr::has_been_parsed()) begin
+      string msg;
+      $sformat(msg, {"New options cannot be added after ",
+		     "the command line has already been parsed. ",
+		     "Option %s is ignored"}, name);
+      `uvm_warning(SVX_CL_MSG_ID, msg)
+      return;
+    end
 
     opt = opt_factory::create(type_handle#(T)::get(), name);
     if(opt == null)

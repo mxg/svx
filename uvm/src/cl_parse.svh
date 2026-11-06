@@ -206,14 +206,26 @@ endclass
 class cl_parse;
 
   local uvm_cmdline_processor clp;
+  local static cl_parse inst;
 
   // Arguments supplied by set_args().  When use_supplied_args is set,
   // these are parsed instead of the real command line.
   local string supplied_args[$];
   local bit use_supplied_args;
 
-  function new();
+  local function new();
     clp = uvm_cmdline_processor::get_inst();
+  endfunction
+
+  //--------------------------------------------------------------------
+  // get
+  //
+  // Return singleton instance of cl_parse
+  //--------------------------------------------------------------------
+  static function cl_parse get();
+    if(inst == null)
+      inst = new();
+    return inst;
   endfunction
 
   //--------------------------------------------------------------------
@@ -272,6 +284,14 @@ class cl_parse;
     validate_opt validate;
     populate_resource_db populate;
 
+    // Have we already done this?  If so, we don't want to do it
+    // again.
+    if(cl_mgr::has_been_parsed()) begin
+      `uvm_warning(SVX_CL_MSG_ID, {"The command line has already been parsed, ",
+				   "we cannot do it again."})
+      return;
+    end
+
     //------------------------------------------------------------------
     // First pass.  Pull apart each option and put the result into a
     // list; The vector preserves the order the options appear on the
@@ -321,6 +341,9 @@ class cl_parse;
     // algo#(cl_opt_instance_base, cl_opt_inst_traits)::for_each(opt_iter,
     // 							      print);
     // $display("--- END Parsed Command Line Options  ---");
+
+    // All done
+    cl_mgr::set_parse_flag();
 
   endfunction
 
