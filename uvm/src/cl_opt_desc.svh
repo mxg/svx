@@ -180,12 +180,7 @@ class validate_int#(type T=int, type P);
     bit num_ok;
     int32_t len;
     bit too_long;
-
-    // It appears that Verilator does not support underbars in numeric
-    // constants.
-`ifdef VERILATOR
-    td.digits = strip_underscores(td.digits);
-`endif    
+    uint32_t size = (td.size == 0) ? W : td.size;    
 
    // Is the argument an integer?
     if(inst.token != TOKEN_INT) begin
@@ -197,9 +192,7 @@ class validate_int#(type T=int, type P);
     end
 
     // Does the argument fit into the data type?
-    if(td.size == 0)
-      td.size = W;
-    if(td.size > W) begin
+    if(size > W) begin
       $sformat(msg,
                {"Invalid size of the value for command line option +%s. ",
                 "Value must be an integer whose size is no more than %0d bits."},
@@ -252,9 +245,9 @@ class validate_int#(type T=int, type P);
     end
 
     // Does the value fit in its stated size?
-    if(td.size > 0 && (mag >> td.size) != 0)  begin
+    if((mag >> size) != 0)  begin
       $sformat(msg, "The value for +%s doesn't fit into %0d bits.",
-               inst.get_name(), td.size);
+               inst.get_name(), size);
       `uvm_error(SVX_CL_MSG_ID, msg)
       return 0;
     end
@@ -287,36 +280,6 @@ class validate_int#(type T=int, type P);
       n = -n;
     // n is the final value returned through the output arg.
     return 1;
-  endfunction
-
-  //----------------------------------------------------------------------
-  // strip_underscores
-  //
-  // Return s with all underscores removed.  Copies each run of
-  // characters between underscores with a single substr(), and returns
-  // s itself when it contains no underscores.
-  //----------------------------------------------------------------------
-  static function string strip_underscores(string s);
-    string r = "";
-    int	   start = 0;   // index of the first character of the current run
-    
-    for (int i = 0; i < s.len(); i++) begin
-      if (s[i] == "_") begin
-	if (i > start)
-          r = {r, s.substr(start, i - 1)};
-	start = i + 1;
-      end
-    end
-
-    // Common case: there were no underscores
-    if (start == 0)
-      return s;
-
-    // Copy the run after the last underscore
-    if (start < s.len())
-      r = {r, s.substr(start, s.len() - 1)};
-
-    return r;
   endfunction
 
   //----------------------------------------------------------------------
