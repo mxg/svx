@@ -153,7 +153,7 @@ module cl_parse_unit_test;
 
     catcher.clear();
     args.push_front("Vtestrunner");
-    p = new();
+    p = cl_parse::get();
     p.set_args(args);
     p.parse();
   endfunction

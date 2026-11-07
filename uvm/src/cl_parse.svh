@@ -307,7 +307,8 @@ class cl_parse;
 
     if(parse.has_errors) begin
       `uvm_error(SVX_CL_MSG_ID,
-		 "Errors in the command line prevent further processing of the options.")
+		 {"Errors in the command line prevent ",
+		  "further processing of the options."})
       return;
     end
     
@@ -326,7 +327,8 @@ class cl_parse;
     
     if(errs > 0) begin
       `uvm_error(SVX_CL_MSG_ID,
-		 "Errors in the command line prevent further processing of the options.")
+		 {"Errors in the command line prevent ",
+		  "further processing of the options."})
       return;
     end
 
