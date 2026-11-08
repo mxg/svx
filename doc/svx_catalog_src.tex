@@ -8,22 +8,40 @@
 \usepackage{parskip}
 \usepackage[colorlinks=true, linkcolor=blue, urlcolor=blue]{hyperref}
 \renewcommand{\arraystretch}{1.25}
+% Allow line breaks after underscores so long identifiers fit in table columns.
+\AtBeginDocument{\renewcommand{\_}{\textunderscore\allowbreak}}
 \usepackage{titlesec}
 \titleformat{\chapter}[display]
   {\normalfont\Huge\bfseries}{}{0pt}{\Huge}
 \titlespacing*{\chapter}{0pt}{10pt}{20pt}
-\title{\textbf{SVX Library Class Catalog}\\[0.5em]
-       \large SystemVerilog Extension Library --- Core Library (\texttt{src/})\\[0.3em]
-       \normalsize Version 2.1.2 beta}
-\author{Mark Glasser}
-\date{October 2026}
 \begin{document}
-\maketitle
+\begin{titlepage}
+  \centering
+  \vspace*{2cm}
+  {\Huge\bfseries SVX\par}
+  \vspace{0.5em}
+  {\Large SystemVerilog Extension Library\par}
+  \vspace{1.5em}
+  {\huge Class Catalog\par}
+  \vspace{0.5em}
+  {\large Core Library and UVM Utilities\par}
+  \vspace{2em}
+  {\large Version 2.1.3~beta\par}
+  \vspace{0.5em}
+  {\large November 2026\par}
+  \vspace{0.5em}
+  {\large Mark Glasser\par}
+  \vfill
+  {\small Copyright 2026 Mark Glasser.
+  Licensed under the Apache License, Version~2.0.\par}
+\end{titlepage}
 \tableofcontents
+
+\part{Core Library}
 
 \chapter{Types}
 \section{svx\_types --- Standard Typedefs}
-\noindent\small\textit{File: \texttt{src/types/svx\_types.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/types/svx\_types.svh}}\par
 
 Standardized C-style integer typedefs, size and index types, process identifiers, and package-level Boolean constants. Provides a portable numeric vocabulary across the library.
 
@@ -42,7 +60,7 @@ Standardized C-style integer typedefs, size and index types, process identifiers
 \texttt{uint32\_t} & \texttt{int unsigned} & Unsigned 32-bit integer. \\
 \texttt{int64\_t} & \texttt{longint} & Signed 64-bit integer. \\
 \texttt{uint64\_t} & \texttt{longint unsigned} & Unsigned 64-bit integer. \\
-\texttt{int128\_t} & \texttt{bit [127:0]} & Signed 128-bit integer (two-state). \\
+\texttt{int128\_t} & \texttt{bit signed [127:0]} & Signed 128-bit integer (two-state). \\
 \texttt{uint128\_t} & \texttt{bit unsigned [127:0]} & Unsigned 128-bit integer (two-state). \\
 \texttt{size\_t} & \texttt{uint64\_t} & Represents a container or array size. \\
 \texttt{index\_t} & \texttt{uint64\_t} & Unsigned container index. \\
@@ -51,7 +69,7 @@ Standardized C-style integer typedefs, size and index types, process identifiers
 \end{xltabular}
 
 \section{type\_handle}
-\noindent\small\textit{File: \texttt{src/types/type\_handle.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/types/type\_handle.svh}}\par
 
 Singleton type-handle mechanism. \texttt{type\_handle\#(T)} is a parameterized class that returns a unique singleton object for each distinct type \texttt{T}, enabling runtime type identity comparison. \texttt{type\_container\#(T)} wraps any value with its type handle for polymorphic storage.
 
@@ -68,6 +86,7 @@ Non-parameterized base for all type handles.
 \bottomrule
 \endfoot
 \texttt{get\_type\_handle} & \texttt{type\_handle\_base} & --- & Return the singleton type handle for this object (pure virtual). \\
+\texttt{get\_typename} & \texttt{string} & --- & Return the name of the type (pure virtual). \\
 \end{xltabular}
 
 \subsection*{\texttt{type\_handle\#(T)}}
@@ -83,13 +102,15 @@ Parameterized singleton. One instance exists per distinct type T.
 \bottomrule
 \endfoot
 \texttt{get\_type} & \texttt{type\_handle\#()} & --- & Return the singleton type handle for T, creating it on the first call. Static. \\
+\texttt{get} & \texttt{type\_handle\_base} & --- & Return the singleton type handle for T as a base-class handle. Static. \\
 \texttt{get\_type\_handle} & \texttt{type\_handle\_base} & --- & Return this singleton cast to base type. \\
+\texttt{get\_typename} & \texttt{string} & --- & Return the name of T, as given by \texttt{\$typename}. \\
 \end{xltabular}
 
 \subsection*{\texttt{type\_container\_base}}
 \noindent\small\textit{class}\par
 
-Non-parameterized base for typed containers; supports polymorphic storage with convert2string.
+Non-parameterized base for typed containers; supports polymorphic storage and formatted printing of the contained value.
 
 \begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
 \toprule
@@ -98,7 +119,9 @@ Non-parameterized base for typed containers; supports polymorphic storage with c
 \endhead
 \bottomrule
 \endfoot
-\texttt{convert2string} & \texttt{string} & --- & Return a human-readable representation (default: empty string). \\
+\texttt{val2str} & \texttt{string} & \texttt{string fmt=""} & Return the value formatted with fmt, or with the default format if fmt is empty (default: empty string). \\
+\texttt{set\_default\_fmt} & void & \texttt{string fmt} & Set the default format used by val2str. \\
+\texttt{get\_typename} & \texttt{string} & --- & Return the name of the contained type (default: empty string). \\
 \texttt{get\_type\_handle} & \texttt{type\_handle\_base} & --- & Return the type handle for the contained type (default: null). \\
 \end{xltabular}
 
@@ -119,10 +142,12 @@ Holds a value of type T along with its type handle.
 \texttt{get\_type\_handle} & \texttt{type\_handle\_base} & --- & Return the type handle for T. \\
 \texttt{set} & void & \texttt{T x} & Store a new value, replacing any existing one. \\
 \texttt{get} & \texttt{T} & --- & Retrieve the stored value. \\
+\texttt{val2str} & \texttt{string} & \texttt{string fmt=""} & Format the value with \texttt{\$sformatf}, using fmt or the default format. \\
+\texttt{get\_typename} & \texttt{string} & --- & Return the name of T. \\
 \end{xltabular}
 
 \section{type\_match}
-\noindent\small\textit{File: \texttt{src/types/type\_match.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/types/type\_match.svh}}\par
 
 Compile-time type-compatibility utilities. \texttt{type\_match\#(T1,T2)} provides static functions to check whether two type parameters are identical or whether one is derived from the other. The convenience macro \texttt{\`{}check\_is\_derived\_from} installs a const-initializer that will call \texttt{\$fatal} if the constraint is violated at elaboration time.
 
@@ -147,7 +172,7 @@ Static type-comparison utilities for T1 and T2.
 \end{xltabular}
 
 \section{typeid}
-\noindent\small\textit{File: \texttt{src/types/typeid.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/types/typeid.svh}}\par
 
 Runtime type-classification for common SystemVerilog scalar types. \texttt{typeid\#(T)} uses \texttt{type\_handle} singletons to determine at run time whether \texttt{T} is integral, two-state, four-state, real, or string. Classification is limited to explicitly enumerated built-in types.
 
@@ -177,7 +202,7 @@ Static type-classification functions for built-in SV scalar types.
 
 \chapter{Traits}
 \section{Traits Classes}
-\noindent\small\textit{File: \texttt{src/containers/traits.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/containers/traits.svh}}\par
 
 The traits system provides per-type constants and static functions used by all parameterized containers and algorithms. Every traits class defines an \texttt{empty\_t} typedef, an \texttt{empty} constant, and static \texttt{equal()}, \texttt{compare()}, and \texttt{sort()} functions. The base class is \texttt{void\_traits}; scalar integer families derive from \texttt{base\_int\_traits}.
 
@@ -323,7 +348,7 @@ Traits for string. empty is an empty string. Uses lexicographic comparison and s
 
 \chapter{Containers}
 \section{object --- Base Object}
-\noindent\small\textit{File: \texttt{src/containers/object.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/containers/object.svh}}\par
 
 Defines \texttt{void\_t} (the empty base class, used as the "void" type throughout SVX) and \texttt{object} (adds virtual to\_str, compare, and copy to void\_t). All containers and tree nodes derive ultimately from \texttt{object}.
 
@@ -351,7 +376,7 @@ Base object providing virtual to\_str(), compare(), and copy().
 \end{xltabular}
 
 \section{container --- Container Base Classes}
-\noindent\small\textit{File: \texttt{src/containers/container.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/containers/container.svh}}\par
 
 Abstract container base hierarchy. \texttt{container} defines size/clear/is\_empty. \texttt{typed\_container\#(T,P)} adds a typed empty-element sentinel initialised from the traits class P at construction.
 
@@ -392,7 +417,7 @@ Typed abstract base. Provides a typed empty-element sentinel initialised from th
 \end{xltabular}
 
 \section{vector}
-\noindent\small\textit{File: \texttt{src/containers/vector.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/containers/vector.svh}}\par
 
 Dynamic array backed by a SystemVerilog queue. Provides random read/write with automatic extension, shallow copy/clone, equality comparison, sort, and bulk append operations. The base class for queue, stack, and deque.
 
@@ -426,7 +451,7 @@ Ordered, random-access dynamic array.
 \end{xltabular}
 
 \section{map}
-\noindent\small\textit{File: \texttt{src/containers/map.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/containers/map.svh}}\par
 
 Class-based dynamic associative array. Allows sparse key-value storage allocated on demand and passed by reference. \texttt{singleton\_map} provides a global instance accessible via \texttt{get\_inst()}.
 
@@ -475,7 +500,7 @@ A map of which only one instance exists per type parameterization.
 \end{xltabular}
 
 \section{queue}
-\noindent\small\textit{File: \texttt{src/containers/queue.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/containers/queue.svh}}\par
 
 FIFO queue derived from vector. put() inserts at the head; get() removes from the tail. \texttt{fixed\_size\_queue} adds a maximum-size constraint and a push-success status.
 
@@ -523,7 +548,7 @@ Queue that rejects pushes when the maximum size is reached.
 \end{xltabular}
 
 \section{stack}
-\noindent\small\textit{File: \texttt{src/containers/stack.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/containers/stack.svh}}\par
 
 LIFO stack derived from vector. push() and pop() operate on the front (index 0).
 
@@ -547,7 +572,7 @@ LIFO stack: top of stack is index 0.
 \end{xltabular}
 
 \section{deque}
-\noindent\small\textit{File: \texttt{src/containers/deque.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/containers/deque.svh}}\par
 
 Double-ended queue derived from vector. Supports push/pop at both ends, shuffle, and reverse.
 
@@ -573,7 +598,7 @@ Double-ended queue with push/pop at both front and back.
 \end{xltabular}
 
 \section{circ\_buf --- Circular Buffer}
-\noindent\small\textit{File: \texttt{src/containers/circ\_buf.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/containers/circ\_buf.svh}}\par
 
 Fixed-capacity circular (ring) buffer backed by a static array of size S, parameterised on element type T, traits P, and compile-time capacity S. Operates in one of two modes. In the default reject mode a push into a full buffer is refused with an error message. In overwrite mode a push into a full buffer silently overwrites the oldest item at the tail.
 
@@ -600,7 +625,7 @@ Fixed-size circular buffer holding S elements in FIFO ordering.
 \end{xltabular}
 
 \section{pair / triple / quadruple}
-\noindent\small\textit{File: \texttt{src/containers/pair.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/containers/pair.svh}}\par
 
 Lightweight tuple containers for binding two, three, or four values of potentially different types. All extend pair\#(T1,T2) and derive from void\_t (use void\_traits when placing in a container).
 
@@ -661,7 +686,7 @@ Extends triple with a fourth element of type T4.
 \end{xltabular}
 
 \section{sorter}
-\noindent\small\textit{File: \texttt{src/containers/sorter.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/containers/sorter.svh}}\par
 
 Generic sort implementation for SystemVerilog queues. The comparator is provided by the traits parameter P.
 
@@ -682,7 +707,7 @@ Sorts queues of type T using P::compare() as the element comparator.
 \end{xltabular}
 
 \section{multimap}
-\noindent\small\textit{File: \texttt{src/containers/multimap.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/containers/multimap.svh}}\par
 
 A map in which each key may be associated with multiple values. Internally, each key maps to a \texttt{deque\#(T,P)}, so insertion order is preserved within a key and values can be retrieved individually or as a group. \texttt{multimap} is built on top of \texttt{map\#(KEY, deque\_t, class\_traits\#(deque\_t))}.
 
@@ -702,7 +727,7 @@ Container that maps each key to an ordered collection of values. Multiple values
 \endfoot
 \texttt{get} & \texttt{T} & \texttt{KEY key} & Return the last-inserted value for key, or P::empty if the key is absent. \\
 \texttt{get\_all} & \texttt{deque\_t} & \texttt{KEY key} & Return a cloned deque of all values stored under key, in insertion order; returns the empty sentinel if the key is absent. \\
-\texttt{get\_map} & \texttt{map\_t} & --- & Return the internal map handle. Not intended for general use; required by multimap\textbackslash{}\_iterator because SystemVerilog lacks friend access. \\
+\texttt{get\_map} & \texttt{map\_t} & --- & Return the internal map handle. Not intended for general use; required by multimap\_iterator because SystemVerilog lacks friend access. \\
 \texttt{insert} & void & \texttt{KEY key, T item} & Append item to the deque stored under key, creating the deque if needed. \\
 \texttt{size} & \texttt{size\_t} & --- & Return the total number of items across all keys (O(k) in the number of distinct keys). \\
 \texttt{size\_nonzero} & \texttt{bit} & --- & Return 1 if at least one item has been inserted; O(1) alternative to testing size() \textgreater{} 0. \\
@@ -715,7 +740,7 @@ Container that maps each key to an ordered collection of values. Multiple values
 
 \chapter{Iterators}
 \section{Iterator Interfaces}
-\noindent\small\textit{File: \texttt{src/iterators/iterator\_intf.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/iterators/iterator\_intf.svh}}\par
 
 The iterator interface hierarchy. \texttt{iterator\_intf\_base} defines set/get/skip/size/is\_empty. \texttt{fwd\_intf} adds forward traversal (first/next/is\_last/at\_end). \texttt{bkwd\_intf} adds backward traversal (last/prev/is\_first/at\_beginning). \texttt{random\_intf} adds random selection.
 
@@ -792,7 +817,7 @@ Random-access iterator interface.
 \end{xltabular}
 
 \section{List Iterators}
-\noindent\small\textit{File: \texttt{src/iterators/list\_iterators.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/iterators/list\_iterators.svh}}\par
 
 Iterators for \texttt{vector\#()} and any class derived from it, including \texttt{stack}, \texttt{queue}, and \texttt{deque}. \texttt{list\_iterator\_base} provides the common binding and set/get/skip/size/is\_empty logic. \texttt{list\_iterator} traverses the container in either the forward or backward direction. \texttt{list\_random\_iterator} chooses a random item.
 
@@ -862,7 +887,7 @@ Choose a random item in the bound vector.
 \end{xltabular}
 
 \section{Map Iterators}
-\noindent\small\textit{File: \texttt{src/iterators/map\_iterators.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/iterators/map\_iterators.svh}}\par
 
 Iterators for the map container. \texttt{map\_iterator\_base} provides a means for binding a map to an iterator and for setting and getting the item at the current position. \texttt{map\_iterator} traverses the map in either the forward or backward direction. \texttt{map\_random\_iterator} provides random selection. Map keys are traversed in the natural sorted order of the underlying SV associative array.
 
@@ -903,6 +928,7 @@ Traverse a map in either the forward or backward direction. In addition to the f
 \texttt{set} & void & \texttt{T t} & Update the value at the current key. \\
 \texttt{get} & \texttt{T} & --- & Return the value at the current key. \\
 \texttt{get\_index} & \texttt{KEY} & --- & Return the current key. \\
+\texttt{get\_item} & \texttt{pair\#(KEY, T)} & --- & Return the current key and value as a pair. \\
 \texttt{first} & \texttt{bit} & --- & Move to the first (smallest) key; returns 0 if the map is empty. \\
 \texttt{next} & \texttt{bit} & --- & Advance to the next key; returns 0 if at the end of the map. \\
 \texttt{is\_last} & \texttt{bit} & --- & True if current key equals the last key in the map. \\
@@ -936,7 +962,7 @@ Randomly selects a map entry.
 \end{xltabular}
 
 \section{Permutation Iterators}
-\noindent\small\textit{File: \texttt{src/iterators/permute\_iterators.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/iterators/permute\_iterators.svh}}\par
 
 Iterators that generate all permutations of a bound vector without modifying it. An internal index ordering tracks the current permutation; the bound vector itself is never changed. The original ordering of the bound vector is permutation~0. A vector of length~$n$ has $n!$ permutations. \texttt{get\_nth(n)} returns the \texttt{n}th element of the current permutation; \texttt{get\_permutation\_vector()} returns the current element ordering. \texttt{permute\_iterator} traverses all permutations sequentially in both directions; \texttt{permute\_random\_iterator} jumps to a randomly chosen permutation. Once a vector is bound, it should not be modified; call \texttt{initialize()} to reset if needed.
 
@@ -981,7 +1007,7 @@ Sequential bidirectional traversal of all permutations.
 \texttt{first} & \texttt{bit} & --- & Reset to permutation 0. \\
 \texttt{next} & \texttt{bit} & --- & Advance to next permutation; returns 0 if already at last. \\
 \texttt{is\_last} & \texttt{bit} & --- & True if at the last permutation. \\
-\texttt{at\_end} & \texttt{bit} & --- & True if pix \textgreater{}= max\textbackslash{}\_pix. \\
+\texttt{at\_end} & \texttt{bit} & --- & True if pix \textgreater{}= max\_pix. \\
 \texttt{last} & \texttt{bit} & --- & Jump to the last permutation. \\
 \texttt{prev} & \texttt{bit} & --- & Return to the previous permutation. \\
 \texttt{is\_first} & \texttt{bit} & --- & True if pix==0. \\
@@ -1008,7 +1034,7 @@ Jump to a randomly chosen permutation.
 \end{xltabular}
 
 \section{range}
-\noindent\small\textit{File: \texttt{src/iterators/range.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/iterators/range.svh}}\par
 
 A view over a contiguous sub-range [lb, ub] of an existing iterator. \texttt{range\_base} stores and validates the bounds. \texttt{range\#(T,P)} wraps a \texttt{fwd\_intf} iterator and optionally a \texttt{bkwd\_intf} if the underlying iterator supports it; backward access is silently unavailable otherwise.
 
@@ -1060,7 +1086,7 @@ Sub-range iterator. Binds to a fwd\_intf; optionally acquires backward capabilit
 \end{xltabular}
 
 \section{map\_range}
-\noindent\small\textit{File: \texttt{src/iterators/map\_range.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/iterators/map\_range.svh}}\par
 
 Extends \texttt{range} for map iterators, adding \texttt{get\_index()} to retrieve the current map key from within a sub-range view.
 
@@ -1082,7 +1108,7 @@ Range view over a map iterator slice, exposing the current key.
 \end{xltabular}
 
 \section{multimap\_iterator}
-\noindent\small\textit{File: \texttt{src/iterators/multimap\_iterator.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/iterators/multimap\_iterator.svh}}\par
 
 Bidirectional iterator for \texttt{multimap}. Uses a dual-iterator design: a \texttt{map\_iterator} advances across keys and a \texttt{list\_iterator} traverses the values within each key's deque. The concrete \texttt{multimap\_iterator} implements both \texttt{fwd\_intf} and \texttt{bkwd\_intf}.
 
@@ -1123,6 +1149,7 @@ Full bidirectional iterator over a multimap. Iterates all stored values in key o
 \texttt{get} & \texttt{T} & --- & Return the value at the current position; returns P::empty if unbound or empty. \\
 \texttt{set} & void & \texttt{T t} & Replace the value at the current position. \\
 \texttt{get\_index} & \texttt{KEY} & --- & Return the key at the current position. \\
+\texttt{get\_item} & \texttt{pair\#(KEY, T)} & --- & Return the current key and value as a pair. \\
 \texttt{first} & \texttt{bit} & --- & Move to the first value in the map; returns 0 if empty. \\
 \texttt{next} & \texttt{bit} & --- & Advance one position; moves to the next value in the current deque, or to the first value of the next key. Returns 0 when past the end. \\
 \texttt{is\_last} & \texttt{bit} & --- & True if the current position is the very last value in the multimap. \\
@@ -1136,7 +1163,7 @@ Full bidirectional iterator over a multimap. Iterates all stored values in key o
 
 \chapter{Algorithms}
 \section{algo --- Core Algorithms}
-\noindent\small\textit{File: \texttt{src/algorithms/algo.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/algorithms/algo.svh}}\par
 
 Generic single-iterator algorithms. All functions are static and accept a \texttt{fwd\_intf} iterator plus, where needed, a \texttt{predicate} or \texttt{fcn} object. find() positions the iterator at the first matching element rather than returning it.
 
@@ -1163,7 +1190,7 @@ Collection of generic single-iterator algorithms.
 \end{xltabular}
 
 \section{algo2 --- Dual-Iterator Algorithms}
-\noindent\small\textit{File: \texttt{src/algorithms/algo2.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/algorithms/algo2.svh}}\par
 
 Algorithms that operate on two iterators simultaneously. \texttt{zip} traverses both iterators in lock-step, calling \texttt{fn.f(t1, t2)} at each step until either iterator reaches its end.
 
@@ -1183,7 +1210,7 @@ Algorithms for paired traversal of two differently-typed iterators.
 \end{xltabular}
 
 \section{accum --- Accumulation Algorithms}
-\noindent\small\textit{File: \texttt{src/algorithms/accum.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/algorithms/accum.svh}}\par
 
 Algorithms that carry a mutable accumulator \texttt{A} across iterations. \texttt{accum} operates on one iterator; \texttt{accum2} operates on two in lock-step.
 
@@ -1218,7 +1245,7 @@ Dual-iterator accumulation algorithm.
 \end{xltabular}
 
 \section{fcn --- Function Objects}
-\noindent\small\textit{File: \texttt{src/algorithms/fcn.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/algorithms/fcn.svh}}\par
 
 Virtual function objects (SVX's substitute for C++ functors and lambdas). Users derive concrete classes and override \texttt{f()}. The hierarchy provides one-argument, two-argument, and accumulating variants.
 
@@ -1289,7 +1316,7 @@ Abstract function object taking two values and a mutable accumulator.
 \end{xltabular}
 
 \section{predicate --- Predicate Classes}
-\noindent\small\textit{File: \texttt{src/algorithms/predicate.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/algorithms/predicate.svh}}\par
 
 Virtual predicate hierarchy. A predicate is a Boolean function over a single element T. Concrete predicate classes are composed with \texttt{and\_pred}, \texttt{or\_pred}, and \texttt{not\_pred}.
 
@@ -1396,9 +1423,153 @@ Constant predicate that always evaluates to 0.
 \texttt{is\_true} & \texttt{bit} & \texttt{T t} & Always returns 0. \\
 \end{xltabular}
 
+\chapter{Lexer}
+\section{ctypes --- Character Classification}
+\noindent\small\textit{File: \texttt{core/src/lexer/ctypes.svh}, \texttt{core/src/lexer/ctypes\_macros.svh}}\par
+
+A SystemVerilog implementation of the C library \texttt{ctype} facility. The package \texttt{ctypes} holds a 128-entry table indexed by ASCII code; each entry is a bit field describing the character (upper case, lower case, digit, whitespace, punctuation, control, hex digit, blank, octal digit, logic value). A set of macros tests a character against the table, mirroring the C \texttt{ctype} functions. Characters are masked to 7 bits before lookup.
+
+\subsection*{\texttt{ctype macros}}
+\noindent\small\textit{macros}\par
+
+Each macro takes a character \texttt{c} and evaluates to true if the character has the named characteristic.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{\`{}isalpha(c)} & \texttt{bit} & --- & Upper- or lower-case letter. \\
+\texttt{\`{}isupper(c)} & \texttt{bit} & --- & Upper-case letter. \\
+\texttt{\`{}islower(c)} & \texttt{bit} & --- & Lower-case letter. \\
+\texttt{\`{}isdigit(c)} & \texttt{bit} & --- & Decimal digit 0--9. \\
+\texttt{\`{}isxdigit(c)} & \texttt{bit} & --- & Hexadecimal digit 0--9, a--f, A--F. \\
+\texttt{\`{}isodigit(c)} & \texttt{bit} & --- & Octal digit 0--7. \\
+\texttt{\`{}isalnum(c)} & \texttt{bit} & --- & Letter or decimal digit. \\
+\texttt{\`{}isspace(c)} & \texttt{bit} & --- & Whitespace character. \\
+\texttt{\`{}isblank(c)} & \texttt{bit} & --- & Blank (space) character. \\
+\texttt{\`{}ispunct(c)} & \texttt{bit} & --- & Punctuation character. \\
+\texttt{\`{}isprint(c)} & \texttt{bit} & --- & Printable character: punctuation, letter, digit, or blank. \\
+\texttt{\`{}islogic(c)} & \texttt{bit} & --- & Four-state logic digit: \texttt{x}, \texttt{X}, \texttt{z}, or \texttt{Z}. \\
+\end{xltabular}
+
+\section{token\_types --- Tokens and Token Descriptors}
+\noindent\small\textit{File: \texttt{core/src/lexer/token\_types.svh}}\par
+
+The enumerated type of tokens the lexer returns, a traits class so tokens can be stored in SVX containers, and the descriptor that carries details about numeric tokens.
+
+\subsection*{\texttt{token\_t}}
+\noindent\small\textit{enum}\par
+
+Token types returned by \texttt{lexer\_core::get\_token()}.
+
+\begin{xltabular}{\linewidth}{>{\small}p{2.6in} >{\small}X}
+\toprule
+\textbf{Token} & \textbf{Meaning} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{TOKEN\_ID} & Identifier: a letter or underscore followed by letters, digits, and underscores. \\
+\texttt{TOKEN\_INT} & Integer constant, sized or unsized, in any base. \\
+\texttt{TOKEN\_LOGIC} & Integer constant containing \texttt{x} or \texttt{z} digits. \\
+\texttt{TOKEN\_FLOAT} & Real constant with a decimal point and/or exponent. \\
+\texttt{TOKEN\_TIME} & Time constant: a number followed by \texttt{s}, \texttt{ms}, \texttt{us}, \texttt{ns}, \texttt{ps}, or \texttt{fs}. \\
+\texttt{TOKEN\_STRING} & Single- or double-quoted string; the lexeme includes the quotes. \\
+\texttt{TOKEN\_ON / TOKEN\_OFF} & Keywords \texttt{on}/\texttt{off}, \texttt{true}/\texttt{false}, \texttt{yes}/\texttt{no} (all lower or all upper case). \\
+\texttt{TOKEN\_PLUS, TOKEN\_MINUS, TOKEN\_STAR, TOKEN\_SLASH, TOKEN\_DOT, TOKEN\_BANG} & Single-character operators \texttt{+ - * / . !}. \\
+\texttt{TOKEN\_EQUAL} & \texttt{=} \\
+\texttt{TOKEN\_LESS\_THAN, TOKEN\_LESS\_EQUAL, TOKEN\_GREATER\_THAN, TOKEN\_GREATER\_EQUAL} & \texttt{\textless{}}, \texttt{\textless{}=}, \texttt{\textgreater{}}, \texttt{\textgreater{}=}. \\
+\texttt{TOKEN\_AT, TOKEN\_PERCENT, TOKEN\_AMPERSAND, TOKEN\_CARAT, TOKEN\_TILDE, TOKEN\_BACKTICK, TOKEN\_DOLLAR, TOKEN\_POUND, TOKEN\_QUESTION} & Punctuation \texttt{@ \% \& \textasciicircum{} \textasciitilde{} \`{} \$ \# ?}. \\
+\texttt{TOKEN\_SEMI, TOKEN\_COLON, TOKEN\_LEFT\_PAREN, TOKEN\_RIGHT\_PAREN} & \texttt{; : ( )} \\
+\texttt{TOKEN\_EOL} & End of the input string. \\
+\texttt{TOKEN\_ERROR} & Unrecognized or malformed input. \\
+\end{xltabular}
+
+\subsection*{\texttt{token\_traits}}
+\noindent\small\textit{class}\quad \textbf{extends} \texttt{void\_traits}\par
+
+Traits for \texttt{token\_t} so tokens can be stored in vectors, maps, and other containers. The empty value is \texttt{TOKEN\_EOL}.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{equal} & \texttt{bit} & \texttt{token\_t a, token\_t b} & True if a and b are the same token. Static. \\
+\texttt{compare} & \texttt{int} & \texttt{token\_t a, token\_t b} & Return 1, 0, or -1 comparing the enum values. Static. \\
+\texttt{sort} & void & \texttt{token\_t vec[\$]} & Sort a queue of tokens. Static. \\
+\end{xltabular}
+
+\subsection*{\texttt{token\_descriptor}}
+\noindent\small\textit{class}\par
+
+Details of the most recent numeric token, filled in by the lexer.
+
+\noindent\textbf{Constructor:} \texttt{new()} --- Initialize to an unsized, unsigned decimal value with multiplier 1.0.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.5in} >{\small}p{1.5in} >{\small}X}
+\toprule
+\textbf{Field} & \textbf{Type} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{base} & \texttt{byte} & Base character: \texttt{d}, \texttt{h}, \texttt{o}, or \texttt{b} (either case). \\
+\texttt{size} & \texttt{int unsigned} & Declared size of a sized constant; 0 if unsized. \\
+\texttt{sign} & \texttt{byte} & Leading sign character, \texttt{+} or \texttt{-}; 0 if none. \\
+\texttt{digits} & \texttt{string} & The digits of the value, without sign, size, or base. \\
+\texttt{is\_signed} & \texttt{bit} & Set if the constant is marked signed. \\
+\texttt{is\_logic} & \texttt{bit} & Set if the digits include \texttt{x} or \texttt{z}. \\
+\texttt{multiplier} & \texttt{real} & Scale factor for time units (e.g. 1.0e-9 for \texttt{ns}). \\
+\end{xltabular}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{print} & void & --- & Display the descriptor fields. \\
+\end{xltabular}
+
+\section{lexer\_core --- Lexical Analyzer}
+\noindent\small\textit{File: \texttt{core/src/lexer/lexer\_core.svh}}\par
+
+Breaks a string into tokens. Call \texttt{start()} with the string to analyze, then call \texttt{get\_token()} repeatedly until it returns \texttt{TOKEN\_EOL}. After each token, \texttt{get\_lexeme()} returns its text and, for numeric tokens, \texttt{get\_token\_descriptor()} returns details such as size, base, and sign. Whitespace between tokens is skipped. The lexer does not handle comments.
+
+Numeric constants follow SystemVerilog conventions without the apostrophe, which command shells treat specially: an optional sign, an optional decimal size, a base letter (\texttt{b}, \texttt{o}, \texttt{d}, or \texttt{h}, either case), and digits, e.g. \texttt{32h7fff\_624c} or \texttt{-100}. Underscores may appear between digits but not as the first character. Real constants use a decimal point and/or an exponent, and a number followed by a time unit is returned as \texttt{TOKEN\_TIME}.
+
+\subsection*{\texttt{lexer\_core}}
+\noindent\small\textit{class}\par
+
+The lexical analyzer. Internal character-level helpers are local and not part of the user interface.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{start} & void & \texttt{string s} & Initialize the lexer with the string to analyze. Must be called before any other method. \\
+\texttt{get\_token} & \texttt{token\_t} & --- & Return the next token from the input. \\
+\texttt{get\_lexeme} & \texttt{string} & --- & Return the text of the most recent token. Empty for \texttt{TOKEN\_EOL}. \\
+\texttt{get\_digits} & \texttt{string} & --- & Return the digits of the most recent numeric token. \\
+\texttt{get\_token\_descriptor} & \texttt{token\_descriptor} & --- & Return the descriptor for the most recent numeric token. \\
+\texttt{get\_loc} & \texttt{uint32\_t} & --- & Return the index in the input where the most recent lexeme begins. \\
+\texttt{put\_token} & void & \texttt{string lex} & Push a token back so it is returned again by the next \texttt{get\_token()}. Pass the token's lexeme. \\
+\texttt{lex\_filename} & \texttt{token\_t} & --- & Treat the rest of the input as a single raw value (e.g. a file path) without breaking it into tokens. Quoted values must be terminated; the lexeme keeps the quotes. Returns \texttt{TOKEN\_STRING}, \texttt{TOKEN\_ERROR}, or \texttt{TOKEN\_EOL}. \\
+\end{xltabular}
+
 \chapter{Linked Structures}
 \section{node}
-\noindent\small\textit{File: \texttt{src/linked/node.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/linked/node.svh}}\par
 
 A named, markable container node extending \texttt{object}. The name field supports hierarchical naming in the tree. The mark/unmark mechanism supports traversal algorithms that need to track visited nodes.
 
@@ -1425,7 +1596,7 @@ Named, markable base node for tree structures.
 \end{xltabular}
 
 \section{tree}
-\noindent\small\textit{File: \texttt{src/linked/tree.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/linked/tree.svh}}\par
 
 Classic tree data structure. Each node has exactly one parent (except the root, which has none), a name, and a map of named children. Each node is a typed container that can hold an object of arbitrary type. Hierarchical path names use the dot~(.)~as the separator; the \texttt{find()} method locates any named node by dot-separated path.
 
@@ -1458,7 +1629,7 @@ N-ary tree node with named children, full-path support, and hierarchical search.
 \end{xltabular}
 
 \section{tree\_iterator}
-\noindent\small\textit{File: \texttt{src/linked/tree\_iterator.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/linked/tree\_iterator.svh}}\par
 
 Pre-order depth-first iterator over a tree. \texttt{size()} counts all reachable nodes from the bound root.
 
@@ -1489,7 +1660,7 @@ Forward-only pre-order DFS iterator over a tree.
 
 \chapter{Set}
 \section{set}
-\noindent\small\textit{File: \texttt{src/set/set\_impl.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/set/set\_impl.svh}}\par
 
 Mathematical set. All set operations return a new set and do not mutate their operands.
 
@@ -1521,7 +1692,7 @@ Mathematical set with insert, membership test, and set-algebra operations.
 
 \chapter{Utilities}
 \section{msg --- Message Interface}
-\noindent\small\textit{File: \texttt{src/utils/msg.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/utils/msg.svh}}\par
 
 A simple, uniform interface for printing diagnostic messages. All methods are static, so no instance is required. Each method prints a formatted message prefixed with its severity tag and the caller-supplied identifier.
 
@@ -1537,14 +1708,14 @@ Static message-printing class. Wraps \texttt{\$error}, \texttt{\$warning}, \text
 \endhead
 \bottomrule
 \endfoot
-\texttt{error} & void & \texttt{string id, string txt} & Print an error message via \textbackslash{}\$error. Static. \\
-\texttt{warning} & void & \texttt{string id, string txt} & Print a warning message via \textbackslash{}\$warning. Static. \\
-\texttt{info} & void & \texttt{string id, string txt} & Print an informational message via \textbackslash{}\$info. Static. \\
-\texttt{fatal} & void & \texttt{string id, string txt} & Print a fatal message and abort simulation via \textbackslash{}\$fatal(1,...). Static. \\
+\texttt{error} & void & \texttt{string id, string txt} & Print an error message via \$error. Static. \\
+\texttt{warning} & void & \texttt{string id, string txt} & Print a warning message via \$warning. Static. \\
+\texttt{info} & void & \texttt{string id, string txt} & Print an informational message via \$info. Static. \\
+\texttt{fatal} & void & \texttt{string id, string txt} & Print a fatal message and abort simulation via \$fatal(1,...). Static. \\
 \end{xltabular}
 
 \section{msg macros --- Convenience Message Macros}
-\noindent\small\textit{File: \texttt{src/utils/msg\_macros.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/utils/msg\_macros.svh}}\par
 
 Preprocessor convenience macros that forward directly to the \texttt{msg} class static functions. Using the macros avoids writing \texttt{msg::} at every call site and keeps diagnostic output consistent across the library.
 
@@ -1560,14 +1731,14 @@ Four single-statement macros, one per severity level. Each expands to the corres
 \endhead
 \bottomrule
 \endfoot
-\texttt{\`{}info\_msg(id,\ txt)} & void & --- & Expands to \textbackslash{}texttt\{msg::info(id,txt)\}. \\
-\texttt{\`{}warning\_msg(id,\ txt)} & void & --- & Expands to \textbackslash{}texttt\{msg::warning(id,txt)\}. \\
-\texttt{\`{}error\_msg(id,\ txt)} & void & --- & Expands to \textbackslash{}texttt\{msg::error(id,txt)\}. \\
-\texttt{\`{}fatal\_msg(id,\ txt)} & void & --- & Expands to \textbackslash{}texttt\{msg::fatal(id,txt)\}. \\
+\texttt{\`{}info\_msg(id,\ txt)} & void & --- & Expands to \texttt{msg::info(id,txt)}. \\
+\texttt{\`{}warning\_msg(id,\ txt)} & void & --- & Expands to \texttt{msg::warning(id,txt)}. \\
+\texttt{\`{}error\_msg(id,\ txt)} & void & --- & Expands to \texttt{msg::error(id,txt)}. \\
+\texttt{\`{}fatal\_msg(id,\ txt)} & void & --- & Expands to \texttt{msg::fatal(id,txt)}. \\
 \end{xltabular}
 
 \section{ver --- Version}
-\noindent\small\textit{File: \texttt{src/utils/version.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/utils/version.svh}}\par
 
 Exposes the library version number through static accessor functions. Version components are defined by macros in the library header and retrieved at run time through this class.
 
@@ -1586,9 +1757,218 @@ Static version-query class for the SVX library.
 \texttt{get\_major\_version} & \texttt{int unsigned} & --- & Return the major version number. Static. \\
 \texttt{get\_minor\_version} & \texttt{int unsigned} & --- & Return the minor version number. Static. \\
 \texttt{get\_fix\_version} & \texttt{int unsigned} & --- & Return the fix/patch version number. Static. \\
-\texttt{get\_release\_mode} & \texttt{string} & --- & Return the release mode string (e.g., \textbackslash{}texttt\{beta\}). Static. \\
+\texttt{get\_release\_mode} & \texttt{string} & --- & Return the release mode string (e.g., \texttt{beta}). Static. \\
 \texttt{get\_version\_string} & \texttt{string} & --- & Return the full version string. Static. \\
 \texttt{print\_banner} & void & --- & Display a formatted version banner to stdout. Static. \\
+\end{xltabular}
+
+\part{UVM Utilities}
+
+\chapter{Command Line Processor}
+\section{Overview}
+\noindent\small\textit{File: \texttt{uvm/src/README-cl.md}}\par
+
+The command line processor recognizes plusargs --- arguments of the form \texttt{+name} or \texttt{+name=value} --- validates each value against a table of registered options, converts it to the option's type, and puts it into the UVM resource database under the scope \texttt{CL::}. The table gives a single place to find every option a testbench accepts.
+
+The use model has three steps, all performed before \texttt{run\_test()} so that every phase, including \texttt{build\_phase}, can read the values:
+
+\begin{enumerate}
+\item Register each option with \texttt{cl\#(T)::add()} or \texttt{cl\#(T)::add\_with\_default()}. Registration can happen anywhere --- any module, package, or class --- and in any order.
+\item Call \texttt{cl\_parse::get().parse()} once.
+\item Read values with \texttt{uvm\_resource\_db\#(T)::read\_by\_name("CL::", name, val)}.
+\end{enumerate}
+
+A \texttt{+name} without a value turns on a \texttt{bit} option. Numeric values may be sized and based, SystemVerilog style but without the apostrophe (e.g. \texttt{32h7fff\_624c}), and must fit the option's type. \texttt{string} values are taken as written, without being broken into tokens. Arguments that are not registered options --- simulator options, UVM options, other plusargs --- are skipped. If any registered option has an invalid value, the parser reports an error and publishes no command line values; UVM then stops the run at the end of elaboration.
+
+Supported types are \texttt{bit}, \texttt{byte}, \texttt{shortint}, \texttt{int}, \texttt{longint}, their \texttt{unsigned} forms (including the \texttt{int8\_t} ... \texttt{uint64\_t} aliases), \texttt{real}, and \texttt{string}.
+
+\section{cl --- Option Registration}
+\noindent\small\textit{File: \texttt{uvm/src/cl.svh}}\par
+
+User interface for registering command line options. The type parameter is the type of the option's value. Registration after the command line has been parsed is ignored with a warning, and registering a name twice is an error.
+
+\subsection*{\texttt{cl\#(T)}}
+\noindent\small\textit{class}\par
+
+Static registration functions.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{add} & void & \texttt{string name, string fmt=""} & Register option \texttt{name} of type T. The leading \texttt{+} is omitted. \texttt{fmt} optionally overrides the format used when printing the value. Static. \\
+\texttt{add\_with\_default} & void & \texttt{string name, T def, string fmt=""} & Register an option with a default value. The default is put into the resource database immediately and is overridden by a command line value. Static. \\
+\end{xltabular}
+
+\subsection*{\texttt{cl\_mgr}}
+\noindent\small\textit{class}\par
+
+Static manager for the table of registered options. Not instantiated.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{add} & void & \texttt{string name, cl\_opt\_desc\_base opt} & Add an option descriptor to the table. Errors if the name exists. Static. \\
+\texttt{find} & \texttt{cl\_opt\_desc\_base} & \texttt{string name} & Return the descriptor for \texttt{name}, or null. Static. \\
+\texttt{dump} & void & --- & Print the table: name, type, format, and default for each option. Static. \\
+\texttt{has\_been\_parsed} & \texttt{bit} & --- & True once the command line has been parsed. Static. \\
+\texttt{set\_parse\_flag} & void & --- & Mark the command line as parsed. Called by the parser. Static. \\
+\texttt{clr\_parse\_flag} & void & --- & Clear the parsed flag. Intended for testing. Static. \\
+\end{xltabular}
+
+\subsection*{\texttt{opt\_factory}}
+\noindent\small\textit{class}\par
+
+Creates the option descriptor that matches a type. This is the one place that lists the supported types.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{create} & \texttt{cl\_opt\_desc\_base} & \texttt{type\_handle\_base th, string name} & Return a new descriptor for the type, or report an error for an unsupported type. Static. \\
+\end{xltabular}
+
+\section{cl\_parse --- Parser}
+\noindent\small\textit{File: \texttt{uvm/src/cl\_parse.svh}}\par
+
+The parser. It runs in three passes over the arguments: split each registered plusarg into an option instance, validate and convert each value, and, if there were no errors, publish every value to the resource database.
+
+\subsection*{\texttt{cl\_parse}}
+\noindent\small\textit{class}\par
+
+Singleton command line parser.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{get} & \texttt{cl\_parse} & --- & Return the singleton parser. Static. \\
+\texttt{parse} & void & --- & Parse the command line and publish option values. Runs only once; later calls issue a warning and do nothing. \\
+\texttt{set\_args} & void & \texttt{string args[\$]} & Parse the given arguments instead of the simulator command line. Intended for testing; \texttt{args[0]} is the program name. \\
+\end{xltabular}
+
+The passes are implemented by the function objects \texttt{parse\_opt}, \texttt{validate\_opt}, and \texttt{populate\_resource\_db}, which are internal to the parser.
+
+\section{Option Descriptors and Instances}
+\noindent\small\textit{File: \texttt{uvm/src/cl\_opt\_desc.svh}, \texttt{uvm/src/cl\_opt\_instance.svh}}\par
+
+Each registered option has a descriptor; each occurrence on the command line produces an instance. Descriptors form a three-level hierarchy: a non-parameterized base used to manage descriptors polymorphically, \texttt{cl\_opt\_desc\#(T)} which supplies the value type, and leaf classes that implement type-specific parsing and conversion. Adding support for a new kind of value means adding a leaf class and a factory entry; the parser itself does not change.
+
+\subsection*{\texttt{cl\_opt\_desc\_base}}
+\noindent\small\textit{virtual class}\par
+
+Base class for option descriptors. Public members \texttt{fmt} (print format) and \texttt{multiple} (reserved for options that may repeat).
+
+\noindent\textbf{Constructor:} \texttt{new(string name)} --- Set the option name.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{create\_instance} & \texttt{cl\_opt\_instance\_base} & \texttt{string name} & Create an instance of the matching type (pure virtual). \\
+\texttt{validate\_and\_convert} & \texttt{bit} & \texttt{cl\_opt\_instance\_base inst} & Check the instance's value and convert it to the option type; 1 on success (pure virtual). \\
+\texttt{publish} & void & \texttt{cl\_opt\_instance\_base inst} & Put the converted value into the resource database (pure virtual). \\
+\texttt{get\_default\_value} & \texttt{type\_container\_base} & --- & Return the default value, or null (pure virtual). \\
+\texttt{get\_typename}, \texttt{get\_type\_handle} & \texttt{string}, \texttt{type\_handle\_base} & --- & Return the option type's name or type handle (pure virtual). \\
+\texttt{get\_name} & \texttt{string} & --- & Return the option name. \\
+\texttt{is\_switch} & \texttt{bit} & --- & True if the option may appear without a value. Default 0. \\
+\texttt{lex\_value} & \texttt{token\_t} & \texttt{lexer\_core lex} & Read the value token. Default uses \texttt{get\_token()}. \\
+\texttt{print} & void & --- & Print the option name, type, format, and default. \\
+\end{xltabular}
+
+\subsection*{\texttt{cl\_opt\_desc\#(T)}}
+\noindent\small\textit{virtual class}\quad \textbf{extends} \texttt{cl\_opt\_desc\_base}\par
+
+Implements everything that depends only on T: instance creation, publishing with \texttt{uvm\_resource\_db\#(T)::\allowbreak set\_override()}, the default value, and type information. \texttt{validate\_and\_convert()} remains pure virtual.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.9in} >{\small}X}
+\toprule
+\textbf{Leaf class} & \textbf{Handles} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{cl\_opt\_int\_desc\#(T, P)} & All integer types; P is the type's traits class. Checks range, sign, and sized-literal width. Default format \texttt{\%0d}. \\
+\texttt{cl\_opt\_real\_desc} & \texttt{real}; accepts real or integer values. Default format \texttt{\%g}. \\
+\texttt{cl\_opt\_string\_desc} & \texttt{string}; reads the value raw with \texttt{lex\_filename()}. Default format \texttt{\%s}. \\
+\texttt{cl\_opt\_bit\_desc} & \texttt{bit}; accepts the switch form, \texttt{on}/\texttt{off}, \texttt{true}/\texttt{false}, \texttt{yes}/\texttt{no}, 0, or 1. Default format \texttt{\%b}. \\
+\end{xltabular}
+
+\subsection*{\texttt{validate\_int\#(T, P)}}
+\noindent\small\textit{class}\par
+
+Integer validation shared by the integer, real, and bit descriptors.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{validate} & \texttt{bit} & \texttt{cl\_opt\_instance\_base inst, output T n} & Validate an integer token and return its value in n. Static. \\
+\texttt{str\_to\_uint} & \texttt{bit} & \texttt{string digits, uint32\_t radix, output uint128\_t mag} & Convert a digit string in the given radix to a 128-bit magnitude, skipping underscores. Static. \\
+\end{xltabular}
+
+\subsection*{\texttt{cl\_opt\_instance\#(T)}}
+\noindent\small\textit{class}\quad \textbf{extends} \texttt{cl\_opt\_instance\_base}\par
+
+One option as it appeared on the command line: its name, lexeme, token, numeric descriptor, the converted value, and a link to its descriptor.
+
+\chapter{Pipelined Testbenches}
+\section{Pipe Stages}
+\noindent\small\textit{File: \texttt{uvm/src/pipe\_stage\_base.svh}, \texttt{uvm/src/pipe\_stage.svh}}\par
+
+Base classes for building testbenches as a chain of stages. Each stage owns a sequencer and exposes it through \texttt{seq\_item\_export}; the next stage pulls items through its \texttt{seq\_item\_port}. A stage processes each item in \texttt{process\_item()} and, unless it is the last stage, sends the item downstream with \texttt{sqr.execute\_item()}. Each stage sets its \texttt{done} flag when it has no more work, so the environment can end the test when every stage is done.
+
+\subsection*{\texttt{pipe\_stage\_base\#(SEQ)}}
+\noindent\small\textit{class}\quad \textbf{extends} \texttt{uvm\_component}\par
+
+Base for all stages, and used directly for the first stage, which generates items itself. SEQ is the sequence item type.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{process\_item} & void & \texttt{SEQ item} & Virtual hook for handling an item; commonly sends it downstream. Task. \\
+\texttt{is\_done} & \texttt{bit} & --- & Return the \texttt{done} flag. \\
+\end{xltabular}
+
+\subsection*{\texttt{pipe\_stage\#(SEQ)}}
+\noindent\small\textit{class}\quad \textbf{extends} \texttt{pipe\_stage\_base\#(SEQ)}\par
+
+Base for every stage after the first. \texttt{run\_phase} runs two processes: one pulls items from upstream into an analysis FIFO, the other takes items from the FIFO and calls \texttt{process\_item()}. \texttt{done} is set whenever the FIFO is empty.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.5in} >{\small}p{1.5in} >{\small}X}
+\toprule
+\textbf{Member} & \textbf{Type} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{seq\_item\_port} & \texttt{uvm\_seq\_item\_pull\_port\#(SEQ)} & Connect to the upstream stage's \texttt{seq\_item\_export}. \\
+\texttt{seq\_item\_export} & \texttt{uvm\_seq\_item\_pull\_export\#(SEQ)} & Inherited; connected to the stage's own sequencer for the downstream stage. \\
+\texttt{fifo} & \texttt{uvm\_tlm\_analysis\_fifo\#(SEQ)} & Holds items pulled from upstream until they are processed. \\
+\texttt{done} & \texttt{bit} & Set when the stage has no work in progress. \\
 \end{xltabular}
 
 \end{document}

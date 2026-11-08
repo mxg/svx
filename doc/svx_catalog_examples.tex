@@ -11,6 +11,9 @@
 \usepackage{hyperref}
 \usepackage{makecell}
 
+% Allow line breaks after underscores so long identifiers fit.
+\AtBeginDocument{\renewcommand{\_}{\textunderscore\allowbreak}}
+
 \hypersetup{
   colorlinks=true,
   linkcolor=blue,
@@ -34,25 +37,30 @@
   {\Large SystemVerilog Extension Library\par}
   \vspace{1.5em}
   {\huge Examples Catalog\par}
-  \vspace{1em}
-  {\large Version 2.1.2~beta\par}
   \vspace{0.5em}
-  {\large October 2026\par}
+  {\large Core Library and UVM Utilities\par}
+  \vspace{2em}
+  {\large Version 2.1.3~beta\par}
+  \vspace{0.5em}
+  {\large November 2026\par}
   \vspace{0.5em}
   {\large Mark Glasser\par}
-  \vspace{0.5em}
-  {\large Apache License 2.0\par}
+  \vfill
+  {\small Copyright 2026 Mark Glasser.
+  Licensed under the Apache License, Version~2.0.\par}
 \end{titlepage}
 
 \tableofcontents
 \newpage
+\part{Core Library}
+
 \chapter{Containers}
 
 The container examples demonstrate the four core generic containers provided by SVX\@: \texttt{vector}, \texttt{deque}, \texttt{queue}, and \texttt{map}.  Each example is self-contained and focuses on the essential operations for that container.
 
 \section{Vector}
 
-\textit{Source:} \texttt{examples/containers/vector}\\
+\textit{Source:} \texttt{core/examples/containers/vector}\\
 
 Demonstrates the two distinct ways to grow a vector. In the first approach, elements are written past the current end of the vector using write(); the vector extends itself automatically to accommodate the new index. In the second approach, appendc() adds new elements one at a time to the back, also growing the vector. After population the example performs random-access reads and a targeted write, then traverses the vector by index to print its contents.
 
@@ -64,7 +72,7 @@ Demonstrates the two distinct ways to grow a vector. In the first approach, elem
 \end{itemize}
 \section{Deque}
 
-\textit{Source:} \texttt{examples/containers/deque}\\
+\textit{Source:} \texttt{core/examples/containers/deque}\\
 
 Demonstrates double-ended queue operations. Elements are pushed onto both the back and the front of the deque, then drained from the front with pop\_front(). A second pass re-populates the deque and shows that read(), inherited from the vector base class, can be used for indexed access even on a deque instance. The deque is then reversed in place and printed again.
 
@@ -76,7 +84,7 @@ Demonstrates double-ended queue operations. Elements are pushed onto both the ba
 \end{itemize}
 \section{Queue}
 
-\textit{Source:} \texttt{examples/containers/queue}\\
+\textit{Source:} \texttt{core/examples/containers/queue}\\
 
 Demonstrates storing user-defined class objects in a queue. The example defines a packet class with a randomized destination byte and a 16-byte payload stored in a vector. A static vector of valid destinations is shared across all packet instances and populated once at setup time.
 
@@ -92,7 +100,7 @@ Ten packets are created via a static factory function, which selects a random de
 \end{itemize}
 \section{Map}
 
-\textit{Source:} \texttt{examples/containers/map}\\
+\textit{Source:} \texttt{core/examples/containers/map}\\
 
 Demonstrates a string-keyed map whose values are polymorphic class handles. Three concrete classes (str\_obj, real\_obj, int\_obj) each extend an abstract base class that declares a virtual to\_string() method. One instance of each is created and inserted into the map under a descriptive key.
 
@@ -110,7 +118,7 @@ The algorithm examples demonstrate the \texttt{algo\#()} class, which provides a
 
 \section{Algo}
 
-\textit{Source:} \texttt{examples/algo/algo}\\
+\textit{Source:} \texttt{core/examples/algo/algo}\\
 
 Demonstrates the core algorithms in algo\#() applied to a small vector of bytes. A custom predicate class (extending predicate\#()) tests whether each element is less than 0x0f. A custom functor class (extending fcn\#()) prints each element.
 
@@ -132,7 +140,7 @@ The types examples demonstrate SVX\textquotesingle s compile-time type classific
 
 \section{Type Check}
 
-\textit{Source:} \texttt{examples/types/type\_check}\\
+\textit{Source:} \texttt{core/examples/types/type\_check}\\
 
 Demonstrates compile-time type trait assertions via the check\_trait macro. The example class is parameterized by a type T and its associated traits class P. Three check\_trait invocations at class elaboration time assert that the type is integral, is two-state, and is not a string. If any assertion fails, elaboration terminates with a fatal message.
 
@@ -151,7 +159,7 @@ The lexer example demonstrates \texttt{lexer\_core} in a realistic application c
 
 \section{RPN Calculator}
 
-\textit{Source:} \texttt{examples/lexer}\\
+\textit{Source:} \texttt{core/examples/lexer}\\
 
 Implements a reverse Polish notation (RPN) calculator using the lexer\_core tokenizer and a stack. The lexer tokenizes an input string into integer operands, floating-point operands, and arithmetic operators (+, -, *, /). The calculator maintains a stack of triple\#() items, where each item carries the token type, an integer value, and a real value. For each token the calculator either pushes an operand onto the stack or pops two operands, performs the operation, and pushes the result.
 
@@ -167,11 +175,11 @@ The example evaluates six expressions covering integer arithmetic, floating-poin
 \end{itemize}
 \chapter{Use Models}
 
-The use model examples are longer, more detailed demonstrations that show recommended patterns for using SVX containers, iterators, and algorithms. They are collected in \texttt{examples/use\_models} and can be run together from a single top-level module. Each sub-example is described separately below.
+The use model examples are longer, more detailed demonstrations that show recommended patterns for using SVX containers, iterators, and algorithms. They are collected in \texttt{core/examples/use\_models} and can be run together from a single top-level module. Each sub-example is described separately below.
 
 \section{List}
 
-\textit{Source:} \texttt{examples/use\_models/list\_example.svh}\\
+\textit{Source:} \texttt{core/examples/use\_models/list\_example.svh}\\
 
 Demonstrates the canonical forward-iteration use model for SVX containers. A vector of 20 random integers is built using appendc(). A list\_iterator is then created and bound to the vector, and the standard idiom (first() / at\_end() / get() / next()) is used to traverse and print all elements.
 
@@ -186,7 +194,7 @@ The vector is then sorted with sort(), and the same iterator is reset to first()
 \end{itemize}
 \section{Map --- Basic Use}
 
-\textit{Source:} \texttt{examples/use\_models/map\_example.svh}\\
+\textit{Source:} \texttt{core/examples/use\_models/map\_example.svh}\\
 
 Demonstrates inserting, looking up, and iterating over a typed map. The map stores eight physical constants (Faraday, Planck, Avogadro, Boltzmann, electron mass, proton mass, magnetic flux constant, and elementary charge) keyed by their common names. A map\_iterator traverses all entries, using get\_index() to retrieve each key and printing the value and units.
 
@@ -201,7 +209,7 @@ Two direct lookups follow: one for a key that exists (proton\_mass) and one for 
 \end{itemize}
 \section{Map --- Polymorphic Container}
 
-\textit{Source:} \texttt{examples/use\_models/map\_example.svh}\\
+\textit{Source:} \texttt{core/examples/use\_models/map\_example.svh}\\
 
 Demonstrates storing heterogeneous values of different types in a single map by wrapping them in type\_container\#(). Three entries are inserted under string keys: an integer, a real number, and a string, each wrapped in the corresponding type\_container specialization.
 
@@ -219,7 +227,7 @@ The example then demonstrates two approaches to processing the polymorphic map. 
 \end{itemize}
 \section{Algo with Range}
 
-\textit{Source:} \texttt{examples/use\_models/algo\_example.svh}\\
+\textit{Source:} \texttt{core/examples/use\_models/algo\_example.svh}\\
 
 Demonstrates running algorithms over a sub-range of a vector using the range\#() iterator. A vector of random 16-bit integers is created with a randomized size. A range iterator is then bound to a list\_iterator over the vector, with randomly chosen lower and upper bounds.
 
@@ -242,7 +250,7 @@ The application examples demonstrate SVX\textquotesingle s three application-lay
 
 \section{Sparse Memory}
 
-\textit{Source:} \texttt{examples/mem}\\
+\textit{Source:} \texttt{core/examples/mem}\\
 
 Demonstrates the mem\#() sparse memory model in a read/write verification scenario. A 32-bit memory with 16-bit pages, 8-bit blocks, and a 4-byte word size is instantiated. One word at a fixed offset within the test region is marked write-protected with set\_word\_restriction() before any writes begin.
 
@@ -255,7 +263,7 @@ Demonstrates the mem\#() sparse memory model in a read/write verification scenar
 \end{itemize}
 \section{Device Memory Map}
 
-\textit{Source:} \texttt{examples/mem\_map}\\
+\textit{Source:} \texttt{core/examples/mem\_map}\\
 
 Constructs a realistic SoC-style hierarchical address map and exercises its path-based and address-based lookup facilities. The hierarchy models a complete system with a 64 KB address space (0x0000--0xFFFF). An IO bus region at 0xFF00 contains two UART sub-regions, each with read\_buf, write\_buf, and ctrl registers. A system bus at 0x0000 is modeled by two overlapping views: sys\_bus, which contains a timer region (with a CSR register holding start\_stop and status fields) and two memory blocks; and sys\_bus\_2, an alternate view of the same address range that exposes the memory as a single flat block. The two views are both of type mem\_view\#(), which permits overlapping sibling instances.
 
@@ -273,7 +281,7 @@ After the hierarchy is constructed, calculate\_and\_check() is called on the roo
 \end{itemize}
 \section{Priority Queue Job Scheduler}
 
-\textit{Source:} \texttt{examples/pri\_queue}\\
+\textit{Source:} \texttt{core/examples/pri\_queue}\\
 
 Simulates a priority-based job scheduler using two concurrent simulation threads. Sixteen jobs labeled A through P are pre-loaded into an SVX queue, which serves as a staging buffer for convenience. The first thread dequeues jobs one at a time, assigns each a randomized priority (0--9), pushes it into a priority queue, and waits two time units before pushing the next.
 
@@ -285,5 +293,49 @@ The second thread runs concurrently, waiting for the priority queue to become no
   \item \texttt{pri\_queue\#(T,P)}
   \item \texttt{queue\#(T,P)}
   \item \texttt{string\_traits}
+\end{itemize}
+\part{UVM Utilities}
+
+\chapter{Command Line Processor}
+
+The command line example shows the complete use model for reading plusargs into a UVM testbench: registering options, parsing the command line before \texttt{run\_test()}, and reading the values from the UVM resource database.
+
+\section{Command Line Options}
+
+\textit{Source:} \texttt{uvm/examples/cl}\\
+
+The top module registers thirteen options of different types --- integers of several widths and signedness, \texttt{real}, \texttt{bit} switches, and \texttt{string} --- some with default values and some with custom print formats. It then obtains the singleton parser with \texttt{cl\_parse::get()} and calls \texttt{parse()}, all before calling \texttt{run\_test()}, so the values are available to every phase.
+
+The makefile supplies a command line that exercises the value forms the parser accepts: unsized decimal and negative values, a real in exponent notation, a \texttt{bit} given in switch form, sized hexadecimal values (one with underscores), a file path, and an option given twice, where the last value wins. Options not on the command line keep their defaults.
+
+In \texttt{build\_phase}, the test reads every option back with \texttt{uvm\_resource\_db\#(T)::read\_by\_name()} using the \texttt{CL::} scope and prints its value, reporting an error for any option that was not found. Reading the values in \texttt{build\_phase} shows that they are available before the component hierarchy is built --- for example, to decide how many agents to create.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{cl\#(T)::add()}
+  \item \texttt{cl\#(T)::add\_with\_default()}
+  \item \texttt{cl\_parse::get()}
+  \item \texttt{cl\_parse::parse()}
+\end{itemize}
+\chapter{Pipelined Testbenches}
+
+The pipeline example shows how to build a testbench as a chain of stages using the pipe-stage base classes, with transactions flowing from one stage to the next through sequencer ports.
+
+\section{Three-Stage Pipeline}
+
+\textit{Source:} \texttt{uvm/examples/pipeline}\\
+
+An environment contains three stages connected in a chain: the \texttt{seq\_item\_port} of each stage is connected to the \texttt{seq\_item\_export} of the stage before it. The transaction is a sequence item with a random operation (\texttt{NOP}, \texttt{READ}, or \texttt{WRITE}), a word-aligned address, and data.
+
+The first stage, derived from \texttt{pipe\_stage\_base}, generates ten random transactions, two time units apart, and sends each one downstream through its sequencer. The second and third stages, derived from \texttt{pipe\_stage}, pull transactions from upstream into a FIFO and process them; the second stage forwards each transaction and then waits three time units, while the third, the last stage, waits five. Because the stages run at different rates, transactions queue up in the FIFOs, and the log shows how they move through the pipeline over time.
+
+Each stage sets its \texttt{done} flag when it has no work left. The environment holds an objection until all three flags are set, so the test ends once every transaction has passed through the pipeline.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{pipe\_stage\_base\#(SEQ)}
+  \item \texttt{pipe\_stage\#(SEQ)}
 \end{itemize}
 \end{document}
