@@ -189,6 +189,7 @@ module cl_parse_unit_test;
   begin                                         \
     T v__;                                      \
     string n__;                                 \
+    cl_mgr::clr_parse_flag();                   \
     n__ = opt#(T)::add();                       \
     parse_one(n__, SUFFIX);                     \
     `FAIL_UNLESS(catcher.n_errors == 0)         \
@@ -202,6 +203,7 @@ module cl_parse_unit_test;
   begin                                         \
     T v__;                                      \
     string n__;                                 \
+    cl_mgr::clr_parse_flag();                   \
     n__ = opt#(T)::add();                       \
     parse_one(n__, SUFFIX);                     \
     `FAIL_UNLESS(catcher.n_errors == 0)         \
@@ -213,6 +215,7 @@ module cl_parse_unit_test;
   begin                                         \
     T v__;                                      \
     string n__;                                 \
+    cl_mgr::clr_parse_flag();                   \
     n__ = opt#(T)::add();                       \
     parse_one(n__, SUFFIX);                     \
     `FAIL_IF(catcher.n_errors == 0)             \
@@ -426,6 +429,7 @@ module cl_parse_unit_test;
       int32_t v;
       string n;
 
+      cl_mgr::clr_parse_flag();
       n = opt#(int32_t)::add();
       parse_args({$sformatf("+%s=1", n), $sformatf("+%s=2", n)});
       `FAIL_UNLESS(catcher.n_errors == 0)
@@ -447,6 +451,7 @@ module cl_parse_unit_test;
       string bad;
 
       // Missing value: a first-pass error
+      cl_mgr::clr_parse_flag();
       good = opt#(int32_t)::add();
       bad  = opt#(int32_t)::add();
       parse_args({$sformatf("+%s=5", good), $sformatf("+%s", bad)});
@@ -454,6 +459,7 @@ module cl_parse_unit_test;
       `FAIL_IF(opt#(int32_t)::get(good, v))
 
       // Invalid value: a second-pass error
+      cl_mgr::clr_parse_flag();
       good = opt#(int32_t)::add();
       bad  = opt#(int32_t)::add();
       parse_args({$sformatf("+%s=5", good), $sformatf("+%s=abc", bad)});
@@ -473,6 +479,7 @@ module cl_parse_unit_test;
       string args[$];
 
       // Not on the command line: the default is visible
+      cl_mgr::clr_parse_flag();
       n = opt#(int32_t)::add_with_default(17);
       parse_args(args);
       `FAIL_UNLESS(catcher.n_errors == 0)
@@ -480,6 +487,7 @@ module cl_parse_unit_test;
       `FAIL_UNLESS(v == 17)
 
       // On the command line: the command line value wins
+      cl_mgr::clr_parse_flag();
       n = opt#(int32_t)::add_with_default(17);
       parse_one(n, "=99");
       `FAIL_UNLESS(catcher.n_errors == 0)

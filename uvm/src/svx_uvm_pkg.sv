@@ -42,4 +42,8 @@ package svx_uvm_pkg;
   `include "cl.svh"
   `include "cl_parse.svh"
 
+  // Pipelined testbenches
+  `include "pipe_stage_base.svh"
+  `include "pipe_stage.svh"
+
 endpackage

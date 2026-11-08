@@ -50,7 +50,7 @@ class cl_mgr;
   // class.
   //--------------------------------------------------------------------
   local function new();
-endfunction
+  endfunction
 
 
   // Keep track of whether the parser has been called once.
@@ -60,6 +60,11 @@ endfunction
 
   static function bit has_been_parsed();
     return parse_flag;
+  endfunction
+
+  // Clearing the parse flag is necessary for testing
+  static function void clr_parse_flag();
+    parse_flag = 0;
   endfunction
 
   //--------------------------------------------------------------------

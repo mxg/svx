@@ -26,7 +26,7 @@
 # permissions and limitations under the License.
 #=======================================================================
 
-EXAMPLES	:= cl
+EXAMPLES	:= cl pipeline
 
 MAKE		:= /usr/bin/make -s
 

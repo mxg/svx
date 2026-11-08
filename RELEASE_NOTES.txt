@@ -4,29 +4,35 @@ RELEASE NOTES
 
 Version svx-2.1 <beta 3>
 
-October 2026
+November 2026
 
 ----------------------------------------------------------------------
-
-* Added get_item to map#() and multimap(). These functions return a
-  pair#() that contains the key and the data item.
-
-* ADDED: Command line parser.  You can specify a list of command line
-  options in a table.  THowse options are recognised on the commnand
-  line.  The values of each option is stored in the resource database.
 
 * Enable compilation of UVM in the makefile system. Using IEEE
   1800.2-2020 standard as implemented in the Accellera kit version
   1800.2-2020.3.2.
 
+* ADDED: Added get_item to map#() and multimap(). These functions
+  return a pair#() that contains the key and the data item.
+
+* ADDED: Command line parser.  You can specify a list of command line
+  options in a table.  THowse options are recognised on the commnand
+  line.  The values of each option is stored in the resource database.
+
 * FIXED: bug in lexer that caused the first character of an identifier
   lexeme to disappear.
+
+* FIXED: Fixed bugs in lexer related to recognizing numeric constants.
 
 * ADDED: Added val2str() virtual function to type_container_base and
   type_container. It can be implemented to convert an internal value
   to a printable string.
 
-* FIXED: Fixed bugs in lexer related to recognizing numeric constants.
+* ADDED: base classes for piplined testbenches. The two classes,
+  pipe_stage_base and pipe_stage can be used to build pipelined
+  testbenches.  An examample of a pipelined testbench is in
+  uvm/examples/pipeline.
+
 
 
 ----------------------------------------------------------------------
