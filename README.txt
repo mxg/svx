@@ -34,18 +34,25 @@
 
                           Author: Mark Glasser
 
-SVX is an experiment in generic programming in SystemVerilog.  It's
-loosely modeled on C++'s STL. Originally built in 2016, its purpose is
-twofold: One is to provide tools for writing generic programs --
-programs that can be easily reused; the other is to provide building
-blocks for creating programs at higher levels of abstraction -- that
-is, abstract away low-level details of containers.  Because
-SystemVerilog only partially supports multiple inheritance and does
-not support function overloading and partial template specialization
-many things found in STL cannot be replicated in SystemVerilog.
-However, there is still plenty of opportunity to build generic
-elements. While using STL as an inspiration, SVX has its own
+SVX has two parts: the core library and UVM utilities.
+
+The SVX core library is an experiment in generic programming in
+SystemVerilog.  It's loosely modeled on C++'s STL. Originally built in
+2016, its purpose is twofold: One is to provide tools for writing
+generic programs -- programs that can be easily reused; the other is
+to provide building blocks for creating programs at higher levels of
+abstraction -- that is, abstract away low-level details of containers.
+Because SystemVerilog only partially supports multiple inheritance and
+does not support function overloading and partial template
+specialization many things found in STL cannot be replicated in
+SystemVerilog.  However, there is still plenty of opportunity to build
+generic elements. While using STL as an inspiration, SVX has its own
 language-specific flavor.
+
+The UVM tuilities are a et of tools for building sophisticated UVM
+testbenches.  These utilities are built on top of or along side UVM
+and do not interfer with UVM itself.  Many of the utilities are
+written in a generic style and rely on the core library.
 
 This version has been ported to Verilator, an increasingly important
 open source SystemVerilog compiler and simulator.  Recently, through
@@ -57,19 +64,38 @@ what UVM uses.
 PACKAGE CONTENTS
 ----------------
 
-The SVX library distribution is organized into a set of directories
+The SVX library distribution is organized into a set of directories.
 
-src      - contains the library source code
+-- top-level --
 
-doc      - contains the documentation PDF files as well as the
-           documentation source.
+core     - The core library
 
-test     - contains a comprehensive test suite
+uvm     - uvm utilities
 
-examples - contains use model examples
+make    - a comman makefile used in building all the tests and
+          examples
+doc     - contains the documentation PDF files as well as the
+          documentation source.
 
-apps     - A collection of SystemVerilog utilities built with SVX.
+-- Core Library --
 
+core/src      - contains the core library source code.
+
+core/test     - contains a comprehensive test suite.
+
+core/examples - contains use model examples.
+
+core apps     - A collection of SystemVerilog utilities built with
+                SVX.
+
+-- UVM utilities
+
+uvm/src       - contains the source for the UVM utilities.
+
+uvm/examples  - contains a collection of usage examples of the UVM
+                utilities.
+
+test          - contains a test suite for the UVM utilities.
 
 INSTALLATION
 ------------
@@ -77,13 +103,12 @@ INSTALLATION
 Simply unpack the tar kit in a convenient location.  Nothing else is
 required to install the package.
 
-
 BUILDING
 --------
 
 To use the SVX library in your own work You will have to compile and
 link the SVX library along with other SystemVerilog code in the usual
-way.  Create an environment variable SVX_HOME which points to the
+
 location where you installed the SVX library.  E.g.,
 
 % setenv SVX_HOME /home/tools/svx-2.0.0
@@ -100,19 +125,23 @@ Because Verilator compiles SystemVerilog into C++, building any
 Verilator code requires a C++ compiler.  For our development and
 testing we used C++-17 with the gcc 15.2.0 compiler.
 
-
 USAGE
 -----
 
-To use the library import the SVX package and include the file of macro
-definitions in your SystemVerilog source.  E.g.
+The library has two package files, one for each macjor componenet of
+the library. Both must be imported to use all the features of SVX.
 
-import svx::*;
+import svx::*
+import svx_uvm_pkg::*;
 `include "svx_macros.svh"
+
+You can use the SVX core library without the UVM utilities.  To do so,
+just remove the "import svx_uvm_pkg::*" line.  The UVM utilities have
+a dependency on the core library, os you must import the core library
+to use the UVM utilities.
 
 This will provide access to all of the SVX library features in your
 SystemVerilog programs.
-
 
 DOCUMENTATION
 -------------

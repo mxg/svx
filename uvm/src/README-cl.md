@@ -21,6 +21,10 @@ processor identifies them by their leading "+" character.  The plus
 sign does not need to be supplied as part of the name for cl::add()
 and cl::add_with_default().
 
+You can print out the command option table with the following call:
+
+  cl_mgr::dump();
+
 To execute the parsing operation you need to get a handle to the
 parser object and call parse().  Get() retrieves the singleton handle
 of cl_parse.
