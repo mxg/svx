@@ -46,7 +46,10 @@ package svx_uvm_pkg;
   `include "pipe_stage_base.svh"
   `include "pipe_stage.svh"
 
-  // Agreerments
+  // Agreements
   `include "agreement.svh"
+
+  // Plugins
+  `include "plugins.svh"
 
 endpackage

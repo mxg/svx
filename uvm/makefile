@@ -26,7 +26,7 @@
 # permissions and limitations under the License.
 #=======================================================================
 
-DIRS	:= test examples
+DIRS	:= examples test
 
 MAKE	:= /usr/bin/make -s
 

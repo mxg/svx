@@ -39,12 +39,12 @@ module top;
   import test_pkg::*;
 
   //--------------------------------------------------------------------
-  // populate
+  // preliminaries
   //
   // Populate the command line option table with all possible
   // command line options.
   //--------------------------------------------------------------------
-  function static void populate();
+  function static void preliminaries();
 
     // Obtain a handle to the singleton command line parser.
     cl_parse clp = cl_parse::get();
@@ -78,7 +78,7 @@ module top;
     // Populate the option table, parse the command line, and put the
     // options into the resource database before run_test() executes.
     // This makes all the options available during the build phase.
-    populate();
+    preliminaries();
     run_test();
   end
 
