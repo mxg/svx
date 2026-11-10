@@ -53,7 +53,8 @@ class env extends uvm_component;
     ok_to_shutdown = new();
 
     // Put the new agreement into the resource database.
-    uvm_resource_db#(agreement)::set("*", "ok_to_shutdown", ok_to_shutdown, this);
+    uvm_resource_db#(agreement)::set("*", "ok_to_shutdown", 
+				     ok_to_shutdown, this);
   endfunction
 
   task run_phase(uvm_phase phase);

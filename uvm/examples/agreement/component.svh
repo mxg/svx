@@ -39,8 +39,8 @@ class component extends uvm_component;
   endfunction
 
   function void build_phase(uvm_phase phase);
-    // Retrieve the agreement from the resource database.  Every
-    // instance of cpmponent shares the same agreement instance.
+    // Retrieve the agreement from the resource database.  All
+    // instances of component shares the same agreement instance.
     if(!uvm_resource_db#(agreement)::read_by_name(get_name(),
 						  "ok_to_shutdown",
 						  ok_to_shutdown, this)) begin
@@ -55,7 +55,7 @@ class component extends uvm_component;
     $display("%10t: %s", $time, get_name());
     ok_to_shutdown.agree(this);
     #100;
-    $display("This message should never display");
+    $display("This message should never display!");
   endtask
 
 endclass
