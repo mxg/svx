@@ -1424,15 +1424,66 @@ Constant predicate that always evaluates to 0.
 \end{xltabular}
 
 \chapter{Lexer}
+\section{lexer\_core --- Lexical Analyzer}
+\noindent\small\textit{File: \texttt{core/src/lexer/lexer\_core.svh}}\par
+
+Breaks a string into tokens. To use the lexer, create a \texttt{lexer\_core} object, call \texttt{start()} with the string to analyze, and then call \texttt{get\_token()} repeatedly until it returns \texttt{TOKEN\_EOL}. Each call returns a value of the enumerated type \texttt{token\_t} (defined in \texttt{token\_types.svh}). After each token, \texttt{get\_lexeme()} returns its text, and for numeric tokens \texttt{get\_token\_descriptor()} returns details such as the size, base, and sign. Whitespace between tokens is skipped. The lexer does not handle comments.
+
+\begin{verbatim}
+lexer_core lex = new();
+token_t    tok;
+
+lex.start("size = 32h7fff_624c");
+for(tok = lex.get_token(); tok != TOKEN_EOL; tok = lex.get_token())
+  $display("%s: %s", tok.name(), lex.get_lexeme());
+\end{verbatim}
+
+Numeric constants follow SystemVerilog conventions without the apostrophe, which command shells treat specially: an optional sign, an optional decimal size, a base letter (\texttt{b}, \texttt{o}, \texttt{d}, or \texttt{h}, either case), and digits, e.g. \texttt{32h7fff\_624c} or \texttt{-100}. Underscores may appear between digits but not as the first character. Real constants use a decimal point and/or an exponent, and a number followed by a time unit (\texttt{s}, \texttt{ms}, \texttt{us}, \texttt{ns}, \texttt{ps}, \texttt{fs}) is a time constant. The words \texttt{on}, \texttt{true}, and \texttt{yes} and \texttt{off}, \texttt{false}, and \texttt{no} (all lower or all upper case) are returned as the tokens \texttt{TOKEN\_ON} and \texttt{TOKEN\_OFF}.
+
+\subsection*{\texttt{lexer\_core}}
+\noindent\small\textit{class}\par
+
+\noindent\textbf{Constructor:} \texttt{new()} --- Create a lexer. Call \texttt{start()} before any other method.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{start} & void & \texttt{string s} & Initialize the lexer with the string to analyze. \\
+\texttt{get\_token} & \texttt{token\_t} & --- & Return the next token from the input; \texttt{TOKEN\_EOL} at the end. \\
+\texttt{get\_lexeme} & \texttt{string} & --- & Return the text of the most recent token. Empty for \texttt{TOKEN\_EOL}. \\
+\texttt{get\_token\_descriptor} & \texttt{token\_descriptor} & --- & Return details of the most recent numeric token. \\
+\texttt{put\_token} & void & \texttt{string lex} & Push a token back so it is returned again by the next \texttt{get\_token()}. Pass the token's lexeme. \\
+\texttt{lex\_filename} & \texttt{token\_t} & --- & Take the rest of the input as a single raw value, such as a file path, without breaking it into tokens. Returns \texttt{TOKEN\_STRING}, \texttt{TOKEN\_ERROR} for an unterminated quote, or \texttt{TOKEN\_EOL}. \\
+\end{xltabular}
+
+\subsection*{\texttt{token\_descriptor}}
+\noindent\small\textit{class}\par
+
+Details of the most recent numeric token, returned by \texttt{get\_token\_descriptor()}.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.5in} >{\small}p{1.5in} >{\small}X}
+\toprule
+\textbf{Field} & \textbf{Type} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{sign} & \texttt{byte} & Leading sign character, \texttt{+} or \texttt{-}; 0 if none. \\
+\texttt{size} & \texttt{int unsigned} & Declared size of a sized constant; 0 if unsized. \\
+\texttt{base} & \texttt{byte} & Base character: \texttt{d}, \texttt{h}, \texttt{o}, or \texttt{b} (either case). \\
+\texttt{digits} & \texttt{string} & The digits of the value, without sign, size, or base. \\
+\texttt{is\_logic} & \texttt{bit} & Set if the digits include \texttt{x} or \texttt{z}. \\
+\texttt{multiplier} & \texttt{real} & Scale factor for a time constant's unit, e.g. 1.0e-9 for \texttt{ns}. \\
+\end{xltabular}
+
 \section{ctypes --- Character Classification}
-\noindent\small\textit{File: \texttt{core/src/lexer/ctypes.svh}, \texttt{core/src/lexer/ctypes\_macros.svh}}\par
+\noindent\small\textit{File: \texttt{core/src/lexer/ctypes\_macros.svh}}\par
 
-A SystemVerilog implementation of the C library \texttt{ctype} facility. The package \texttt{ctypes} holds a 128-entry table indexed by ASCII code; each entry is a bit field describing the character (upper case, lower case, digit, whitespace, punctuation, control, hex digit, blank, octal digit, logic value). A set of macros tests a character against the table, mirroring the C \texttt{ctype} functions. Characters are masked to 7 bits before lookup.
-
-\subsection*{\texttt{ctype macros}}
-\noindent\small\textit{macros}\par
-
-Each macro takes a character \texttt{c} and evaluates to true if the character has the named characteristic.
+Macros, modeled on the C \texttt{ctype} functions, that test a character for a characteristic. The lexer uses them, and they are available for any character processing.
 
 \begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
 \toprule
@@ -1453,118 +1504,6 @@ Each macro takes a character \texttt{c} and evaluates to true if the character h
 \texttt{\`{}ispunct(c)} & \texttt{bit} & --- & Punctuation character. \\
 \texttt{\`{}isprint(c)} & \texttt{bit} & --- & Printable character: punctuation, letter, digit, or blank. \\
 \texttt{\`{}islogic(c)} & \texttt{bit} & --- & Four-state logic digit: \texttt{x}, \texttt{X}, \texttt{z}, or \texttt{Z}. \\
-\end{xltabular}
-
-\section{token\_types --- Tokens and Token Descriptors}
-\noindent\small\textit{File: \texttt{core/src/lexer/token\_types.svh}}\par
-
-The enumerated type of tokens the lexer returns, a traits class so tokens can be stored in SVX containers, and the descriptor that carries details about numeric tokens.
-
-\subsection*{\texttt{token\_t}}
-\noindent\small\textit{enum}\par
-
-Token types returned by \texttt{lexer\_core::get\_token()}.
-
-\begin{xltabular}{\linewidth}{>{\small}p{2.6in} >{\small}X}
-\toprule
-\textbf{Token} & \textbf{Meaning} \\
-\midrule
-\endhead
-\bottomrule
-\endfoot
-\texttt{TOKEN\_ID} & Identifier: a letter or underscore followed by letters, digits, and underscores. \\
-\texttt{TOKEN\_INT} & Integer constant, sized or unsized, in any base. \\
-\texttt{TOKEN\_LOGIC} & Integer constant containing \texttt{x} or \texttt{z} digits. \\
-\texttt{TOKEN\_FLOAT} & Real constant with a decimal point and/or exponent. \\
-\texttt{TOKEN\_TIME} & Time constant: a number followed by \texttt{s}, \texttt{ms}, \texttt{us}, \texttt{ns}, \texttt{ps}, or \texttt{fs}. \\
-\texttt{TOKEN\_STRING} & Single- or double-quoted string; the lexeme includes the quotes. \\
-\texttt{TOKEN\_ON / TOKEN\_OFF} & Keywords \texttt{on}/\texttt{off}, \texttt{true}/\texttt{false}, \texttt{yes}/\texttt{no} (all lower or all upper case). \\
-\texttt{TOKEN\_PLUS, TOKEN\_MINUS, TOKEN\_STAR, TOKEN\_SLASH, TOKEN\_DOT, TOKEN\_BANG} & Single-character operators \texttt{+ - * / . !}. \\
-\texttt{TOKEN\_EQUAL} & \texttt{=} \\
-\texttt{TOKEN\_LESS\_THAN, TOKEN\_LESS\_EQUAL, TOKEN\_GREATER\_THAN, TOKEN\_GREATER\_EQUAL} & \texttt{\textless{}}, \texttt{\textless{}=}, \texttt{\textgreater{}}, \texttt{\textgreater{}=}. \\
-\texttt{TOKEN\_AT, TOKEN\_PERCENT, TOKEN\_AMPERSAND, TOKEN\_CARAT, TOKEN\_TILDE, TOKEN\_BACKTICK, TOKEN\_DOLLAR, TOKEN\_POUND, TOKEN\_QUESTION} & Punctuation \texttt{@ \% \& \textasciicircum{} \textasciitilde{} \`{} \$ \# ?}. \\
-\texttt{TOKEN\_SEMI, TOKEN\_COLON, TOKEN\_LEFT\_PAREN, TOKEN\_RIGHT\_PAREN} & \texttt{; : ( )} \\
-\texttt{TOKEN\_EOL} & End of the input string. \\
-\texttt{TOKEN\_ERROR} & Unrecognized or malformed input. \\
-\end{xltabular}
-
-\subsection*{\texttt{token\_traits}}
-\noindent\small\textit{class}\quad \textbf{extends} \texttt{void\_traits}\par
-
-Traits for \texttt{token\_t} so tokens can be stored in vectors, maps, and other containers. The empty value is \texttt{TOKEN\_EOL}.
-
-\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
-\toprule
-\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
-\midrule
-\endhead
-\bottomrule
-\endfoot
-\texttt{equal} & \texttt{bit} & \texttt{token\_t a, token\_t b} & True if a and b are the same token. Static. \\
-\texttt{compare} & \texttt{int} & \texttt{token\_t a, token\_t b} & Return 1, 0, or -1 comparing the enum values. Static. \\
-\texttt{sort} & void & \texttt{token\_t vec[\$]} & Sort a queue of tokens. Static. \\
-\end{xltabular}
-
-\subsection*{\texttt{token\_descriptor}}
-\noindent\small\textit{class}\par
-
-Details of the most recent numeric token, filled in by the lexer.
-
-\noindent\textbf{Constructor:} \texttt{new()} --- Initialize to an unsized, unsigned decimal value with multiplier 1.0.
-
-\begin{xltabular}{\linewidth}{>{\small}p{1.5in} >{\small}p{1.5in} >{\small}X}
-\toprule
-\textbf{Field} & \textbf{Type} & \textbf{Description} \\
-\midrule
-\endhead
-\bottomrule
-\endfoot
-\texttt{base} & \texttt{byte} & Base character: \texttt{d}, \texttt{h}, \texttt{o}, or \texttt{b} (either case). \\
-\texttt{size} & \texttt{int unsigned} & Declared size of a sized constant; 0 if unsized. \\
-\texttt{sign} & \texttt{byte} & Leading sign character, \texttt{+} or \texttt{-}; 0 if none. \\
-\texttt{digits} & \texttt{string} & The digits of the value, without sign, size, or base. \\
-\texttt{is\_signed} & \texttt{bit} & Set if the constant is marked signed. \\
-\texttt{is\_logic} & \texttt{bit} & Set if the digits include \texttt{x} or \texttt{z}. \\
-\texttt{multiplier} & \texttt{real} & Scale factor for time units (e.g. 1.0e-9 for \texttt{ns}). \\
-\end{xltabular}
-
-\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
-\toprule
-\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
-\midrule
-\endhead
-\bottomrule
-\endfoot
-\texttt{print} & void & --- & Display the descriptor fields. \\
-\end{xltabular}
-
-\section{lexer\_core --- Lexical Analyzer}
-\noindent\small\textit{File: \texttt{core/src/lexer/lexer\_core.svh}}\par
-
-Breaks a string into tokens. Call \texttt{start()} with the string to analyze, then call \texttt{get\_token()} repeatedly until it returns \texttt{TOKEN\_EOL}. After each token, \texttt{get\_lexeme()} returns its text and, for numeric tokens, \texttt{get\_token\_descriptor()} returns details such as size, base, and sign. Whitespace between tokens is skipped. The lexer does not handle comments.
-
-Numeric constants follow SystemVerilog conventions without the apostrophe, which command shells treat specially: an optional sign, an optional decimal size, a base letter (\texttt{b}, \texttt{o}, \texttt{d}, or \texttt{h}, either case), and digits, e.g. \texttt{32h7fff\_624c} or \texttt{-100}. Underscores may appear between digits but not as the first character. Real constants use a decimal point and/or an exponent, and a number followed by a time unit is returned as \texttt{TOKEN\_TIME}.
-
-\subsection*{\texttt{lexer\_core}}
-\noindent\small\textit{class}\par
-
-The lexical analyzer. Internal character-level helpers are local and not part of the user interface.
-
-\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
-\toprule
-\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
-\midrule
-\endhead
-\bottomrule
-\endfoot
-\texttt{start} & void & \texttt{string s} & Initialize the lexer with the string to analyze. Must be called before any other method. \\
-\texttt{get\_token} & \texttt{token\_t} & --- & Return the next token from the input. \\
-\texttt{get\_lexeme} & \texttt{string} & --- & Return the text of the most recent token. Empty for \texttt{TOKEN\_EOL}. \\
-\texttt{get\_digits} & \texttt{string} & --- & Return the digits of the most recent numeric token. \\
-\texttt{get\_token\_descriptor} & \texttt{token\_descriptor} & --- & Return the descriptor for the most recent numeric token. \\
-\texttt{get\_loc} & \texttt{uint32\_t} & --- & Return the index in the input where the most recent lexeme begins. \\
-\texttt{put\_token} & void & \texttt{string lex} & Push a token back so it is returned again by the next \texttt{get\_token()}. Pass the token's lexeme. \\
-\texttt{lex\_filename} & \texttt{token\_t} & --- & Treat the rest of the input as a single raw value (e.g. a file path) without breaking it into tokens. Quoted values must be terminated; the lexeme keeps the quotes. Returns \texttt{TOKEN\_STRING}, \texttt{TOKEN\_ERROR}, or \texttt{TOKEN\_EOL}. \\
 \end{xltabular}
 
 \chapter{Linked Structures}
@@ -1768,30 +1707,73 @@ Static version-query class for the SVX library.
 \section{Overview}
 \noindent\small\textit{File: \texttt{uvm/src/README-cl.md}}\par
 
-The command line processor recognizes plusargs --- arguments of the form \texttt{+name} or \texttt{+name=value} --- validates each value against a table of registered options, converts it to the option's type, and puts it into the UVM resource database under the scope \texttt{CL::}. The table gives a single place to find every option a testbench accepts.
+The command line processor reads the plusargs on the simulator command line --- arguments beginning with \texttt{+} --- checks each one against a table of options, converts its value to the option's type, and puts it into the UVM resource database where testbench code can retrieve it. Because every option is registered in one table, the table is a complete list of the options a testbench accepts.
 
-The use model has three steps, all performed before \texttt{run\_test()} so that every phase, including \texttt{build\_phase}, can read the values:
+\subsection*{Use Model}
 
-\begin{enumerate}
-\item Register each option with \texttt{cl\#(T)::add()} or \texttt{cl\#(T)::add\_with\_default()}. Registration can happen anywhere --- any module, package, or class --- and in any order.
-\item Call \texttt{cl\_parse::get().parse()} once.
-\item Read values with \texttt{uvm\_resource\_db\#(T)::read\_by\_name("CL::", name, val)}.
-\end{enumerate}
+Register each option with \texttt{cl\#(T)::add()} or \texttt{cl\#(T)::add\_with\_default()}, where T is the type of the option's value, then call \texttt{parse()} on the singleton parser. Do both before calling \texttt{run\_test()} so every phase, including \texttt{build\_phase}, has access to the values. Options can be registered anywhere --- in any module, package, or class --- and in any order, as long as it is before the command line is parsed.
 
-A \texttt{+name} without a value turns on a \texttt{bit} option. Numeric values may be sized and based, SystemVerilog style but without the apostrophe (e.g. \texttt{32h7fff\_624c}), and must fit the option's type. \texttt{string} values are taken as written, without being broken into tokens. Arguments that are not registered options --- simulator options, UVM options, other plusargs --- are skipped. If any registered option has an invalid value, the parser reports an error and publishes no command line values; UVM then stops the run at the end of elaboration.
+\begin{verbatim}
+module top;
 
-Supported types are \texttt{bit}, \texttt{byte}, \texttt{shortint}, \texttt{int}, \texttt{longint}, their \texttt{unsigned} forms (including the \texttt{int8\_t} ... \texttt{uint64\_t} aliases), \texttt{real}, and \texttt{string}.
+  function automatic void populate();
+    cl_parse clp = cl_parse::get();
+    cl#(uint32_t)::add_with_default("size", 4);
+    cl#(bit)::add("x_mode");
+    cl#(string)::add("file");
+    clp.parse();
+  endfunction
+
+  initial begin
+    populate();
+    run_test();
+  end
+
+endmodule
+\end{verbatim}
+
+The parser puts each option into the resource database under the scope \texttt{CL::}, which keeps command line options from conflicting with other resources. Retrieve a value with the standard \texttt{uvm\_resource\_db} interface, using the same type the option was registered with:
+
+\begin{verbatim}
+uint32_t size;
+uvm_resource_db#(uint32_t)::read_by_name("CL::", "size", size, this);
+\end{verbatim}
+
+\subsection*{Command Line Syntax}
+
+An option takes one of two forms, \texttt{+name} or \texttt{+name=value}, with no spaces around the \texttt{=}. The form \texttt{+name} is a switch and is valid only for \texttt{bit} options: it turns the option on. A \texttt{bit} option can also be set explicitly:
+
+\begin{xltabular}{\linewidth}{>{\small}p{2.4in} >{\small}X}
+\toprule
+\textbf{Value} & \textbf{Meaning} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{1, ON, on, TRUE, true} & Turn the switch on. Equivalent to \texttt{+name}. \\
+\texttt{0, OFF, off, FALSE, false} & Turn the switch off. \\
+\end{xltabular}
+
+A value must fit the option's type; \texttt{+bias=2000} is rejected for a \texttt{byte} option even though it is a valid number. Numeric values may be sized and given in any base, as in SystemVerilog but without the apostrophe, which command shells use for their own purposes. Underscores are allowed:
+
+\begin{verbatim}
++base=32hf77_7003c
++mask=12b011_000_111_010
++mode=12o6263
+\end{verbatim}
+
+\texttt{string} values are taken exactly as written, so file paths and other text need no quoting. If an option appears more than once, the last value wins. Plusargs that are not registered options --- simulator and UVM options, or plusargs used by other code --- are ignored. If any registered option has an invalid value, the parser reports an error and puts none of the command line values into the resource database, and UVM stops the run at the end of elaboration.
+
+Supported types are \texttt{string}, \texttt{real}, \texttt{bit}, \texttt{byte}, \texttt{shortint}, \texttt{int}, \texttt{longint}, and their \texttt{unsigned} forms, along with the aliases \texttt{int8\_t} through \texttt{int64\_t} and \texttt{uint8\_t} through \texttt{uint64\_t}.
 
 \section{cl --- Option Registration}
 \noindent\small\textit{File: \texttt{uvm/src/cl.svh}}\par
 
-User interface for registering command line options. The type parameter is the type of the option's value. Registration after the command line has been parsed is ignored with a warning, and registering a name twice is an error.
+Static functions for adding options to the option table. The type parameter is the type of the option's value. The option name is given without the leading \texttt{+}. An option registered after the command line has been parsed is ignored with a warning, and registering the same name twice is an error.
 
 \subsection*{\texttt{cl\#(T)}}
 \noindent\small\textit{class}\par
 
-Static registration functions.
-
 \begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
 \toprule
 \textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
@@ -1799,54 +1781,17 @@ Static registration functions.
 \endhead
 \bottomrule
 \endfoot
-\texttt{add} & void & \texttt{string name, string fmt=""} & Register option \texttt{name} of type T. The leading \texttt{+} is omitted. \texttt{fmt} optionally overrides the format used when printing the value. Static. \\
-\texttt{add\_with\_default} & void & \texttt{string name, T def, string fmt=""} & Register an option with a default value. The default is put into the resource database immediately and is overridden by a command line value. Static. \\
-\end{xltabular}
-
-\subsection*{\texttt{cl\_mgr}}
-\noindent\small\textit{class}\par
-
-Static manager for the table of registered options. Not instantiated.
-
-\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
-\toprule
-\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
-\midrule
-\endhead
-\bottomrule
-\endfoot
-\texttt{add} & void & \texttt{string name, cl\_opt\_desc\_base opt} & Add an option descriptor to the table. Errors if the name exists. Static. \\
-\texttt{find} & \texttt{cl\_opt\_desc\_base} & \texttt{string name} & Return the descriptor for \texttt{name}, or null. Static. \\
-\texttt{dump} & void & --- & Print the table: name, type, format, and default for each option. Static. \\
-\texttt{has\_been\_parsed} & \texttt{bit} & --- & True once the command line has been parsed. Static. \\
-\texttt{set\_parse\_flag} & void & --- & Mark the command line as parsed. Called by the parser. Static. \\
-\texttt{clr\_parse\_flag} & void & --- & Clear the parsed flag. Intended for testing. Static. \\
-\end{xltabular}
-
-\subsection*{\texttt{opt\_factory}}
-\noindent\small\textit{class}\par
-
-Creates the option descriptor that matches a type. This is the one place that lists the supported types.
-
-\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
-\toprule
-\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
-\midrule
-\endhead
-\bottomrule
-\endfoot
-\texttt{create} & \texttt{cl\_opt\_desc\_base} & \texttt{type\_handle\_base th, string name} & Return a new descriptor for the type, or report an error for an unsupported type. Static. \\
+\texttt{add} & void & \texttt{string name, string fmt=""} & Add option \texttt{name} of type T to the table. \texttt{fmt} optionally sets the format used when the option is printed. Static. \\
+\texttt{add\_with\_default} & void & \texttt{string name, T def, string fmt=""} & Add an option with a default value. The default goes into the resource database immediately and is replaced by a value given on the command line. Static. \\
 \end{xltabular}
 
 \section{cl\_parse --- Parser}
 \noindent\small\textit{File: \texttt{uvm/src/cl\_parse.svh}}\par
 
-The parser. It runs in three passes over the arguments: split each registered plusarg into an option instance, validate and convert each value, and, if there were no errors, publish every value to the resource database.
+The command line parser is a singleton. Obtain it with \texttt{get()} and call \texttt{parse()} once, after all options are registered.
 
 \subsection*{\texttt{cl\_parse}}
 \noindent\small\textit{class}\par
-
-Singleton command line parser.
 
 \begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
 \toprule
@@ -1856,80 +1801,8 @@ Singleton command line parser.
 \bottomrule
 \endfoot
 \texttt{get} & \texttt{cl\_parse} & --- & Return the singleton parser. Static. \\
-\texttt{parse} & void & --- & Parse the command line and publish option values. Runs only once; later calls issue a warning and do nothing. \\
-\texttt{set\_args} & void & \texttt{string args[\$]} & Parse the given arguments instead of the simulator command line. Intended for testing; \texttt{args[0]} is the program name. \\
+\texttt{parse} & void & --- & Parse the command line, validate each registered option, and put the values into the resource database. Parsing happens only once; later calls issue a warning and do nothing. \\
 \end{xltabular}
-
-The passes are implemented by the function objects \texttt{parse\_opt}, \texttt{validate\_opt}, and \texttt{populate\_resource\_db}, which are internal to the parser.
-
-\section{Option Descriptors and Instances}
-\noindent\small\textit{File: \texttt{uvm/src/cl\_opt\_desc.svh}, \texttt{uvm/src/cl\_opt\_instance.svh}}\par
-
-Each registered option has a descriptor; each occurrence on the command line produces an instance. Descriptors form a three-level hierarchy: a non-parameterized base used to manage descriptors polymorphically, \texttt{cl\_opt\_desc\#(T)} which supplies the value type, and leaf classes that implement type-specific parsing and conversion. Adding support for a new kind of value means adding a leaf class and a factory entry; the parser itself does not change.
-
-\subsection*{\texttt{cl\_opt\_desc\_base}}
-\noindent\small\textit{virtual class}\par
-
-Base class for option descriptors. Public members \texttt{fmt} (print format) and \texttt{multiple} (reserved for options that may repeat).
-
-\noindent\textbf{Constructor:} \texttt{new(string name)} --- Set the option name.
-
-\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
-\toprule
-\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
-\midrule
-\endhead
-\bottomrule
-\endfoot
-\texttt{create\_instance} & \texttt{cl\_opt\_instance\_base} & \texttt{string name} & Create an instance of the matching type (pure virtual). \\
-\texttt{validate\_and\_convert} & \texttt{bit} & \texttt{cl\_opt\_instance\_base inst} & Check the instance's value and convert it to the option type; 1 on success (pure virtual). \\
-\texttt{publish} & void & \texttt{cl\_opt\_instance\_base inst} & Put the converted value into the resource database (pure virtual). \\
-\texttt{get\_default\_value} & \texttt{type\_container\_base} & --- & Return the default value, or null (pure virtual). \\
-\texttt{get\_typename}, \texttt{get\_type\_handle} & \texttt{string}, \texttt{type\_handle\_base} & --- & Return the option type's name or type handle (pure virtual). \\
-\texttt{get\_name} & \texttt{string} & --- & Return the option name. \\
-\texttt{is\_switch} & \texttt{bit} & --- & True if the option may appear without a value. Default 0. \\
-\texttt{lex\_value} & \texttt{token\_t} & \texttt{lexer\_core lex} & Read the value token. Default uses \texttt{get\_token()}. \\
-\texttt{print} & void & --- & Print the option name, type, format, and default. \\
-\end{xltabular}
-
-\subsection*{\texttt{cl\_opt\_desc\#(T)}}
-\noindent\small\textit{virtual class}\quad \textbf{extends} \texttt{cl\_opt\_desc\_base}\par
-
-Implements everything that depends only on T: instance creation, publishing with \texttt{uvm\_resource\_db\#(T)::\allowbreak set\_override()}, the default value, and type information. \texttt{validate\_and\_convert()} remains pure virtual.
-
-\begin{xltabular}{\linewidth}{>{\small}p{1.9in} >{\small}X}
-\toprule
-\textbf{Leaf class} & \textbf{Handles} \\
-\midrule
-\endhead
-\bottomrule
-\endfoot
-\texttt{cl\_opt\_int\_desc\#(T, P)} & All integer types; P is the type's traits class. Checks range, sign, and sized-literal width. Default format \texttt{\%0d}. \\
-\texttt{cl\_opt\_real\_desc} & \texttt{real}; accepts real or integer values. Default format \texttt{\%g}. \\
-\texttt{cl\_opt\_string\_desc} & \texttt{string}; reads the value raw with \texttt{lex\_filename()}. Default format \texttt{\%s}. \\
-\texttt{cl\_opt\_bit\_desc} & \texttt{bit}; accepts the switch form, \texttt{on}/\texttt{off}, \texttt{true}/\texttt{false}, \texttt{yes}/\texttt{no}, 0, or 1. Default format \texttt{\%b}. \\
-\end{xltabular}
-
-\subsection*{\texttt{validate\_int\#(T, P)}}
-\noindent\small\textit{class}\par
-
-Integer validation shared by the integer, real, and bit descriptors.
-
-\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
-\toprule
-\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
-\midrule
-\endhead
-\bottomrule
-\endfoot
-\texttt{validate} & \texttt{bit} & \texttt{cl\_opt\_instance\_base inst, output T n} & Validate an integer token and return its value in n. Static. \\
-\texttt{str\_to\_uint} & \texttt{bit} & \texttt{string digits, uint32\_t radix, output uint128\_t mag} & Convert a digit string in the given radix to a 128-bit magnitude, skipping underscores. Static. \\
-\end{xltabular}
-
-\subsection*{\texttt{cl\_opt\_instance\#(T)}}
-\noindent\small\textit{class}\quad \textbf{extends} \texttt{cl\_opt\_instance\_base}\par
-
-One option as it appeared on the command line: its name, lexeme, token, numeric descriptor, the converted value, and a link to its descriptor.
 
 \chapter{Pipelined Testbenches}
 \section{Pipe Stages}
