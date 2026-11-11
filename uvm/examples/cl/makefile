@@ -37,6 +37,8 @@ SV_SRC		+= top.sv test_pkg.sv
 
 UVM		= 1
 
-RUN_OPTS	= +name=freddy +offset=4 +freq=1.5e9 +x_mode +channels=8 +bias=-100 +base=32h7fff_624c +data=64h6f7200137090bbc6 +bignum=-12000 +smallnum=88 +file='a/b/c/d' +file=barney_and_betty.doo +svx_cl_dump
+RUN_OPTS	= +name=freddy +offset=4 +freq=1.5e9 +x_mode +channels=8 +bias=-100 +base=32h7fff_624c +data=64h6f7200137090bbc6 +bignum=-12000 +smallnum=88 +file='a/b/c/d' +file=barney_and_betty.doo  +svx_cl_dump
+
+#RUN_OPTS	= +svx_help
 
 include ${TOP}/make/makefile

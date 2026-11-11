@@ -39,7 +39,8 @@ class agreement extends uvm_object;
   
   typedef enum{AGREE, DISAGREE} agree_t;
   
-  local static bit debug = 0;
+  local static bit debug_all = 0;
+  local bit debug;
   local agree_t votes[uvm_object];
   local uint32_t disagreements;
   
@@ -47,12 +48,20 @@ class agreement extends uvm_object;
     super.new(name);
   endfunction
   
-  static function void set_debug();
+  function void set_debug();
     debug = 1;
   endfunction
   
-  static function void clr_debug();
+  function void clr_debug();
     debug = 0;
+  endfunction
+
+  static function void set_debug_all();
+    debug_all = 1;
+  endfunction
+  
+  static function void clr_debug_all();
+    debug_all = 0;
   endfunction
 
   //--------------------------------------------------------------------
@@ -74,7 +83,7 @@ class agreement extends uvm_object;
   //--------------------------------------------------------------------
   function void agree(uvm_object obj, int lineno = 0);
     update(obj, AGREE);
-    if(debug)
+    if(debug | debug_all)
       `uvm_info("SVX/AGREE", status_msg(obj, lineno), UVM_NONE)
   endfunction
   
@@ -85,7 +94,7 @@ class agreement extends uvm_object;
   //--------------------------------------------------------------------
   function void disagree(uvm_object obj, int lineno = 0);
     update(obj, DISAGREE);
-    if(debug)
+    if(debug | debug_all)
       `uvm_info("SVX/DISAGREE", status_msg(obj, lineno), UVM_NONE)
   endfunction
   
@@ -99,7 +108,7 @@ class agreement extends uvm_object;
     // agreement.
     #0;
     wait(disagreements == 0);
-    if(debug)
+    if(debug | debug_all)
       `uvm_info("SVX/ALL_IN_AGREEMENT", status_msg(obj, lineno), UVM_NONE)
   endtask
   
@@ -111,7 +120,7 @@ class agreement extends uvm_object;
   function void clear(uvm_object obj, int lineno = 0);
     votes.delete();
     disagreements = 0;
-    if(debug)
+    if(debug | debug_all)
       `uvm_info("SVX/CLEAR", status_msg(obj, lineno), UVM_NONE)
   endfunction
 

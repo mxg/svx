@@ -144,7 +144,7 @@ Even though it is syntactically correct, 2000 does not fit into 8 bits
 and will be rejected by the parser.
 
 Numeric values can be sized and can be specified in different bases,
-much like in SystemVerilog.  Underscores are also lega. E.g.,
+much like in SystemVerilog.  Underscores are also legal. E.g.,
 
    32hf77_7003c
    12b011_000_111_010
@@ -154,5 +154,17 @@ Note that there are no ticks in the number.  Command shells use ticks
 (single quotes) for their own purposes, so we avoided using them in
 command line values. As with unsized values, the value must fit into
 the data type specified for the option.
+
+The SVX Command Line Parser has some builtin command line options.
+
+  * +svx_cl_dump : dumps the command line option table.
+
+  * +svx_help    : Prints help information including the SVX version
+                   number and the command line option table, and then
+		   terminates.
+
+  * +plugin      : Specifies a UVM plugin to be instantiated and
+                   activated.
+  
 
                               * * * * *

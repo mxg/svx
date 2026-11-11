@@ -226,6 +226,7 @@ class cl_parse;
   local function void add_builtin_options();
     cl#(bit)::add_with_default("svx_cl_dump", 0, "Dump the command line option table");
     cl#(string)::add("plugin", "Specify a plugin to be installed and activated");
+    cl#(bit)::add("svx_help", "Dump the command line option table and then exit");
   endfunction
   
   //--------------------------------------------------------------------
@@ -295,6 +296,12 @@ class cl_parse;
     print_opt print;
     validate_opt validate;
     populate_resource_db populate;
+
+    // Users can specify +svx_help to get a dump of the command line
+    // option table along with some other useful help information.
+    if($test$plusargs("svx_help")) begin
+      print_help();
+    end
 
     // Have we already done this?  If so, we don't want to do it
     // again.
@@ -373,5 +380,27 @@ class cl_parse;
 
   endfunction
 
-endclass
+  //--------------------------------------------------------------------
+  // print_help
+  //
+  // Print help information and then terminate.
+  //--------------------------------------------------------------------
+  function void print_help();
+    ver::print_banner();
+    cl_mgr::dump();
+    $display();
+    $display("command line syntax:");
+    $display("  option  = +<option_name> |");
+    $display("            +<option_name>=<value>");
+    $display("  <value> = string |");
+    $display("            floating point value |");
+    $display("            decimal integer |");
+    $display("            <size>h<hex_digits> |");
+    $display("            <size>o<octal_digits> |");
+    $display("            <size>b<binary_digits>");
+    $display("  <size>  = decimal integer");
+    $finish();
+  endfunction
+  
 
+endclass

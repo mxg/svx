@@ -23,6 +23,11 @@ November 2026
   line.  The values of each option is stored in the resource
   database. See uvm/src/README-cl.md for details.
 
+* ADDED: Builtin fommand line options.
+    - +svx_cl_dump : dumps the command line option table.
+    - +svx_help : prints a help message and then terminates.
+    - +plugin : specifies a UVM plugin to be instantiated and activated.
+    
 * ADDED: SVUnit testsuite for command line parser.
 
 * ADDED: Added val2str() virtual function to type_container_base and
