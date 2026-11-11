@@ -223,9 +223,9 @@ class cl_parse;
   //
   // These options come with the SVX library package
   //--------------------------------------------------------------------
-  function void add_builtin_options();
-    cl#(bit)::add_with_default("svx_cl_dump", 0);
-    cl#(string)::add("plugin");
+  local function void add_builtin_options();
+    cl#(bit)::add_with_default("svx_cl_dump", 0, "Dump the command line option table");
+    cl#(string)::add("plugin", "Specify a plugin to be installed and activated");
   endfunction
   
   //--------------------------------------------------------------------
@@ -321,6 +321,7 @@ class cl_parse;
       `uvm_error(SVX_CL_MSG_ID,
 		 {"Errors in the command line prevent ",
 		  "further processing of the options."})
+      cl_mgr::set_parse_flag();
       return;
     end
     
@@ -341,6 +342,7 @@ class cl_parse;
       `uvm_error(SVX_CL_MSG_ID,
 		 {"Errors in the command line prevent ",
 		  "further processing of the options."})
+      cl_mgr::set_parse_flag();
       return;
     end
 
