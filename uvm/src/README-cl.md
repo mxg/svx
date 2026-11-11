@@ -118,7 +118,7 @@ Similarly, a switch can be turned off with these command lines:
   +x_mode=FALSE
   +x_mode=false
   +x_mode=NO
-  +x_mode-no
+  +x_mode=no
 
 In the second form, +<option>=<value> there cannot be any spaces on
 either side of the equal sign.

@@ -92,7 +92,7 @@ class pipe_stage#(type SEQ = uvm_sequence_item)
   //--------------------------------------------------------------------
   // is_idle
   //
-  // Is the device idle?  You can override this functioh to supply
+  // Is the device idle?  You can override this function to supply
   // your own stage-specific criteria for determining idleness.
   // --------------------------------------------------------------------
   virtual function bit is_idle();
@@ -103,10 +103,10 @@ class pipe_stage#(type SEQ = uvm_sequence_item)
   // dequeue_items
   //
   // Take items from the fifo and call process_item.  Process_item()
-  // is a virtual function that can perform anu desired computation
-  // with the sequence item.  If this stage is not the last one then
-  // it must call sqwr.execute_item() to send it downstream.
-  // --------------------------------------------------------------------
+  // is a virtual task that can perform any desired computation with
+  // the sequence item.  If this stage is not the last one then it
+  // must call sqr.execute_item() to send it downstream.
+  //--------------------------------------------------------------------
   task dequeue_items();
     SEQ item;
     forever begin

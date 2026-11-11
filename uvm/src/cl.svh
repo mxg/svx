@@ -279,7 +279,9 @@ class cl #(type T=int);
   //--------------------------------------------------------------------
   // add
   //--------------------------------------------------------------------
-  static function void add(string name, string fmt="");
+  static function void add(string name,
+			   string fmt="",
+			   string desc="");
 
     cl_opt_desc_base opt;
 
@@ -298,6 +300,8 @@ class cl #(type T=int);
     
     if(fmt != "")
       opt.fmt = fmt;
+    opt.desc = desc;
+    
     cl_mgr::add(name, opt);
     
   endfunction
@@ -305,10 +309,12 @@ class cl #(type T=int);
   //--------------------------------------------------------------------
   // add_with_default
   //--------------------------------------------------------------------
-  static function void add_with_default(string name, T def, string fmt="");
+  static function void add_with_default(string name, T def, 
+					string fmt="",
+					string desc="");
 
     cl_opt_desc_base opt;
-    cl_opt_desc#(T) opt_type;
+    cl_opt_desc#(T) opt_desc;
     type_container#(T) val;
 
     if(cl_mgr::has_been_parsed()) begin
@@ -326,8 +332,9 @@ class cl #(type T=int);
 
     if(fmt != "")
       opt.fmt = fmt;
+    opt.desc = desc;
 
-    if(!$cast(opt_type, opt)) begin
+    if(!$cast(opt_desc, opt)) begin
       string msg;
       $sformat(msg,
 	       "Something went wrong in creating the descriptor for option %s", 
@@ -339,7 +346,7 @@ class cl #(type T=int);
     val = new();
     val.set(def);
     val.set_default_fmt(opt.fmt);
-    opt_type.default_value = val;
+    opt_desc.default_value = val;
 
     cl_mgr::add(name, opt);
 

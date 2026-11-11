@@ -50,7 +50,7 @@ class env extends uvm_component;
     s2 = new("stage_2", this);
     s3 = new("stage_3", this);
     pipeline_done = new("pipeline_done");
-    uvm_resource_db#(agreement)::set({get_full_name(), "*"},
+    uvm_resource_db#(agreement)::set({get_full_name(), ".*"},
 				     "pipeline_done", 
 				     pipeline_done, this);
   endfunction

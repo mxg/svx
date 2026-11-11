@@ -60,7 +60,7 @@ class plugins;
 
     // Is there at least one plugin specified on the command line?
     if(q.size() == 0) begin
-      `uvm_info("SVX/PLUGIN", "No UVM plugins are available", UVM_NONE)
+      `uvm_info("SVX/PLUGIN", "No UVM plugins are available", UVM_MEDIUM)
       return; // no plugins
     end
 

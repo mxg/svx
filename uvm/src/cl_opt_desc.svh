@@ -61,6 +61,7 @@ virtual class cl_opt_desc_base;
   protected string name;
   string fmt;
   bit  multiple;
+  string desc;
 
   function new(string _name);
     name = _name;
@@ -93,9 +94,8 @@ virtual class cl_opt_desc_base;
     if(def != null)
       $write(" = %s", def.val2str(fmt));
     if(multiple)
-      $display(" (multiple ok)");
-    else
-      $display();
+      $write(" (multiple ok)");
+    $display(": %s", desc);
     
   endfunction  
   

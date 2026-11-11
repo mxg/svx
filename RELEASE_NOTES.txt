@@ -14,7 +14,7 @@ November 2026
 
 * Tested the library using Verilator 5.054 2026-11-01 rev v5.054
 
-* ADDED: Added get_ite()m to map_iterator#() and
+* ADDED: Added get_item() to map_iterator#() and
   multimap_iterator(). These functions return a pair#() that contains
   the key and the data item.
 
