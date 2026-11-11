@@ -75,7 +75,7 @@ class agreement extends uvm_object;
   function void agree(uvm_object obj, int lineno = 0);
     update(obj, AGREE);
     if(debug)
-      `uvm_info("SVX/AGREE", status_msg(obj, lineno), UVM_NONE);
+      `uvm_info("SVX/AGREE", status_msg(obj, lineno), UVM_NONE)
   endfunction
   
   //--------------------------------------------------------------------
@@ -86,7 +86,7 @@ class agreement extends uvm_object;
   function void disagree(uvm_object obj, int lineno = 0);
     update(obj, DISAGREE);
     if(debug)
-      `uvm_info("SVX/DISAGREE", status_msg(obj, lineno), UVM_NONE);
+      `uvm_info("SVX/DISAGREE", status_msg(obj, lineno), UVM_NONE)
   endfunction
   
   //--------------------------------------------------------------------
@@ -95,9 +95,12 @@ class agreement extends uvm_object;
   // Block until agreement is reached.
   //--------------------------------------------------------------------
   task wait_for_agreement(uvm_object obj, int lineno = 0);
+    // Make sure all processes start executing before we wait for
+    // agreement.
+    #0;
     wait(disagreements == 0);
     if(debug)
-      `uvm_info("SVX/ALL_IN_AGREEMENT", status_msg(obj, lineno), UVM_NONE);
+      `uvm_info("SVX/ALL_IN_AGREEMENT", status_msg(obj, lineno), UVM_NONE)
   endtask
   
   //--------------------------------------------------------------------
@@ -105,15 +108,15 @@ class agreement extends uvm_object;
   //
   // Clear the agreement's state.
   //--------------------------------------------------------------------
-  function clear(uvm_object obj, int lineno = 0);
+  function void clear(uvm_object obj, int lineno = 0);
     votes.delete();
     disagreements = 0;
     if(debug)
-      `uvm_info("SVX/CLEAR", status_msg(obj, lineno), UVM_NONE);
+      `uvm_info("SVX/CLEAR", status_msg(obj, lineno), UVM_NONE)
   endfunction
 
   //--------------------------------------------------------------------
-  // num_disagree
+  // num_disagreements
   //
   // How many disagreements are outstanding?
   //--------------------------------------------------------------------
@@ -133,7 +136,7 @@ class agreement extends uvm_object;
     
     case(1)
       (obj == null) && (lineno == 0) :
-            $sformat(msg, "[%s] threshold = %0d",
+            $sformat(msg, "[%s] disagreements = %0d",
                      get_name(), num_disagreements());
       (obj == null) && (lineno != 0) : $sformat(msg, "[%s] disagreements = %0d @ %0d",
                                                 get_name(), num_disagreements(), lineno);

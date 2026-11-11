@@ -27,20 +27,6 @@
 //======================================================================
 
 //----------------------------------------------------------------------
-// plugin_opts
-//
-// Add the "plugin" option to the set of available command line
-//options.
-//----------------------------------------------------------------------
-class plugin_opts;
-
-  static function void add_opts();
-    cl#(string)::add("plugin");
-  endfunction
-
-endclass
-
-//----------------------------------------------------------------------
 // plugins
 //
 // Retrieve the names of pluygins specified on the command line.  Then
@@ -49,11 +35,22 @@ endclass
 class plugins;
 
   //--------------------------------------------------------------------
-  // setup
+  // register_opts
   //
-  // Locate the "+plugin=<name>" command line options.
+  // Add plugin-related command line options.
   //--------------------------------------------------------------------
-  static function void setup();
+  static function void register_opts();
+    cl#(string)::add("plugin");
+  endfunction
+
+  //--------------------------------------------------------------------
+  // install
+  //
+  // Locate the "+plugin=<name>" command line options.  This function
+  // must run before run_test() so that command line options can be
+  // parsed before run_test() executes.
+  //--------------------------------------------------------------------
+  static function void install();
 
     uvm_resource_base th = uvm_resource#(string)::get_type();
     uvm_resource_pool rp = uvm_resource_pool::get();
@@ -63,7 +60,7 @@ class plugins;
 
     // Is there at least one plugin specified on the command line?
     if(q.size() == 0) begin
-      $display("no plugins available");
+      `uvm_info("SVX/PLUGIN", "No UVM plugins are available", UVM_NONE)
       return; // no plugins
     end
 
@@ -71,10 +68,9 @@ class plugins;
     while(q.size() > 0) begin
       uvm_resource#(string) plugin_rsrc;
       uvm_resource_base rsrc = q.pop_front();
-      string plugin;
       
       if(!$cast(plugin_rsrc, rsrc))
-	$display("cannot cast plugin resource to string");
+	`uvm_error("SVX/PLUGIN", "Failure to cast plugin resource to string")
       else
 	install_plugin(plugin_rsrc.read());
     end

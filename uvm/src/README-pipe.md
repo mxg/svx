@@ -24,10 +24,10 @@ not accept an item from upstream, and the last stage does not send an
 item downstream.
 
 Pipe_stage_base has a seq_item_export for sending an item downstream.
-Pipe_stage_base has a seq_item port for accepting an item from
-upstream. To construct the pipeline during the build_phase you connect
-the seq_item_port for each stage to the seq_item_export of its
-upstream neighbor.
+Pipe_stage has a seq_item port for accepting an item from upstream. To
+construct the pipeline during the build_phase you connect the
+seq_item_port for each stage to the seq_item_export of its upstream
+neighbor.
 
 Pipe_stage spawns two threads -- enqueue_items() and dequeue_items().
 Enqueue_items() gets the next sequence item from its upstream neighbor

@@ -35,10 +35,13 @@ class stage_1 extends pipe_stage_base #(transaction);
     super.new(name, parent);
   endfunction
 
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    pipeline_done.disagree(this);
+  endfunction    
+
   task run_phase(uvm_phase phase);
     transaction t;
-
-    pipeline_done.disagree(this);
 
     for(int i = 0; i < 10; i++) begin
       t = new();

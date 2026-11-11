@@ -65,7 +65,7 @@ class pipe_stage#(type SEQ = uvm_sequence_item)
   //--------------------------------------------------------------------
   // run_phase
   //
-  // Launch the two processes that druve the stage's activities.
+  // Launch the two processes that drive the stage's activities.
   //--------------------------------------------------------------------
   task run_phase(uvm_phase phase);
     fork
@@ -83,28 +83,37 @@ class pipe_stage#(type SEQ = uvm_sequence_item)
     SEQ item;
     forever begin
       seq_item_port.get_next_item(item);
-      fifo.put(item);
       pipeline_done.disagree(this);
+      fifo.put(item);
       seq_item_port.item_done();
     end
   endtask
 
   //--------------------------------------------------------------------
+  // is_idle
+  //
+  // Is the device idle?  You can override this functioh to supply
+  // your own stage-specific criteria for determining idleness.
+  // --------------------------------------------------------------------
+  virtual function bit is_idle();
+    return (fifo.used() == 0);
+  endfunction
+
+  //--------------------------------------------------------------------
   // dequeue_items
   //
   // Take items from the fifo and call process_item.  Process_item()
-  // is a virtual function that can operfoirma nay descired
-  // computation with the sequence item.  If this stage is not the
-  // last one then it must call sqwr.execute_item() to send it
-  // downstream.
-  //--------------------------------------------------------------------
+  // is a virtual function that can perform anu desired computation
+  // with the sequence item.  If this stage is not the last one then
+  // it must call sqwr.execute_item() to send it downstream.
+  // --------------------------------------------------------------------
   task dequeue_items();
     SEQ item;
     forever begin
       fifo.get(item);
       process_item(item);
       // Are we done?
-      if(fifo.used() == 0)
+      if(is_idle())
 	pipeline_done.agree(this);
     end
   endtask

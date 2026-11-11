@@ -107,6 +107,8 @@ semantically equivalent to the following command lines:
   +x_mode=on
   +x_mode=TRUE
   +x_mode=true
+  +x_mode=YES
+  +x_mode=yes
 
 Similarly, a switch can be turned off with these command lines:
 
@@ -115,6 +117,8 @@ Similarly, a switch can be turned off with these command lines:
   +x_mode=off
   +x_mode=FALSE
   +x_mode=false
+  +x_mode=NO
+  +x_mode-no
 
 In the second form, +<option>=<value> there cannot be any spaces on
 either side of the equal sign.
@@ -132,7 +136,7 @@ On the command line we can put
 
   +bias=10
 
-However, a numeric value that does not git into a byte is illegal:
+However, a numeric value that does not fit into a byte is illegal:
 
   +bias=2000  !!ILLEGAL!!
 

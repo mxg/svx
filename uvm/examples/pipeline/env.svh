@@ -50,7 +50,8 @@ class env extends uvm_component;
     s2 = new("stage_2", this);
     s3 = new("stage_3", this);
     pipeline_done = new("pipeline_done");
-    uvm_resource_db#(agreement)::set("*", "pipeline_done", 
+    uvm_resource_db#(agreement)::set({get_full_name(), "*"},
+				     "pipeline_done", 
 				     pipeline_done, this);
   endfunction
 
@@ -65,13 +66,10 @@ class env extends uvm_component;
   //--------------------------------------------------------------------
   // run_phase
   //
-  // Each stage has its own done flag.  The simulation is complete
-  // when all the done flags are set, meaning there are no more
-  // sequence items in flight.
+  // An agreement is used to control when shutdown occurs.
   //--------------------------------------------------------------------
   task run_phase(uvm_phase phase);
     phase.raise_objection(this);
-    #0;
     pipeline_done.wait_for_agreement(this);
     phase.drop_objection(this);
   endtask

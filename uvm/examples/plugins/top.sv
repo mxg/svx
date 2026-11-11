@@ -46,9 +46,9 @@ module top;
   //--------------------------------------------------------------------
   /* static */ function void preliminaries();
     static cl_parse clp = cl_parse::get();
-    plugin_opts::add_opts();  // Add options for plugins
+    plugins::register_opts(); // Add options for plugins
     clp.parse();              // Parse the command line (all opts)
-    plugins::setup();         // install plugins (if any)
+    plugins::install();       // install plugins (if any)
   endfunction
 
   initial begin

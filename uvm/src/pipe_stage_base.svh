@@ -50,7 +50,7 @@ class pipe_stage_base #(type SEQ = uvm_sequence_item)
   function void build_phase(uvm_phase phase);
     sqr = new("sequencer", this);
     seq_item_export = new("seq_item_export", this);
-    if(!uvm_resource_db#(agreement)::read_by_name(get_name(), 
+    if(!uvm_resource_db#(agreement)::read_by_name(get_full_name(), 
 					      "pipeline_done", 
 					      pipeline_done, this))
       `uvm_error("SVX/PIPELINE", "Agreement pipeline_done is not available")
