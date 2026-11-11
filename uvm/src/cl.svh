@@ -72,7 +72,7 @@ class cl_mgr;
   //
   // Add a new command line option to the list of options
   //--------------------------------------------------------------------
-  static function void add(string name, cl_opt_desc_base opt);
+  static function bit add(string name, cl_opt_desc_base opt);
     if(opt_map == null)
       opt_map = new();
     
@@ -81,10 +81,11 @@ class cl_mgr;
       $sformat(msg, "Command line option %s already exists, cannot be added again",
 	       name);
       `uvm_error(SVX_CL_MSG_ID, msg)
-      return;
+      return 0;
     end
     
     void'(opt_map.insert(name, opt));
+    return 1;
   endfunction
 
   //--------------------------------------------------------------------
@@ -280,8 +281,8 @@ class cl #(type T=int);
   // add
   //--------------------------------------------------------------------
   static function void add(string name,
-			   string fmt="",
-			   string desc="");
+			   string desc="",
+			   string fmt="");
 
     cl_opt_desc_base opt;
 
@@ -302,7 +303,7 @@ class cl #(type T=int);
       opt.fmt = fmt;
     opt.desc = desc;
     
-    cl_mgr::add(name, opt);
+    void'(cl_mgr::add(name, opt));
     
   endfunction
 
@@ -310,8 +311,8 @@ class cl #(type T=int);
   // add_with_default
   //--------------------------------------------------------------------
   static function void add_with_default(string name, T def, 
-					string fmt="",
-					string desc="");
+					string desc="", 
+					string fmt="");
 
     cl_opt_desc_base opt;
     cl_opt_desc#(T) opt_desc;
@@ -348,10 +349,10 @@ class cl #(type T=int);
     val.set_default_fmt(opt.fmt);
     opt_desc.default_value = val;
 
-    cl_mgr::add(name, opt);
-
-    // Put the default value into the resource database
-    uvm_resource_db#(T)::set("CL::*", name, def, null);
+    // Add the option into the table and put the default value into
+    // the resource database.
+    if(cl_mgr::add(name, opt))
+      uvm_resource_db#(T)::set("CL::*", name, def, null);
     
   endfunction
 

@@ -35,15 +35,6 @@
 class plugins;
 
   //--------------------------------------------------------------------
-  // register_opts
-  //
-  // Add plugin-related command line options.
-  //--------------------------------------------------------------------
-  static function void register_opts();
-    cl#(string)::add("plugin");
-  endfunction
-
-  //--------------------------------------------------------------------
   // install
   //
   // Locate the "+plugin=<name>" command line options.  This function

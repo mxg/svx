@@ -148,7 +148,7 @@ much like in SystemVerilog.  Underscores are also lega. E.g.,
 
    32hf77_7003c
    12b011_000_111_010
-   4o6263
+   8o361
 
 Note that there are no ticks in the number.  Command shells use ticks
 (single quotes) for their own purposes, so we avoided using them in

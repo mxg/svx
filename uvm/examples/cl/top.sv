@@ -53,15 +53,15 @@ module top;
     // to cl#() specifies the type of the option's value. Some have
     // default values, some do not.  The default values are added to
     // the UVM resource database.
-    cl#(uint32_t)::add_with_default("size", 4, "", "Size of things");
-    cl#(int16_t)::add("offset", "", "Offset from base");
-    cl#(real)::add_with_default("freq", 2.875e9, "", "clock frequency in Hz");
+    cl#(uint32_t)::add_with_default("size", 4, "Size of things");
+    cl#(int16_t)::add("offset", "Offset from base");
+    cl#(real)::add_with_default("freq", 2.875e9, "clock frequency in Hz");
     cl#(bit)::add_with_default("x_mode", 0);
     cl#(bit)::add_with_default("z_mode", 0);
     cl#(uint32_t)::add_with_default("channels", 4);
     cl#(string)::add_with_default("name", "<none>");
     cl#(int32_t)::add_with_default("bias", 0);
-    cl#(uint32_t)::add("base", "%8x");
+    cl#(uint32_t)::add("base", "%8x", "Base address");
     cl#(uint64_t)::add("data", "%16x");
     cl#(int64_t)::add("bignum");
     cl#(int8_t)::add("smallnum");

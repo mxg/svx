@@ -215,8 +215,19 @@ class cl_parse;
 
   local function new();
     clp = uvm_cmdline_processor::get_inst();
+    add_builtin_options();
   endfunction
 
+  //--------------------------------------------------------------------
+  // add_builtin_options
+  //
+  // These options come with the SVX library package
+  //--------------------------------------------------------------------
+  function void add_builtin_options();
+    cl#(bit)::add_with_default("svx_cl_dump", 0);
+    cl#(string)::add("plugin");
+  endfunction
+  
   //--------------------------------------------------------------------
   // get
   //
@@ -269,6 +280,7 @@ class cl_parse;
   function void parse();
 
     uint32_t errs;
+    bit svx_cl_dump;
 
     // Vectors    
     vector_string vec;    // List of raw option strings
@@ -346,6 +358,16 @@ class cl_parse;
 
     // All done
     cl_mgr::set_parse_flag();
+
+    if(uvm_resource_db#(bit)::read_by_name("CL::",
+					   "svx_cl_dump", 
+					   svx_cl_dump, null)) begin
+      if(svx_cl_dump)
+	cl_mgr::dump();
+    end
+    else
+      `uvm_error(SVX_CL_MSG_ID,
+		 "Missing svx_cl_dump option value in the resource database")
 
   endfunction
 

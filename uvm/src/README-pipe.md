@@ -39,7 +39,7 @@ upstream or a new item.
 
 The pipeline stages use an agreement to determine when it's time top
 shutdown.  The pipe_stage classes are hardwired to use an agreement
-named "pipeline_done".  The girtual funftion pipe_stage::is_idle()
+named "pipeline_done".  The virtual function pipe_stage::is_idle()
 identifies when it's OK to allow a shutdown.  Derived pipeline stages
 can override this function to change the criteria for allowing
 shutdown.
