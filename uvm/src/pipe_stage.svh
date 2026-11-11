@@ -42,10 +42,15 @@ class pipe_stage#(type SEQ = uvm_sequence_item)
   extends pipe_stage_base #(SEQ);
 
   uvm_seq_item_pull_port #(SEQ) seq_item_port;
-  uvm_tlm_analysis_fifo#(SEQ) fifo;
+  uvm_tlm_fifo#(SEQ) fifo;
+  local int32_t fifo_size;
 
-  function new(string name, uvm_component parent);
+  // constructor
+  //
+  // The internal fifo is unbounded if size == 0.
+  function new(string name, uvm_component parent, int32_t size = 0);
     super.new(name, parent);
+    fifo_size = size;
   endfunction
 
   //--------------------------------------------------------------------
@@ -54,7 +59,7 @@ class pipe_stage#(type SEQ = uvm_sequence_item)
   function void build_phase(uvm_phase phase);
     super.build_phase(phase);
     seq_item_port = new("seq_item_port", this);
-    fifo = new("fifo", this);
+    fifo = new("fifo", this, fifo_size);
   endfunction
 
   //--------------------------------------------------------------------
@@ -79,6 +84,7 @@ class pipe_stage#(type SEQ = uvm_sequence_item)
     forever begin
       seq_item_port.get_next_item(item);
       fifo.put(item);
+      pipeline_done.disagree(this);
       seq_item_port.item_done();
     end
   endtask
@@ -91,15 +97,15 @@ class pipe_stage#(type SEQ = uvm_sequence_item)
   // computation with the sequence item.  If this stage is not the
   // last one then it must call sqwr.execute_item() to send it
   // downstream.
-  //
-  // The done flag is set when the fifo is empty.
   //--------------------------------------------------------------------
   task dequeue_items();
     SEQ item;
     forever begin
       fifo.get(item);
       process_item(item);
-      done = (fifo.used() == 0);
+      // Are we done?
+      if(fifo.used() == 0)
+	pipeline_done.agree(this);
     end
   endtask
 

@@ -36,6 +36,7 @@ class env extends uvm_component;
   stage_1 s1;
   stage_2 s2;
   stage_3 s3;
+  agreement pipeline_done;
 
   function new(string name, uvm_component parent);
     super.new(name, parent);
@@ -48,6 +49,9 @@ class env extends uvm_component;
     s1 = new("stage_1", this);
     s2 = new("stage_2", this);
     s3 = new("stage_3", this);
+    pipeline_done = new("pipeline_done");
+    uvm_resource_db#(agreement)::set("*", "pipeline_done", 
+				     pipeline_done, this);
   endfunction
 
   //--------------------------------------------------------------------
@@ -67,7 +71,8 @@ class env extends uvm_component;
   //--------------------------------------------------------------------
   task run_phase(uvm_phase phase);
     phase.raise_objection(this);
-    wait(s1.done && s2.done && s3.done);
+    #0;
+    pipeline_done.wait_for_agreement(this);
     phase.drop_objection(this);
   endtask
 

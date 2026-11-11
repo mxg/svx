@@ -51,7 +51,7 @@ class plugins;
   //--------------------------------------------------------------------
   // setup
   //
-  // Locate the "+plugin-<name>" command line options.
+  // Locate the "+plugin=<name>" command line options.
   //--------------------------------------------------------------------
   static function void setup();
 

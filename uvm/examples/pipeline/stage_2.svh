@@ -32,7 +32,7 @@
 class stage_2 extends pipe_stage#(transaction);
 
   function new(string name, uvm_component parent);
-    super.new(name, parent);
+    super.new(name, parent, 1);
   endfunction
 
   task process_item(transaction item);

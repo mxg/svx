@@ -40,21 +40,20 @@ class pipe_stage_base #(type SEQ = uvm_sequence_item)
   // Sequencer for sending a sequence downstream.  Note that it is
   // protected so that it cannot be reached from outside.
   protected uvm_sequencer#(SEQ) sqr;
-  // The done flag is set when the stage determines there is no more
-  // work to do.
-  bit done;
+
+  protected agreement pipeline_done;
 
   function new(string name, uvm_component parent);
     super.new(name, parent);
   endfunction
 
-  function bit is_done();
-    return done;
-  endfunction
-
   function void build_phase(uvm_phase phase);
     sqr = new("sequencer", this);
     seq_item_export = new("seq_item_export", this);
+    if(!uvm_resource_db#(agreement)::read_by_name(get_name(), 
+					      "pipeline_done", 
+					      pipeline_done, this))
+      `uvm_error("SVX/PIPELINE", "Agreement pipeline_done is not available")
   endfunction
 
   function void connect_phase(uvm_phase phase);

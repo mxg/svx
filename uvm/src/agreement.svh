@@ -29,22 +29,22 @@
 //----------------------------------------------------------------------
 // agreement
 //
-// An agreement is a lightweight synchronization primitve.  It
+// An agreement is a lightweight synchronization primitive.  It
 // provides a means for synchronizing multiple threads.  This is an
 // implementation of the agreement class described in the 2017 SNUG
 // paper "Shutdown with Agreements in a UVM Testbench" by Mark
 // Glasser.
 //----------------------------------------------------------------------
-class agreement extends uvm_barrier;
+class agreement extends uvm_object;
   
-  typedef enum{AGREE, DISAGREE, WAIT} agree_t;
+  typedef enum{AGREE, DISAGREE} agree_t;
   
   local static bit debug = 0;
-  local static agree_t participants[uvm_object];
+  local agree_t votes[uvm_object];
+  local uint32_t disagreements;
   
   function new(string name = "agreement");
     super.new(name);
-    set_threshold(1);
   endfunction
   
   static function void set_debug();
@@ -60,26 +60,13 @@ class agreement extends uvm_barrier;
   //
   // Update the agreement's state.
   //--------------------------------------------------------------------
-  local function void update(uvm_object ptcpnt,
-                       agree_t a);
+  local function void update(uvm_object p, agree_t a);
+    agree_t old = votes.exists(p) ? votes[p] : AGREE;
+    votes[p] = a;
+    if (old != DISAGREE && a == DISAGREE) disagreements++;
+    if (old == DISAGREE && a != DISAGREE) disagreements--;
+  endfunction  
 
-    // If there is no change in vote, then there is nothing to update
-    if(participants.exists(ptcpnt) &&
-       participants[ptcpnt] == a)
-      return;
-    
-    // Add a new participant and/or change the agreement state.
-    participants[ptcpnt] = a;
-
-    // Update the threshold based on the change in state.
-    case(a)
-      AGREE:    set_threshold(get_threshold() - 1);
-      DISAGREE: set_threshold(get_threshold() + 1);
-      WAIT:;    // do nothing
-    endcase
-    
-  endfunction
-  
   //--------------------------------------------------------------------
   // agree
   //
@@ -88,7 +75,7 @@ class agreement extends uvm_barrier;
   function void agree(uvm_object obj, int lineno = 0);
     update(obj, AGREE);
     if(debug)
-      `uvm_info("AGREE", status_msg(obj, lineno), UVM_NONE);
+      `uvm_info("SVX/AGREE", status_msg(obj, lineno), UVM_NONE);
   endfunction
   
   //--------------------------------------------------------------------
@@ -99,7 +86,7 @@ class agreement extends uvm_barrier;
   function void disagree(uvm_object obj, int lineno = 0);
     update(obj, DISAGREE);
     if(debug)
-      `uvm_info("DISAGREE", status_msg(obj, lineno), UVM_NONE);
+      `uvm_info("SVX/DISAGREE", status_msg(obj, lineno), UVM_NONE);
   endfunction
   
   //--------------------------------------------------------------------
@@ -108,9 +95,9 @@ class agreement extends uvm_barrier;
   // Block until agreement is reached.
   //--------------------------------------------------------------------
   task wait_for_agreement(uvm_object obj, int lineno = 0);
-    wait_for();
+    wait(disagreements == 0);
     if(debug)
-      `uvm_info("ALL IN AGREEMENT", status_msg(obj, lineno), UVM_NONE);
+      `uvm_info("SVX/ALL_IN_AGREEMENT", status_msg(obj, lineno), UVM_NONE);
   endtask
   
   //--------------------------------------------------------------------
@@ -119,33 +106,43 @@ class agreement extends uvm_barrier;
   // Clear the agreement's state.
   //--------------------------------------------------------------------
   function clear(uvm_object obj, int lineno = 0);
-    set_threshold(1);
+    votes.delete();
+    disagreements = 0;
     if(debug)
-      `uvm_info("CLEAR", status_msg(obj, lineno), UVM_NONE);
+      `uvm_info("SVX/CLEAR", status_msg(obj, lineno), UVM_NONE);
+  endfunction
+
+  //--------------------------------------------------------------------
+  // num_disagree
+  //
+  // How many disagreements are outstanding?
+  //--------------------------------------------------------------------
+  function uint32_t num_disagreements();
+    return disagreements;
   endfunction
   
   //--------------------------------------------------------------------
   // status_msg
   //
-  // Print a message showing the state of the agreement. How manay
+  // Print a message showing the state of the agreement. How many
   // waiters are still waiting?
   //--------------------------------------------------------------------
   local function string status_msg(uvm_object obj = null,
-                                   int lineno = 0);
+                             int lineno = 0);
     string msg;
-  
+    
     case(1)
       (obj == null) && (lineno == 0) :
             $sformat(msg, "[%s] threshold = %0d",
-                     get_name(), get_threshold());
-      (obj == null) && (lineno != 0) : $sformat(msg, "[%s] threshold = %0d @ %0d",
-                                                get_name(), get_threshold(), lineno);
-      (obj != null) && (lineno == 0) : $sformat(msg, "[%s] %s: threshold = %0d",
+                     get_name(), num_disagreements());
+      (obj == null) && (lineno != 0) : $sformat(msg, "[%s] disagreements = %0d @ %0d",
+                                                get_name(), num_disagreements(), lineno);
+      (obj != null) && (lineno == 0) : $sformat(msg, "[%s] %s: disagreements = %0d",
                                                 get_name(), obj.get_full_name,
-                                                get_threshold());
-      (obj != null) && (lineno != 0) : $sformat(msg, "[%s] %s: threshold = %0d @ %0d",
+                                                num_disagreements());
+      (obj != null) && (lineno != 0) : $sformat(msg, "[%s] %s: disagreements = %0d @ %0d",
                                                 get_name(), obj.get_full_name,
-                                                get_threshold(), lineno);
+                                                num_disagreements(), lineno);
     endcase
     
     return msg;

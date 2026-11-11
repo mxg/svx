@@ -42,12 +42,12 @@ package svx_uvm_pkg;
   `include "cl.svh"
   `include "cl_parse.svh"
 
+  // Agreements
+  `include "agreement.svh"
+
   // Pipelined testbenches
   `include "pipe_stage_base.svh"
   `include "pipe_stage.svh"
-
-  // Agreements
-  `include "agreement.svh"
 
   // Plugins
   `include "plugins.svh"

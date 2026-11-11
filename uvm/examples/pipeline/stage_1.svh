@@ -38,6 +38,8 @@ class stage_1 extends pipe_stage_base #(transaction);
   task run_phase(uvm_phase phase);
     transaction t;
 
+    pipeline_done.disagree(this);
+
     for(int i = 0; i < 10; i++) begin
       t = new();
       void'(t.randomize());
@@ -45,7 +47,8 @@ class stage_1 extends pipe_stage_base #(transaction);
       $display("stage_1: %10t: %s", $time, t.convert2string());
       #2;
     end
-    done = 1;
+
+    pipeline_done.agree(this);
   endtask
 
   task process_item(SEQ item);
