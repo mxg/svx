@@ -304,9 +304,9 @@ The command line example shows the complete use model for reading plusargs into 
 
 \textit{Source:} \texttt{uvm/examples/cl}\\
 
-The top module registers thirteen options of different types --- integers of several widths and signedness, \texttt{real}, \texttt{bit} switches, and \texttt{string} --- some with default values and some with custom print formats. It then obtains the singleton parser with \texttt{cl\_parse::get()} and calls \texttt{parse()}, all before calling \texttt{run\_test()}, so the values are available to every phase.
+The top module registers thirteen options of different types --- integers of several widths and signedness, \texttt{real}, \texttt{bit} switches, and \texttt{string} --- some with default values, some with descriptions, and some with custom print formats. It then obtains the singleton parser with \texttt{cl\_parse::get()} and calls \texttt{parse()}, all before calling \texttt{run\_test()}, so the values are available to every phase.
 
-The makefile supplies a command line that exercises the value forms the parser accepts: unsized decimal and negative values, a real in exponent notation, a \texttt{bit} given in switch form, sized hexadecimal values (one with underscores), a file path, and an option given twice, where the last value wins. Options not on the command line keep their defaults.
+The makefile supplies a command line that exercises the value forms the parser accepts: unsized decimal and negative values, a real in exponent notation, a \texttt{bit} given in switch form, sized hexadecimal values (one with underscores), a file path, and an option given twice, where the last value wins. Options not on the command line keep their defaults. The command line ends with the built-in option \texttt{+svx\_cl\_dump}, which prints the option table after parsing; running with \texttt{+svx\_help} instead prints the version, the option table, and a syntax summary, and then ends the simulation.
 
 In \texttt{build\_phase}, the test reads every option back with \texttt{uvm\_resource\_db\#(T)::read\_by\_name()} using the \texttt{CL::} scope and prints its value, reporting an error for any option that was not found. Reading the values in \texttt{build\_phase} shows that they are available before the component hierarchy is built --- for example, to decide how many agents to create.
 
@@ -317,25 +317,67 @@ In \texttt{build\_phase}, the test reads every option back with \texttt{uvm\_res
   \item \texttt{cl\#(T)::add\_with\_default()}
   \item \texttt{cl\_parse::get()}
   \item \texttt{cl\_parse::parse()}
+  \item \texttt{+svx\_cl\_dump}
+  \item \texttt{+svx\_help}
+\end{itemize}
+\chapter{Plugins}
+
+The plugins example shows how a component selected on the command line is added to a simulation without any change to the testbench.
+
+\section{Command Line Plugin}
+
+\textit{Source:} \texttt{uvm/examples/plugins}\\
+
+The plugin, \texttt{my\_plugin}, is an ordinary UVM component registered with the factory. It creates two subordinate components in \texttt{build\_phase} and prints a message as each phase starts and ends, so the log shows it going through the full UVM phasing.
+
+The top module parses the command line and calls \texttt{plugins::install()} before \texttt{run\_test()}. The makefile runs with \texttt{+plugin=my\_plugin}, so the factory creates the plugin under \texttt{uvm\_root}. The testbench contains nothing that refers to the plugin.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{plugins::install()}
+  \item \texttt{+plugin=\textless{}type\textgreater{}}
+  \item \texttt{cl\_parse::parse()}
+\end{itemize}
+\chapter{Agreements}
+
+The agreement example shows how an agreement decides when a test ends, in place of objections raised and dropped by each component.
+
+\section{Shutdown by Agreement}
+
+\textit{Source:} \texttt{uvm/examples/agreement}\\
+
+An environment creates an agreement named \texttt{ok\_to\_shutdown}, puts it into the resource database, and creates three components that retrieve it. Each component disagrees at the start of \texttt{run\_phase}, works for a different length of time (10, 30, and 49 time units), and then agrees.
+
+The environment raises an objection, waits for agreement, and drops the objection. The test therefore ends at time 49, when the last component agrees. Each component then waits another 100 time units before printing a message; that message never appears, which shows that the test ended as soon as everyone agreed.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{agreement}
+  \item \texttt{agreement::disagree()}
+  \item \texttt{agreement::agree()}
+  \item \texttt{agreement::wait\_for\_agreement()}
 \end{itemize}
 \chapter{Pipelined Testbenches}
 
-The pipeline example shows how to build a testbench as a chain of stages using the pipe-stage base classes, with transactions flowing from one stage to the next through sequencer ports.
+The pipeline example shows how to build a testbench as a chain of stages using the pipe-stage base classes, with transactions flowing from one stage to the next through sequencer ports and an agreement deciding when the pipeline is finished.
 
 \section{Three-Stage Pipeline}
 
 \textit{Source:} \texttt{uvm/examples/pipeline}\\
 
-An environment contains three stages connected in a chain: the \texttt{seq\_item\_port} of each stage is connected to the \texttt{seq\_item\_export} of the stage before it. The transaction is a sequence item with a random operation (\texttt{NOP}, \texttt{READ}, or \texttt{WRITE}), a word-aligned address, and data.
+An environment contains three stages connected in a chain: the \texttt{seq\_item\_port} of each stage is connected to the \texttt{seq\_item\_export} of the stage before it. The environment also creates the agreement \texttt{pipeline\_done} and puts it into the resource database for the stages to find. The transaction is a sequence item with a random operation (\texttt{NOP}, \texttt{READ}, or \texttt{WRITE}), a word-aligned address, and data.
 
-The first stage, derived from \texttt{pipe\_stage\_base}, generates ten random transactions, two time units apart, and sends each one downstream through its sequencer. The second and third stages, derived from \texttt{pipe\_stage}, pull transactions from upstream into a FIFO and process them; the second stage forwards each transaction and then waits three time units, while the third, the last stage, waits five. Because the stages run at different rates, transactions queue up in the FIFOs, and the log shows how they move through the pipeline over time.
+The first stage, derived from \texttt{pipe\_stage\_base}, disagrees in \texttt{build\_phase}, generates ten random transactions two time units apart, sends each one downstream through its sequencer, and then agrees. The second and third stages, derived from \texttt{pipe\_stage}, each have an internal FIFO of depth one. The second stage forwards each transaction and then waits three time units; the third, the last stage, waits five. Because the FIFOs are bounded, a slow stage holds back the stages before it, and the log shows the transactions moving through the pipeline at the pace of the slowest stage.
 
-Each stage sets its \texttt{done} flag when it has no work left. The environment holds an objection until all three flags are set, so the test ends once every transaction has passed through the pipeline.
+Each later stage disagrees when a transaction arrives and agrees when its FIFO is empty. The environment holds an objection until \texttt{pipeline\_done} reaches agreement, so the test ends once every transaction has passed through the pipeline.
 
 \textbf{SVX features exhibited:}
 
 \begin{itemize}
   \item \texttt{pipe\_stage\_base\#(SEQ)}
   \item \texttt{pipe\_stage\#(SEQ)}
+  \item \texttt{agreement}
 \end{itemize}
 \end{document}

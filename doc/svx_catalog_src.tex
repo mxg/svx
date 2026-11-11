@@ -1716,16 +1716,16 @@ Register each option with \texttt{cl\#(T)::add()} or \texttt{cl\#(T)::add\_with\
 \begin{verbatim}
 module top;
 
-  function automatic void populate();
+  function automatic void preliminaries();
     cl_parse clp = cl_parse::get();
-    cl#(uint32_t)::add_with_default("size", 4);
-    cl#(bit)::add("x_mode");
-    cl#(string)::add("file");
+    cl#(uint32_t)::add_with_default("size", 4, "Size of things");
+    cl#(bit)::add("x_mode", "Enable X mode");
+    cl#(uint32_t)::add("base", "Base address", "%8x");
     clp.parse();
   endfunction
 
   initial begin
-    populate();
+    preliminaries();
     run_test();
   end
 
@@ -1743,28 +1743,45 @@ uvm_resource_db#(uint32_t)::read_by_name("CL::", "size", size, this);
 
 An option takes one of two forms, \texttt{+name} or \texttt{+name=value}, with no spaces around the \texttt{=}. The form \texttt{+name} is a switch and is valid only for \texttt{bit} options: it turns the option on. A \texttt{bit} option can also be set explicitly:
 
-\begin{xltabular}{\linewidth}{>{\small}p{2.4in} >{\small}X}
+\begin{xltabular}{\linewidth}{>{\small}p{2.0in} >{\small}X}
 \toprule
 \textbf{Value} & \textbf{Meaning} \\
 \midrule
 \endhead
 \bottomrule
 \endfoot
-\texttt{1, ON, on, TRUE, true} & Turn the switch on. Equivalent to \texttt{+name}. \\
-\texttt{0, OFF, off, FALSE, false} & Turn the switch off. \\
+\texttt{1, on, true, yes} & Turn the switch on. Equivalent to \texttt{+name}. Keywords may be all lower or all upper case. \\
+\texttt{0, off, false, no} & Turn the switch off. \\
 \end{xltabular}
 
-A value must fit the option's type; \texttt{+bias=2000} is rejected for a \texttt{byte} option even though it is a valid number. Numeric values may be sized and given in any base, as in SystemVerilog but without the apostrophe, which command shells use for their own purposes. Underscores are allowed:
+A value must fit the option's type; \texttt{+bias=2000} is rejected for a \texttt{byte} option even though it is a valid number. Integers may be negative, and may be sized and given in any base --- \texttt{h}, \texttt{o}, \texttt{b}, or \texttt{d}, in either case --- as in SystemVerilog but without the apostrophe, which command shells use for their own purposes. Underscores may separate digits:
 
 \begin{verbatim}
 +base=32hf77_7003c
 +mask=12b011_000_111_010
 +mode=12o6263
++bias=-100
 \end{verbatim}
 
 \texttt{string} values are taken exactly as written, so file paths and other text need no quoting. If an option appears more than once, the last value wins. Plusargs that are not registered options --- simulator and UVM options, or plusargs used by other code --- are ignored. If any registered option has an invalid value, the parser reports an error and puts none of the command line values into the resource database, and UVM stops the run at the end of elaboration.
 
 Supported types are \texttt{string}, \texttt{real}, \texttt{bit}, \texttt{byte}, \texttt{shortint}, \texttt{int}, \texttt{longint}, and their \texttt{unsigned} forms, along with the aliases \texttt{int8\_t} through \texttt{int64\_t} and \texttt{uint8\_t} through \texttt{uint64\_t}.
+
+\subsection*{Built-in Options}
+
+The parser registers three options of its own. Their names are reserved.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.5in} >{\small}X}
+\toprule
+\textbf{Option} & \textbf{Effect} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{+svx\_help} & Print the SVX version, the option table with descriptions and defaults, and a summary of the command line syntax, then end the simulation. Works even when other options on the command line are invalid. \\
+\texttt{+svx\_cl\_dump} & Print the option table after parsing, then continue. \\
+\texttt{+plugin=\textless{}type\textgreater{}} & Install a UVM plugin; may be given more than once. See the Plugins chapter. \\
+\end{xltabular}
 
 \section{cl --- Option Registration}
 \noindent\small\textit{File: \texttt{uvm/src/cl.svh}}\par
@@ -1781,8 +1798,8 @@ Static functions for adding options to the option table. The type parameter is t
 \endhead
 \bottomrule
 \endfoot
-\texttt{add} & void & \texttt{string name, string fmt=""} & Add option \texttt{name} of type T to the table. \texttt{fmt} optionally sets the format used when the option is printed. Static. \\
-\texttt{add\_with\_default} & void & \texttt{string name, T def, string fmt=""} & Add an option with a default value. The default goes into the resource database immediately and is replaced by a value given on the command line. Static. \\
+\texttt{add} & void & \texttt{string name, string desc="", string fmt=""} & Add option \texttt{name} of type T to the table. \texttt{desc} is a one-line description shown by \texttt{+svx\_help} and \texttt{+svx\_cl\_dump}. \texttt{fmt} optionally sets the format used to print the value. Static. \\
+\texttt{add\_with\_default} & void & \texttt{string name, T def, string desc="", string fmt=""} & Add an option with a default value. The default goes into the resource database immediately and is replaced by a value given on the command line. Static. \\
 \end{xltabular}
 
 \section{cl\_parse --- Parser}
@@ -1800,20 +1817,37 @@ The command line parser is a singleton. Obtain it with \texttt{get()} and call \
 \endhead
 \bottomrule
 \endfoot
-\texttt{get} & \texttt{cl\_parse} & --- & Return the singleton parser. Static. \\
+\texttt{get} & \texttt{cl\_parse} & --- & Return the singleton parser, creating it and registering the built-in options on first call. Static. \\
 \texttt{parse} & void & --- & Parse the command line, validate each registered option, and put the values into the resource database. Parsing happens only once; later calls issue a warning and do nothing. \\
 \end{xltabular}
 
-\chapter{Pipelined Testbenches}
-\section{Pipe Stages}
-\noindent\small\textit{File: \texttt{uvm/src/pipe\_stage\_base.svh}, \texttt{uvm/src/pipe\_stage.svh}}\par
+\chapter{Plugins}
+\section{plugins --- UVM Plugins}
+\noindent\small\textit{File: \texttt{uvm/src/plugins.svh}}\par
 
-Base classes for building testbenches as a chain of stages. Each stage owns a sequencer and exposes it through \texttt{seq\_item\_export}; the next stage pulls items through its \texttt{seq\_item\_port}. A stage processes each item in \texttt{process\_item()} and, unless it is the last stage, sends the item downstream with \texttt{sqr.execute\_item()}. Each stage sets its \texttt{done} flag when it has no more work, so the environment can end the test when every stage is done.
+A plugin is a UVM component that is instantiated under \texttt{uvm\_root} instead of inside the testbench hierarchy. It can be any kind of component and perform any function: monitoring, coverage collection, debugging, reporting. Plugins are selected on the command line with \texttt{+plugin=\textless{}type\textgreater{}}, so they can be added to a run without changing the testbench.
 
-\subsection*{\texttt{pipe\_stage\_base\#(SEQ)}}
-\noindent\small\textit{class}\quad \textbf{extends} \texttt{uvm\_component}\par
+A plugin class must be registered with the UVM factory (\texttt{uvm\_component\_utils}) and must be creatable without a parent of its own; it may create subordinate components. Each plugin is created with the factory, using the type name as the instance name, and then goes through every phase like any other component.
 
-Base for all stages, and used directly for the first stage, which generates items itself. SEQ is the sequence item type.
+Install plugins after parsing the command line and before calling \texttt{run\_test()}:
+
+\begin{verbatim}
+initial begin
+  cl_parse clp = cl_parse::get();
+  clp.parse();          // parse the command line
+  plugins::install();   // instantiate +plugin=<type> components
+  run_test();
+end
+\end{verbatim}
+
+\begin{verbatim}
+% <simulator> ... +plugin=my_plugin +plugin=my_other_plugin
+\end{verbatim}
+
+\subsection*{\texttt{plugins}}
+\noindent\small\textit{class}\par
+
+Static functions for installing plugins.
 
 \begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
 \toprule
@@ -1822,14 +1856,112 @@ Base for all stages, and used directly for the first stage, which generates item
 \endhead
 \bottomrule
 \endfoot
-\texttt{process\_item} & void & \texttt{SEQ item} & Virtual hook for handling an item; commonly sends it downstream. Task. \\
-\texttt{is\_done} & \texttt{bit} & --- & Return the \texttt{done} flag. \\
+\texttt{install} & void & --- & Instantiate a component for each \texttt{+plugin=\textless{}type\textgreater{}} on the command line. Reports an error for a type the factory cannot create. Must run after \texttt{parse()} and before \texttt{run\_test()}. Static. \\
+\end{xltabular}
+
+\chapter{Agreements}
+\section{agreement --- Shutdown Agreements}
+\noindent\small\textit{File: \texttt{uvm/src/agreement.svh}, \texttt{uvm/src/README-agreement.md}}\par
+
+An agreement is a lightweight synchronization primitive for threads in different objects. Participating objects vote to agree or disagree; a thread that calls \texttt{wait\_for\_agreement()} blocks until no participant disagrees. Participants may change their votes at any time. The agreement is described in Glasser, "Shutdown with Agreements in a UVM Testbench," SNUG 2017.
+
+A common use is deciding when to end a test. A top-level component creates an agreement, puts it into the resource database, and waits on it in \texttt{run\_phase} while holding an objection. Stimulus generators, scoreboards, and other components retrieve the agreement and disagree while they have work to do and agree when they are finished. When every participant agrees, the waiting component drops its objection.
+
+\begin{verbatim}
+// In the environment
+ok_to_shutdown = new("ok_to_shutdown");
+uvm_resource_db#(agreement)::set({get_full_name(), ".*"},
+                                 "ok_to_shutdown", ok_to_shutdown, this);
+...
+phase.raise_objection(this);
+ok_to_shutdown.wait_for_agreement(this);
+phase.drop_objection(this);
+
+// In a participating component
+ok_to_shutdown.disagree(this);
+... do the work ...
+ok_to_shutdown.agree(this);
+\end{verbatim}
+
+Participants should disagree at the start of \texttt{run\_phase}, before anything that blocks, or earlier in a function phase. \texttt{wait\_for\_agreement()} yields once before testing, so that participants starting in the same time step can register their disagreement first. Any number of threads may wait on the same agreement.
+
+\subsection*{\texttt{agreement}}
+\noindent\small\textit{class}\quad \textbf{extends} \texttt{uvm\_object}\par
+
+\noindent\textbf{Constructor:} \texttt{new(string name = "agreement")} --- Create an agreement with no votes.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{agree} & void & \texttt{uvm\_object obj, int lineno=0} & Record that obj agrees. Agreeing has an effect only if obj previously disagreed. \\
+\texttt{disagree} & void & \texttt{uvm\_object obj, int lineno=0} & Record that obj disagrees. \\
+\texttt{wait\_for\_agreement} & void & \texttt{uvm\_object obj, int lineno=0} & Block until no participant disagrees. Task. \\
+\texttt{clear} & void & \texttt{uvm\_object obj, int lineno=0} & Discard all votes. \\
+\texttt{num\_disagreements} & \texttt{uint32\_t} & --- & Return the number of participants that currently disagree. \\
+\texttt{set\_debug / clr\_debug} & void & --- & Turn debug messages on or off for this agreement. \\
+\texttt{set\_debug\_all / clr\_debug\_all} & void & --- & Turn debug messages on or off for every agreement. Static. \\
+\end{xltabular}
+
+In each method, \texttt{obj} identifies the participant, normally \texttt{this}. The optional \texttt{lineno}, typically \texttt{\`{}\_\_LINE\_\_}, is included in debug messages.
+
+\chapter{Pipelined Testbenches}
+\section{Pipe Stages}
+\noindent\small\textit{File: \texttt{uvm/src/pipe\_stage\_base.svh}, \texttt{uvm/src/pipe\_stage.svh}, \texttt{uvm/src/README-pipe.md}}\par
+
+Base classes for building a testbench as a chain of stages that run concurrently. Each stage looks like a driver to its upstream neighbor and like a sequencer to its downstream neighbor, so stages connect with ordinary sequence-item ports. A stage begins work when an item arrives from upstream and at some point sends an item downstream --- the same item or a different one. Items in and out need not correspond one to one.
+
+\texttt{pipe\_stage\_base} is used directly for the first stage, which creates items itself; \texttt{pipe\_stage} is used for every later stage. Connect each stage's \texttt{seq\_item\_port} to the \texttt{seq\_item\_export} of the stage before it. A stage sends an item downstream by calling \texttt{sqr.execute\_item()} from \texttt{process\_item()}.
+
+Stages decide when the pipeline is finished with an agreement that must be in the resource database under the name \texttt{pipeline\_done}, visible to every stage. Each \texttt{pipe\_stage} disagrees when an item arrives and agrees when it becomes idle; a first stage derived from \texttt{pipe\_stage\_base} must vote itself: disagree in \texttt{build\_phase} and agree after sending its last item. The environment waits on the agreement in \texttt{run\_phase}.
+
+\subsection*{\texttt{pipe\_stage\_base\#(SEQ)}}
+\noindent\small\textit{class}\quad \textbf{extends} \texttt{uvm\_component}\par
+
+Base for all stages, and the class for the first stage. SEQ is the sequence item type. Derived classes use the protected members \texttt{sqr} (the stage's sequencer, for sending items downstream) and \texttt{pipeline\_done} (the agreement).
+
+\noindent\textbf{Constructor:} \texttt{new(string name, uvm\_component parent)} --- Standard component constructor.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{process\_item} & void & \texttt{SEQ item} & Hook for handling an item, commonly by sending it downstream with \texttt{sqr.execute\_item()}. Virtual task. \\
+\end{xltabular}
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.5in} >{\small}p{1.5in} >{\small}X}
+\toprule
+\textbf{Member} & \textbf{Type} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{seq\_item\_export} & \texttt{uvm\_seq\_item\_pull\_export\#(SEQ)} & Connect the downstream stage's \texttt{seq\_item\_port} here. \\
 \end{xltabular}
 
 \subsection*{\texttt{pipe\_stage\#(SEQ)}}
 \noindent\small\textit{class}\quad \textbf{extends} \texttt{pipe\_stage\_base\#(SEQ)}\par
 
-Base for every stage after the first. \texttt{run\_phase} runs two processes: one pulls items from upstream into an analysis FIFO, the other takes items from the FIFO and calls \texttt{process\_item()}. \texttt{done} is set whenever the FIFO is empty.
+Base for every stage after the first. \texttt{run\_phase} runs two threads: one pulls items from upstream into an internal FIFO, the other takes items from the FIFO and calls \texttt{process\_item()}. Pulling from upstream completes as soon as the item is in the FIFO, so a bounded FIFO is what lets a slow stage hold back the stages before it.
+
+\noindent\textbf{Constructor:} \texttt{new(string name, uvm\_component parent, int32\_t size = 0)} --- size is the depth of the internal FIFO; 0 means unbounded.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{process\_item} & void & \texttt{SEQ item} & Inherited hook; called for each item taken from the FIFO. Virtual task. \\
+\texttt{is\_idle} & \texttt{bit} & --- & Return 1 when the stage has no work left; the stage then agrees to shut down. The default is true when the FIFO is empty. Override it for stages that hold work across calls, such as a stage that collects several items before sending one. Virtual. \\
+\end{xltabular}
 
 \begin{xltabular}{\linewidth}{>{\small}p{1.5in} >{\small}p{1.5in} >{\small}X}
 \toprule
@@ -1839,9 +1971,6 @@ Base for every stage after the first. \texttt{run\_phase} runs two processes: on
 \bottomrule
 \endfoot
 \texttt{seq\_item\_port} & \texttt{uvm\_seq\_item\_pull\_port\#(SEQ)} & Connect to the upstream stage's \texttt{seq\_item\_export}. \\
-\texttt{seq\_item\_export} & \texttt{uvm\_seq\_item\_pull\_export\#(SEQ)} & Inherited; connected to the stage's own sequencer for the downstream stage. \\
-\texttt{fifo} & \texttt{uvm\_tlm\_analysis\_fifo\#(SEQ)} & Holds items pulled from upstream until they are processed. \\
-\texttt{done} & \texttt{bit} & Set when the stage has no work in progress. \\
 \end{xltabular}
 
 \end{document}
