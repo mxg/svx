@@ -385,22 +385,20 @@ class cl_parse;
   //
   // Print help information and then terminate.
   //--------------------------------------------------------------------
-  function void print_help();
+  local function void print_help();
     ver::print_banner();
     cl_mgr::dump();
+    $display("\ncommand line syntax:");
+    $display("  option  = +<name>  |  +<name>=<value>  (no spaces around '=')");
+    $display("  <value> = string | real | integer | switch");
+    $display("  integer = [-]<digits>  |  <size><base><digits>");
+    $display("            <base> is h, o, b, or d (either case); '_' may separate digits");
+    $display("  switch  = on | off | true | false | yes | no | 1 | 0");
+    $display("            +<name> alone turns a switch on");
     $display();
-    $display("command line syntax:");
-    $display("  option  = +<option_name> |");
-    $display("            +<option_name>=<value>");
-    $display("  <value> = string |");
-    $display("            floating point value |");
-    $display("            decimal integer |");
-    $display("            <size>h<hex_digits> |");
-    $display("            <size>o<octal_digits> |");
-    $display("            <size>b<binary_digits>");
-    $display("  <size>  = decimal integer");
     $finish();
   endfunction
   
-
 endclass
+
+

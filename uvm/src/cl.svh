@@ -113,6 +113,8 @@ class cl_mgr;
     print = new();
     
     $display("\n--- Command Line Option Table ---");
+    $display("     name           type       fmt   default value   description");
+    $display("------------- ---------------- ---- ---------------- --------------------------------");    
     algo#(cl_opt_desc_base, cl_opt_traits)::for_each(iter, print);
     $display("--- END Command Line Option Table ---");
   endfunction

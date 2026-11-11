@@ -89,14 +89,16 @@ virtual class cl_opt_desc_base;
   function void print();
     
     type_container_base def = get_default_value();
-    
-    $write("%12s: %-16s fmt=%4s", name, get_typename(), fmt);
-    if(def != null)
-      $write(" = %-16s", def.val2str(fmt));
-    else
-      $write("                   ");
+
     if(multiple)
-      $write(" (multiple ok)");
+      $write("*");
+    else
+      $write(" ");
+    $write("%-12s %-16s %4s", name, get_typename(), fmt);
+    if(def != null)
+      $write(" %-16s", def.val2str(fmt));
+    else
+      $write("                 ");
     $display(": %s", desc);
     
   endfunction  
