@@ -37,7 +37,7 @@ arbitrary functionality.  However, at some point it must send an item
 downstream.  The item can be the same item that it received from
 upstream or a new item.
 
-The pipeline stages use an agreement to determine when it's time top
+The pipeline stages use an agreement to determine when it's time to
 shutdown.  The pipe_stage classes are hardwired to use an agreement
 named "pipeline_done".  The virtual function pipe_stage::is_idle()
 identifies when it's OK to allow a shutdown.  Derived pipeline stages

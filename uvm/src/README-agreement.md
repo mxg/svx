@@ -34,11 +34,11 @@ stimulus generation is complete.
 
   task body();
 
-    ok_to_shutdown.disagree();
+    ok_to_shutdown.disagree(this);
     for(i = 0; i < 1000; i++) begin
       // generate a packet
     end
-    ok_to_shutdown.disagree();
+    ok_to_shutdown.agree(this);
 
   endtask
 
@@ -47,14 +47,14 @@ disagree to shutdown.
 
   task run_phase(uvm_phase phase);
     forever begin
-      ok_to_shutdown.agree();
+      ok_to_shutdown.agree(this);
       transaction = fifo.get();
-      ok_to_shutdown.disagree();
+      ok_to_shutdown.disagree(this);
       process_transaction(transaction);
     end
   endtask
 
-Initially, the scoreboard has nothing to do, so it's allows the
+Initially, the scoreboard has nothing to do, so it allows the
 testbench to shutdown.  When a transaction appears from the fifo, then
 it's time to do some work.  The scoreboard disallows shutdown by
 calling disagree() on ok_to_shutdown.  When it is finished processing
