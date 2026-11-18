@@ -378,7 +378,7 @@ Base object providing virtual to\_str(), compare(), and copy().
 \section{container --- Container Base Classes}
 \noindent\small\textit{File: \texttt{core/src/containers/container.svh}}\par
 
-Abstract container base hierarchy. \texttt{container} defines size/clear/is\_empty. \texttt{typed\_container\#(T,P)} adds a typed empty-element sentinel initialised from the traits class P at construction.
+Abstract container base hierarchy. \texttt{container} defines size/clear/is\_empty. \texttt{typed\_container\#(T,P)} adds the element type T and the traits class P; derived containers use \texttt{P::empty} as the empty element.
 
 \subsection*{\texttt{container}}
 \noindent\small\textit{virtual class}\quad \textbf{extends} \texttt{void\_t}\par
@@ -400,9 +400,7 @@ Abstract base for all containers. Defines the core size/clear/is\_empty interfac
 \subsection*{\texttt{typed\_container\#(T, P)}}
 \noindent\small\textit{virtual class}\quad \textbf{extends} \texttt{container}\par
 
-Typed abstract base. Provides a typed empty-element sentinel initialised from the traits class P at construction.
-
-\noindent\textbf{Constructor:} \texttt{new(---)} --- Initialise the typed empty-element sentinel from the traits class P.
+Typed abstract base. T is the element type and P its traits class. Derived containers return \texttt{P::empty} wherever an empty element is needed, for example when reading past the end of a container.
 
 \begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
 \toprule
@@ -1971,6 +1969,62 @@ Base for every stage after the first. \texttt{run\_phase} runs two threads: one 
 \bottomrule
 \endfoot
 \texttt{seq\_item\_port} & \texttt{uvm\_seq\_item\_pull\_port\#(SEQ)} & Connect to the upstream stage's \texttt{seq\_item\_export}. \\
+\end{xltabular}
+
+\chapter{Sequencer Aggregators}
+\section{sqr\_aggregator --- Sequencer Handles for Virtual Sequences}
+\noindent\small\textit{File: \texttt{uvm/src/sqr\_aggregator.svh}, \texttt{uvm/src/README-sqr\_aggr.md}}\par
+
+A virtual sequence is a sequence started without a sequencer, \texttt{seq.start(null)}. It must find the sequencers it sends items through on its own. A sequencer aggregator is a container of sequencer handles that a virtual sequence retrieves from the resource database, replacing a virtual sequencer. Sequencer aggregators are described in Glasser, \textit{Next Level Testbenches: Design Patterns in SystemVerilog and UVM}; in Cummings and Glasser, "Sequencer Containers --- A Unified and Simple Technique to Execute Both Sequences and Virtual Sequences," DVCon U.S. 2025; and in Cummings, Kulkarni, and Glasser, "A Summary and Examination of UVM Virtual Sequence Techniques," DVCon India 2025.
+
+Each sequencer is stored by up to three keys. The path is the sequencer's full name in the component hierarchy and is always used. The name is an arbitrary string chosen by the testbench, such as \texttt{"cfg"}. The kind is an arbitrary string that groups similar sequencers, such as all the sequencers for one type of interface; any number of sequencers can share a kind. An empty name or kind is not stored.
+
+The environment creates the aggregator, puts it into the resource database, and adds the sequencers. Adding them in \texttt{connect\_phase} guarantees that every sequencer has been created. Virtual sequences retrieve the aggregator, look up the handles they need, and send items with the sequencer argument of \texttt{start\_item()}.
+
+\begin{verbatim}
+// In the environment
+function void build_phase(uvm_phase phase);
+  sqrs = new();
+  uvm_resource_db#(sqr_aggregator)::set("*", "sqrs", sqrs, this);
+  ...
+endfunction
+
+function void connect_phase(uvm_phase phase);
+  sqrs.add(cfg_agt.sqr, "cfg", "cfg");
+  sqrs.add(mem_agt[0].sqr, "mem_0", "mem");
+  sqrs.add(mem_agt[1].sqr, "mem_1", "mem");
+endfunction
+
+// In the virtual sequence
+void'(uvm_resource_db#(sqr_aggregator)::read_by_name(get_full_name(),
+                                                     "sqrs", sqrs, this));
+cfg_sqr  = sqrs.lookup_name("cfg");
+mem_sqrs = sqrs.lookup_kind("mem");
+...
+start_item(item, -1, mem_sqrs.read(1));
+finish_item(item);
+\end{verbatim}
+
+\subsection*{\texttt{sqr\_aggregator}}
+\noindent\small\textit{class}\par
+
+Container of sequencer handles indexed by path, name, and kind. The typedef \texttt{deque\_t} is \texttt{deque\#(uvm\_sequencer\_base, class\_traits\#(uvm\_sequencer\_base))}, the type returned by lookups that can find more than one sequencer.
+
+\noindent\textbf{Constructor:} \texttt{new()} --- Create an empty aggregator.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.35in} >{\small}p{1.25in} >{\small}p{0.95in} >{\small}X}
+\toprule
+\textbf{Method} & \textbf{Return} & \textbf{Args} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{add} & void & \texttt{uvm\_sequencer\_base sqr, string name, string kind} & Store sqr by its path, and by name and kind if they are not empty. Reports an error for a null sequencer, and for a sequencer already stored under the same kind, which is not added to that kind again. Adding a name already in use replaces the earlier sequencer and issues a warning. \\
+\texttt{lookup\_path} & \texttt{uvm\_sequencer\_base} & \texttt{string path} & Return the sequencer with the given full path, or null. \\
+\texttt{lookup\_name} & \texttt{uvm\_sequencer\_base} & \texttt{string name} & Return the sequencer with the given name, or null. \\
+\texttt{lookup\_path\_regex} & \texttt{deque\_t} & \texttt{string regex} & Return the sequencers whose paths match a POSIX regular expression. The deque is empty if none match. \\
+\texttt{lookup\_kind} & \texttt{deque\_t} & \texttt{string kind} & Return a copy of the list of sequencers of the given kind, in the order they were added. The deque is empty if there are none. \\
+\texttt{dump} & void & --- & Print the contents of the aggregator by name, by kind, and by path. \\
 \end{xltabular}
 
 \end{document}

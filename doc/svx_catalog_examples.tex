@@ -380,4 +380,31 @@ Each later stage disagrees when a transaction arrives and agrees when its FIFO i
   \item \texttt{pipe\_stage\#(SEQ)}
   \item \texttt{agreement}
 \end{itemize}
+\chapter{Sequencer Aggregators}
+
+The sequencer aggregator example shows a virtual sequence that finds its sequencers in a sequencer aggregator and coordinates stimulus on several interfaces, with an agreement deciding when the test ends.
+
+\section{Four-Channel Memory}
+
+\textit{Source:} \texttt{uvm/examples/sqr\_aggregator}\\
+
+The device is a four-channel memory built on the SVX \texttt{mem} memory model, with all four channels sharing one memory. A configuration interface sets two registers, \texttt{activate} and \texttt{read\_only}, that enable each channel and decide whether it can be written; a channel that is not active ignores its transactions. The interfaces are attached to the memory with \texttt{bind}, and their virtual interfaces are put into the resource database. The memory has an asynchronous reset, and its contents are printed at the end of the simulation.
+
+The environment contains one configuration agent and four memory agents. It creates a sequencer aggregator and the agreement \texttt{ok\_to\_shutdown} in \texttt{build\_phase} and puts both into the resource database. In \texttt{connect\_phase}, once every sequencer exists, it adds the configuration sequencer with name and kind \texttt{"cfg"}, and the four memory sequencers with names \texttt{"mem\_0"} through \texttt{"mem\_3"} and kind \texttt{"mem"}.
+
+The environment starts \texttt{trivial\_seq} with \texttt{start(null)}, making it a virtual sequence. In \texttt{pre\_start()} the sequence retrieves the agreement and the aggregator from the resource database, looks up the configuration sequencer by name, and gets the list of memory sequencers by kind. The body sends a configuration transaction that makes all four channels active and writable, then sends 100 write transactions with random word-aligned addresses and data, each to a randomly chosen memory channel. Every item is sent with \texttt{start\_item()} given the target sequencer, and the sequence collects the response for each write.
+
+The configuration driver waits for reset to end, drives the configuration registers through a clocking block, and finishes each transaction only after the edge where the memory samples the new configuration, so the first write sees all channels active. The sequence and both kinds of drivers disagree while they have work and agree when they finish; the environment ends the test when the agreement is reached, or reports an error if a timeout expires first.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{sqr\_aggregator}
+  \item \texttt{sqr\_aggregator::add()}
+  \item \texttt{sqr\_aggregator::lookup\_name()}
+  \item \texttt{sqr\_aggregator::lookup\_kind()}
+  \item \texttt{deque\#(T,P)}
+  \item \texttt{agreement}
+  \item \texttt{mem\#(ADDR\_BITS,PAGE\_BITS,BLOCK\_BITS,WORD\_SIZE)}
+\end{itemize}
 \end{document}
