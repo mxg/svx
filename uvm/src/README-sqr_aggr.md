@@ -39,7 +39,8 @@ handles to the aggregator after each sequencer is instantiated.
 Typically the aggregator is populated in the agent or environment
 during either the build or connect phase.  Often the connect phase is
 preferable because you can be sure that the sequencer has been
-instantiated.  Virtual sequence
+instantiated. Virtual sequences can retrieve the aggregator from the
+resource database to look up sequencer handles.
 
 Sequencer handles are stored in the aggregator by name, path, and
 kind. Name is an arbitrary string that identifies the sequencer.  Path
@@ -86,7 +87,7 @@ The API for a sequencer aggregator is:
 
 Lookup_path_regex() and lookup_kind() return a deque#() containing the
 located sequencer handles.  If there are no handles found then the
-deque will be empty (i.e., size() == 0)
+deque will be empty (i.e., size() == 0).
 
 The example at uvm/examples/sqr_aggregator demonstrates how to use a
 sequencer aggregator to provide sequencer handles to virtual

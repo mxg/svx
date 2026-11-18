@@ -59,7 +59,7 @@ library.
   Testbenches: Design Patterns in SystemVerilog and UVM" by Mark
   Glasser.  Also discussed in the DVCon India 2025 paper "A Summary
   and Examination of UVM Virtual Sequence Techniques" by Cliff
-  Cummings, Smita Kulkarni, and Mark Glasser, and the DVCon paper
+  Cummings, Smita Kulkarni, and Mark Glasser, and the DVCon US paper
   "Sequencer Containers - A Unified and Simple Technique to Execute
   Both Sequences and Virtual Sequences" by Cliff Cummings and Mark
   Glasser.
