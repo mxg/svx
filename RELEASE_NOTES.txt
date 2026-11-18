@@ -57,9 +57,12 @@ library.
 * ADDED: Sequencer Aggregator, a class for storing sequencer handles
   to be used by virtual sequences.  These are discussed in "Next Level
   Testbenches: Design Patterns in SystemVerilog and UVM" by Mark
-  Glasser.  Also discussed in the DVCon 2025 paper "A Summary and
-  Examination of UVM Virtual Sequencer Techniques" by Cliff Cummings,
-  Smita Kulkarni, and Mark Glasser.
+  Glasser.  Also discussed in the DVCon India 2025 paper "A Summary
+  and Examination of UVM Virtual Sequencer Techniques" by Cliff
+  Cummings, Smita Kulkarni, and Mark Glasser, and the DVCon paper
+  "Sequencer Containers - A Unified and Simple Technique to Execute
+  Both Sequences and Virtual Sequences" by Cliff Cummings and Mark
+  Glasser.
 
 * ADDED: A set of examples that demonstrate the new UVM utilities.
 

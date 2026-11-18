@@ -31,7 +31,7 @@
 //
 // This sequence is expected to NOT be bound to a sequencer when it is
 // launched, making it a virtual sequence.  As such it is responsible
-// for obtaininbg sequencer handles to launch sequence items.  We use
+// for obtaining sequencer handles to launch sequence items.  We use
 // a data structure called a sequencer aggregator to locate the
 // sequencer handles.  The sequencer aggregator is available in the
 // resource database.
