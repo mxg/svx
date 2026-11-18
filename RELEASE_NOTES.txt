@@ -8,6 +8,17 @@ November 2026
 
 ----------------------------------------------------------------------
 
+The latest release includes new UVM utilities.  The quintessential
+application for SystemVerilog is verification -- specifically building
+testbenches.  Most SystemVerilog-based testbenches are based on UVM.
+So, it makes sense to include some elements in the SVX library to make
+construction of UVM testbenches easier.
+
+The library is divided into two parts, the core library and the UVM
+utilities.  You can use the core library without the UVM utilities,
+but NOT vice versa.  The UVM utilities have dependencies on the core
+library.
+
 * Enable compilation of UVM in the makefile system. Using IEEE
   1800.2-2020 standard as implemented in the Accellera kit version
   1800.2-2020.3.2.
@@ -19,7 +30,7 @@ November 2026
   the key and the data item.
 
 * ADDED: Command line parser.  You can specify a list of command line
-  options in a table.  Those options are recognised on the command
+  options in a table.  Those options are recognized on the command
   line.  The values of each option is stored in the resource
   database. See uvm/src/README-cl.md for details.
 
@@ -43,10 +54,36 @@ November 2026
   implementation of the agreement described in the 2017 SNUG paper
   "Shutdown with Agreements in a UVM Testbench" by Mark Glasser.
 
+* ADDED: Sequencer Aggregator, a class for storing sequencer handles to
+  be used by virtual sequences.  These are discussed in "Next Level
+  Testbenches: Design Patters in SystemVerilog and UVM" by Mark
+  Glasser.  Also discussed int the DVCon 2025 paper "A Summary ad
+  Examination of UVM Virtual Sequencer Techniques" by Cliff Cummings,
+  Smita Kulkarni, and Mark Glasser.
+
+* ADDED: A set of examples that demonstrate the new UVM utilities.
+
+    - A small but complete testbench that demonstrates sequencer
+      aggregators and shutdown using agreements. It uses a
+      four-channel memory that is based on the SVX memory model app,
+      mem.
+
+    - A three-stage pipelined testbench.
+
+    - An example of agreements.
+
+    - An example that illustrates how to use the command line parser.
+
+    - An example that illustrages how to use UVM plugins.
+
 * FIXED: bug in lexer that caused the first character of an identifier
   lexeme to disappear.
 
 * FIXED: Fixed bugs in lexer related to recognizing numeric constants.
+
+* REMOVED: m_empty member of typed_container, the base class for all
+  containers. It is not necessary because you can always refer to
+  P::empty.
 
 ----------------------------------------------------------------------
 

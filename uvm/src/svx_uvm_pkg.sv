@@ -52,4 +52,7 @@ package svx_uvm_pkg;
   // Plugins
   `include "plugins.svh"
 
+  // Sequencer Aggregator
+  `include "sqr_aggregator.svh"
+
 endpackage

@@ -119,6 +119,8 @@ COMPILE_OPTS 	+= -Wall --build-jobs `nproc`
 COMPILE_OPTS	+= --Wno-DECLFILENAME -Wno-VARHIDDEN -Wno-UNUSEDSIGNAL -Wno-UNDRIVEN
 COMPILE_OPTS	+= --timing
 COMPILE_OPTS	+= --autoflush
+#COMPILE_OPTS	+= --debug --gdbbt
+
 
 COMPILE_CMD    := ${VERILATOR} ${COMPILE_OPTS} ${EXTRA_COMPILE_OPTS} ${INC} ${SRC}
 
@@ -165,6 +167,12 @@ do_run:
 	@echo "[RUN]" `pwd`
 	${V}echo ${RUN_CMD} > ${RUNLOG} 2>&1
 	${V}${RUN_CMD} >> ${RUNLOG} 2>&1
+
+bld:
+	${COMPILE_CMD}
+
+dbg:
+	${RUN_CMD}
 
 clean:
 	@echo "[CLEAN]" `pwd`

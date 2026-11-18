@@ -103,7 +103,7 @@ class vector #(type T=int, type P=void_traits)
     size_t i;
 
     for(i = 0; i < sz; i++)
-      m_vector.push_back(m_empty);
+      m_vector.push_back(P::empty);
 
   endfunction
       
@@ -134,7 +134,7 @@ class vector #(type T=int, type P=void_traits)
   //--------------------------------------------------------------------
   function T read(index_t idx);
     if(idx >= size())
-      return m_empty;
+      return P::empty;
     return m_vector[idx];
   endfunction
 

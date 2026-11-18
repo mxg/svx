@@ -26,7 +26,7 @@
 # permissions and limitations under the License.
 #=======================================================================
 
-EXAMPLES	:= agreement cl pipeline plugins
+EXAMPLES	:= agreement cl pipeline plugins sqr_aggregator
 
 MAKE		:= /usr/bin/make -s
 

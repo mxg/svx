@@ -69,11 +69,11 @@ class agreement extends uvm_object;
   //
   // Update the agreement's state.
   //--------------------------------------------------------------------
-  local function void update(uvm_object p, agree_t a);
-    agree_t old = votes.exists(p) ? votes[p] : AGREE;
-    votes[p] = a;
-    if (old != DISAGREE && a == DISAGREE) disagreements++;
-    if (old == DISAGREE && a != DISAGREE) disagreements--;
+  local function void update(uvm_object participant, agree_t agmt);
+    agree_t old = votes.exists(participant) ? votes[participant] : AGREE;
+    votes[participant] = agmt;
+    if (old != DISAGREE && agmt == DISAGREE) disagreements++;
+    if (old == DISAGREE && agmt != DISAGREE) disagreements--;
   endfunction  
 
   //--------------------------------------------------------------------

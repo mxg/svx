@@ -49,16 +49,6 @@ endclass
 virtual class typed_container #(type T=int, type P=void_traits)
   extends container;
 
-  protected T m_empty;
-
-  function new();
-    /* verilator lint_off WIDTHTRUNC */
-    /* verilator lint_off CASTCONST */
-    assert($cast(m_empty, P::empty));
-    /* verilator lint_on CASTCONST */
-    /* verilator lint_on WIDTHTRUNC */
-  endfunction
-
   virtual function size_t size();
     return 0;
   endfunction
