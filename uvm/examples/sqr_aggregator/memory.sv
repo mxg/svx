@@ -113,24 +113,27 @@ module memory (input logic clk,
   reg [3:0] rw_reg;
   reg [3:0] en_reg;
 
-  // Reset
+  // Reset and Configure
   always @(posedge clk) begin
+    // reset
     if(rst_n == 1'b0) begin
       activate_reg[3:0]  <= 4'b0000;
       read_only_reg[3:0] <= 4'b1111; // default to read_only
       @(negedge clk);
     end
+    else
+      // configure
+      if(configure == 1'b1) begin
+	$display("configure: activate = %4b read_only = %4b", activate, read_only);
+	activate_reg  <= activate;
+	read_only_reg <= read_only;
+      end
   end
 
-  // Configure
-  always @(posedge clk) begin
-    if((rst_n == 1'b1) &&  (configure == 1'b1)) begin
-      $display("configure: activate = %4b read_only = %4b", activate, read_only);
-      activate_reg  <= activate;
-      read_only_reg <= read_only;
-    end
-  end
-
+  // the values of rqw and en come frrom the transactor (driver). They
+  // are and'ed with the read_only and activate registers whose values
+  // come from the configure transaction to compute the value to send
+  // to the channels.
   assign rw_reg = ~read_only_reg & rw;
   assign en_reg = activate_reg & en;
 
@@ -147,7 +150,7 @@ module memory (input logic clk,
                                .addr     (addr[0]),
                                .data_in  (data_in[0]),
                                .data_out (data_out[0]),
-                               .rw       (rw[0]),
+                               .rw       (rw_reg[0]),
                                .en       (en_reg[0]),
                                .rst_n    (rst_n),
                                .clk      (clk)
@@ -157,7 +160,7 @@ module memory (input logic clk,
                                .addr     (addr[1]),
                                .data_in  (data_in[1]),
                                .data_out (data_out[1]),
-                               .rw       (rw[1]),
+                               .rw       (rw_reg[1]),
                                .en       (en_reg[1]),
                                .rst_n    (rst_n),
                                .clk      (clk)
@@ -167,7 +170,7 @@ module memory (input logic clk,
                                .addr     (addr[2]),
                                .data_in  (data_in[2]),
                                .data_out (data_out[2]),
-                               .rw       (rw[2]),
+                               .rw       (rw_reg[2]),
                                .en       (en_reg[2]),
                                .rst_n    (rst_n),
                                .clk      (clk)
@@ -177,7 +180,7 @@ module memory (input logic clk,
                                .addr     (addr[3]),
                                .data_in  (data_in[3]),
                                .data_out (data_out[3]),
-                               .rw       (rw[3]),
+                               .rw       (rw_reg[3]),
                                .en       (en_reg[3]),
                                .rst_n    (rst_n),
                                .clk      (clk)

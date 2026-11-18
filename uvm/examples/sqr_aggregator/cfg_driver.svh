@@ -63,8 +63,13 @@ class cfg_driver extends uvm_component;
   task run_phase(uvm_phase phase);
 
     cfg_txn txn;
-    logic [3:0] act;
-    logic [3:0]	ro;    
+    logic [3:0] act = 4'b0000;
+    logic [3:0]	ro = 4'b0000; 
+
+    // Put known values on the pins to start things out.
+    vif.cb.activate  <= act;
+    vif.cb.read_only <= ro;
+    vif.cb.configure <= 1'b0;   
 
     forever begin
       seq_item_port.get_next_item(txn);
@@ -128,7 +133,7 @@ class cfg_driver extends uvm_component;
       vif.cb.activate  <= act;
       vif.cb.read_only <= ro;
       vif.cb.configure <= 1'b1;
-      @(vif.cb);                       // DUT samples here
+      @(negedge vif.clk);
       vif.cb.configure <= 1'b0;      
       
       seq_item_port.item_done();

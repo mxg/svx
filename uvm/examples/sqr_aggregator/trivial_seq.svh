@@ -31,7 +31,7 @@
 //----------------------------------------------------------------------
 class trivial_seq extends uvm_sequence#(mem_txn);
 
-  localparam string MSG_ID = "TRIVIAL_SEQ/PRE_BODY";
+  localparam string MSG_ID = "TRIVIAL_SEQ/PRE_START";
 
   typedef class_traits#(uvm_sequencer_base) sequencer_traits;
   typedef deque#(uvm_sequencer_base, sequencer_traits) deque_t;  
@@ -46,6 +46,13 @@ class trivial_seq extends uvm_sequence#(mem_txn);
     super.new(name);
   endfunction
 
+  //--------------------------------------------------------------------
+  // pre_start
+  //
+  // Locate the agreement and sequencer aggregator in the resourcfe
+  // database.  Locate the sequencer handles in the sequencer
+  // aggregator.
+  //--------------------------------------------------------------------
   task pre_start();
     // Locate the agreement
     if(!uvm_resource_db#(agreement)::read_by_name(get_full_name(),
@@ -80,6 +87,11 @@ class trivial_seq extends uvm_sequence#(mem_txn);
     
   endtask
 
+  //--------------------------------------------------------------------
+  // body
+  //
+  // Sned transactions to the driver via the sequencer handles.
+  //--------------------------------------------------------------------
   task body();
 
     cfg_txn cfg;
@@ -95,10 +107,9 @@ class trivial_seq extends uvm_sequence#(mem_txn);
 
     ok_to_shutdown.disagree(this);
 
-    // Configure thr 
+    // Configure the memory device. 
     cfg = new();
-    cfg.txn_type = cfg_txn::CFG_ACTIVATE_RW;
-    cfg.channel = 1;
+    cfg.txn_type = cfg_txn::CFG_ACTIVATE_ALL_RW;
     start_item(cfg, -1, cfg_sqr);
     finish_item(cfg);
 
@@ -107,7 +118,7 @@ class trivial_seq extends uvm_sequence#(mem_txn);
       index_t channel = index_t'($urandom_range(3,0));
       mem = new();
       mem.txn_type = mem_txn::MEM_WRITE;
-      //  generate a randomized address; ensure it is word-aligned
+      //  Generate a randomized address; ensure it is word-aligned.
       mem.addr = ($urandom_range(32'hffffff00, 32'hfffff000)) & 32'hfffffffc;
       mem.data = $urandom();
       start_item(mem, -1, mem_sqrs.read(channel));
