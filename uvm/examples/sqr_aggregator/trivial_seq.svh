@@ -38,24 +38,27 @@ class trivial_seq extends uvm_sequence#(mem_txn);
   local deque_t mem_sqrs;
   local agreement ok_to_shutdown;
   local sqr_aggregator sqrs;
+  local bit errors;
   
   function new(string name);
     super.new(name);
   endfunction
 
-  task pre_body();
+  task pre_start();
     // Locate the agreement
     if(!uvm_resource_db#(agreement)::read_by_name(get_full_name(),
 						  "ok_to_shutdown",
 						  ok_to_shutdown, this)) begin
       `uvm_error("TRIVIAL_SEQ/PRE_BODY", "Unable to locate agreement.")
+      errors = 1;
     end
 
     // Locate the sequencer aggregator
     if(!uvm_resource_db#(sqr_aggregator)::read_by_name(get_full_name(),
 						       "sqrs", sqrs, this)) begin
-      `uvm_error("TRIVIAL_SEQ/PRE_BODY", "Unable to sequencer aggregator.")
-      return;
+      `uvm_error("TRIVIAL_SEQ/PRE_BODY", "Unable to locate sequencer aggregator.")
+      errors = 1;
+      return;  // cannot proceed if read_by_name fails.
     end
 
     // Locate the sequencers in the sequencer aggregator
@@ -63,12 +66,14 @@ class trivial_seq extends uvm_sequence#(mem_txn);
     if(cfg_sqr == null) begin
       `uvm_error("TRIVIAL_SEQ/PRE_BODY",
 		 "No cfg sequencer in the sequencer aggregator")
+      errors = 1;
     end
     
     mem_sqrs = sqrs.lookup_kind("mem");
     if(mem_sqrs == null || mem_sqrs.size() == 0) begin
       `uvm_error("TRIVIAL_SEQ/PRE_BODY",
 		 "No mem sequencers in the sequencer aggregator")
+      errors = 1;
     end
     
   endtask
@@ -77,8 +82,14 @@ class trivial_seq extends uvm_sequence#(mem_txn);
 
     cfg_txn cfg;
     mem_txn mem;
+    mem_txn mem_rsp;
 
     $display("launching sequence");
+
+    // No need to print a message, error messages have already been
+    // printed (above).
+    if(errors)
+      return;
 
     ok_to_shutdown.disagree(this);
 
@@ -97,6 +108,7 @@ class trivial_seq extends uvm_sequence#(mem_txn);
       mem.data = $urandom();
       start_item(mem, -1, mem_sqrs.read(channel));
       finish_item(mem);
+      get_response(mem_rsp);
     end
     ok_to_shutdown.agree(this);
     

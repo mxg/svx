@@ -70,11 +70,11 @@ class cfg_driver extends uvm_component;
 
       if(txn.channel > 3) begin
 	`uvm_warning("CFG/RUN", "Illegal channel")
+	ok_to_shutdown.agree(this);
 	seq_item_port.item_done();
-	continue;
       end
 
-      vif.configure <= 1'b1;
+      vif.configure = 1'b1;
       @(posedge vif.clk);
 
       $display("cfg: %s @ %0d", txn.txn_type.name(), txn.channel);
@@ -99,24 +99,24 @@ class cfg_driver extends uvm_component;
 
 	cfg_txn::CFG_ACTIVATE_ALL_RW:
 	  begin
-	    vif.activate = 4'b1;
-	    vif.read_only = 4'b0;
+	    vif.activate = 4'b1111;
+	    vif.read_only = 4'b0000;
 	  end
 	
 	cfg_txn::CFG_ACTIVATE_ALL_RO:
 	  begin
-	    vif.activate = 4'b1;
-	    vif.read_only = 4'b1;
+	    vif.activate = 4'b1111;
+	    vif.read_only = 4'b1111;
 	  end
 	
 	cfg_txn::CFG_DEACTIVATE_ALL:
 	  begin
-	    vif.activate = 4'b0;
+	    vif.activate = 4'b0000;
 	  end
 
       endcase
       @(negedge vif.clk);
-      vif.configure <= 1'b0;
+      vif.configure = 1'b0;
       seq_item_port.item_done();
       ok_to_shutdown.agree(this);
     end

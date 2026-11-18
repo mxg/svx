@@ -54,10 +54,10 @@ library.
   implementation of the agreement described in the 2017 SNUG paper
   "Shutdown with Agreements in a UVM Testbench" by Mark Glasser.
 
-* ADDED: Sequencer Aggregator, a class for storing sequencer handles to
-  be used by virtual sequences.  These are discussed in "Next Level
-  Testbenches: Design Patters in SystemVerilog and UVM" by Mark
-  Glasser.  Also discussed int the DVCon 2025 paper "A Summary ad
+* ADDED: Sequencer Aggregator, a class for storing sequencer handles
+  to be used by virtual sequences.  These are discussed in "Next Level
+  Testbenches: Design Patterns in SystemVerilog and UVM" by Mark
+  Glasser.  Also discussed in the DVCon 2025 paper "A Summary and
   Examination of UVM Virtual Sequencer Techniques" by Cliff Cummings,
   Smita Kulkarni, and Mark Glasser.
 
@@ -74,7 +74,7 @@ library.
 
     - An example that illustrates how to use the command line parser.
 
-    - An example that illustrages how to use UVM plugins.
+    - An example that illustrates how to use UVM plugins.
 
 * FIXED: bug in lexer that caused the first character of an identifier
   lexeme to disappear.

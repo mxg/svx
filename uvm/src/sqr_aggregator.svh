@@ -31,15 +31,22 @@
 //----------------------------------------------------------------------
 class sqr_aggregator;
 
+  localparam string MSG_ID = "SVX/SQR_AGGR";
+
   typedef class_traits#(uvm_sequencer_base) sequencer_traits;
-  typedef uvm_sequencer_base sqr_q_t[$];
   typedef deque#(uvm_sequencer_base, sequencer_traits) deque_t;
+  typedef list_iterator#(uvm_sequencer_base, sequencer_traits) deque_iter_t;
   typedef map_iterator#(string, uvm_sequencer_base, sequencer_traits) map_iterator_t;
 
   local map#(string, uvm_sequencer_base, sequencer_traits) sqr_table;
   local map#(string, uvm_sequencer_base, sequencer_traits) name_table;
   local map#(string, deque_t, class_traits#(deque_t)) kind_table;
 
+  //--------------------------------------------------------------------
+  // constructor
+  //
+  // create all the tables
+  //--------------------------------------------------------------------
   function new();
     sqr_table = new();
     name_table = new();
@@ -53,10 +60,12 @@ class sqr_aggregator;
   //--------------------------------------------------------------------
   function void add(uvm_sequencer_base sqr, string name, string kind);
     deque_t q;
+    deque_iter_t deque_iter;
     string path;
+    string msg;
 
     if(sqr == null) begin
-      `uvm_error("SVX/SQR_AGGR",
+      `uvm_error(MSG_ID,
 		 "Attempt to put a null sequencer into the sequencer aggregator.")
       return;
     end
@@ -71,14 +80,27 @@ class sqr_aggregator;
 	q = new();
 	void'(kind_table.insert(kind, q));
       end
+
+      // Check to see if the sqr is already registered with this kind.
+      deque_iter = new(q);
+      void'(deque_iter.first());
+      while(!deque_iter.at_end()) begin
+	if(sqr == deque_iter.get()) begin
+	  $sformat(msg, "Sequencer %s is duplicated in kind %s",
+		   sqr.get_full_name(), kind);
+	  `uvm_error(MSG_ID, msg)
+	  return;
+	end
+	void'(deque_iter.next());
+      end
+
       q.push_back(sqr);
     end
 
     if(name != "") begin
       if(name_table.exists(name))
-	`uvm_info("SQR_AGGREGATOR",
-		  $sformatf("replacing sequencer with name %s", name),
-		  UVM_NONE)
+	`uvm_warning(MSG_ID,
+		     $sformatf("replacing sequencer with name %s", name))
       void'(name_table.insert(name, sqr));
     end
     
@@ -112,8 +134,9 @@ class sqr_aggregator;
     void'(iter.first());
     while(!iter.at_end()) begin
       string path = iter.get_index();
-      if(uvm_re_match(regex, path) == 1)
+      if(uvm_re_match(regex, path) == 0)
 	q.push_back(sqr_table.get(path));
+      void'(iter.next());
     end
     return q;
   endfunction
@@ -124,7 +147,12 @@ class sqr_aggregator;
   // Return a queue of all sequencers that match 'kind'.
   //--------------------------------------------------------------------
   function deque_t lookup_kind(string kind);
-    return kind_table.get(kind);
+    deque_t q = kind_table.get(kind);
+    if(q == null)
+      q = new();
+    else
+      q = q.clone();
+    return q;
   endfunction
 
   //--------------------------------------------------------------------
@@ -147,6 +175,7 @@ class sqr_aggregator;
       string name = iter.get_index();
       uvm_sequencer_base sqr = name_table.get(name);
       $display("    %s -> %s", name, sqr.get_full_name());
+      void'(iter.next());
     end
 
     // Dump kind table
@@ -162,7 +191,9 @@ class sqr_aggregator;
       while(!q_iter.at_end()) begin
 	uvm_sequencer_base sqr = q_iter.get();
 	$display("      %s", sqr.get_full_name());
+	void'(q_iter.next());
       end
+      void'(iter.next());
     end
 
     // Dump sequencer table
@@ -172,6 +203,7 @@ class sqr_aggregator;
     while(!iter.at_end()) begin
       string path = iter.get_index();
       $display("    %s", path);
+      void'(iter.next());
     end
 
   endfunction

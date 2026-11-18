@@ -76,7 +76,7 @@ class env extends uvm_component;
   //--------------------------------------------------------------------
   // connect_phase
   //
-  // Put the sequencers into the seqwuencer aggregator.
+  // Put the sequencers into the sequencer aggregator.
   //--------------------------------------------------------------------
   function void connect_phase(uvm_phase phase);
     sqrs.add(cfg_agt.sqr, "cfg", "cfg");
@@ -95,10 +95,10 @@ class env extends uvm_component;
     $display("running...");
     phase.raise_objection(this);
 
-    // Run the test with a tineout. One of the orocesses will finish
-    // first -- either the work to be done or the tinmeout. If the
-    // work hangs or is takng too long the timeout will finish first
-    // and the work process will be killed.
+    // Run the test with a timeout. One of the processes will finish
+    // first -- either the work to be done or the timeout. If the work
+    // hangs or is taking too long the timeout will finish first and
+    // the work process will be killed.
     fork
       begin
 	do_stuff();
