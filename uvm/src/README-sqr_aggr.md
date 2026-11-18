@@ -5,11 +5,11 @@ A sequencer aggregator is a container used to store sequencer handles
 so they can be retrieved by virtual sequences. You can learn more
 about them from the book "Next Level Testbenches: Design Patterns in
 SystemVerilog and UVM" by Mark Glasser.  There is also a discussion
-about them in the DVCon 2025 paper "Sequencer Containers - A Unified
-and Simple Technique to Execute Both Sequences and Virtual Sequences"
-by Cliff Cummings and Mark Glasser, and the DVCon India 2025 paper "A
-Summary and Examination of UVM Virtual Sequencer Techniques" by Cliff
-Cummings, Smita Kulkarni, and Mark Glasser.
+about them in the DVCon US 2025 paper "Sequencer Containers - A
+Unified and Simple Technique to Execute Both Sequences and Virtual
+Sequences" by Cliff Cummings and Mark Glasser, and the DVCon India
+2025 paper "A Summary and Examination of UVM Virtual Sequence
+Techniques" by Cliff Cummings, Smita Kulkarni, and Mark Glasser.
 
 A virtual sequence is a sequence launched without being bound to a
 sequencer.  For example:
@@ -31,7 +31,7 @@ interfaces.
 Virtual sequences are on their own to obtain sequencer handles.  UVM
 does not really address this issue.  Many testbenches employ so-called
 virtual sequencers. These are fraught with many issues as explained in
-the DVCon paper.
+the DVCon papers.
 
 A sequencer aggregator is a container that holds sequencer handles.
 It is stored in the resource database.  The testbench adds sequencer
@@ -39,8 +39,7 @@ handles to the aggregator after each sequencer is instantiated.
 Typically the aggregator is populated in the agent or environment
 during either the build or connect phase.  Often the connect phase is
 preferable because you can be sure that the sequencer has been
-instantiated.  Virtual sequencers can retrieve the aggregator from the
-resource database and then look up sequencer handles.
+instantiated.  Virtual sequence
 
 Sequencer handles are stored in the aggregator by name, path, and
 kind. Name is an arbitrary string that identifies the sequencer.  Path
@@ -85,7 +84,7 @@ The API for a sequencer aggregator is:
     Dumps the contents of the sequencer aggregator for debugging
     purposes.
 
-Lookup_path_regex() and lookup_kind() return a dqeue#() containing the
+Lookup_path_regex() and lookup_kind() return a deque#() containing the
 located sequencer handles.  If there are no handles found then the
 deque will be empty (i.e., size() == 0)
 
