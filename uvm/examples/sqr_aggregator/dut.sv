@@ -35,13 +35,15 @@ module clk_gen(output logic clk,
 
   initial begin
     // Reset the device
-    clk <= 0;
     rst_n <= 1;
     #5ns;
     rst_n <= 0;
-    #5ns;;
+    #30ns;
     rst_n <= 1;
+  end
 
+  initial begin
+    clk <= 0;
     // Start the clock
     forever begin
       #5ns;

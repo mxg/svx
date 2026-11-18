@@ -114,12 +114,11 @@ module memory (input logic clk,
   reg [3:0] en_reg;
 
   // Reset and Configure
-  always @(posedge clk) begin
+  always @(posedge clk or negedge rst_n) begin
     // reset
     if(rst_n == 1'b0) begin
       activate_reg[3:0]  <= 4'b0000;
       read_only_reg[3:0] <= 4'b1111; // default to read_only
-      @(negedge clk);
     end
     else
       // configure
@@ -130,7 +129,7 @@ module memory (input logic clk,
       end
   end
 
-  // the values of rqw and en come frrom the transactor (driver). They
+  // the values of rw and en come frrom the transactor (driver). They
   // are and'ed with the read_only and activate registers whose values
   // come from the configure transaction to compute the value to send
   // to the channels.

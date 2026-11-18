@@ -86,7 +86,7 @@ class cfg_driver extends uvm_component;
 
       // Save the current values as temporaries.
       act = vif.activate;
-      ro  = vif.read_only;      
+      ro  = vif.read_only;
 
       // Update the temporaries based on the command from the
       // transaction object.
@@ -133,7 +133,7 @@ class cfg_driver extends uvm_component;
       vif.cb.activate  <= act;
       vif.cb.read_only <= ro;
       vif.cb.configure <= 1'b1;
-      @(negedge vif.clk);
+      @(vif.cb);
       vif.cb.configure <= 1'b0;      
       
       seq_item_port.item_done();

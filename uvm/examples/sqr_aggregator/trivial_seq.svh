@@ -49,7 +49,7 @@ class trivial_seq extends uvm_sequence#(mem_txn);
   //--------------------------------------------------------------------
   // pre_start
   //
-  // Locate the agreement and sequencer aggregator in the resourcfe
+  // Locate the agreement and sequencer aggregator in the resource
   // database.  Locate the sequencer handles in the sequencer
   // aggregator.
   //--------------------------------------------------------------------
@@ -90,7 +90,7 @@ class trivial_seq extends uvm_sequence#(mem_txn);
   //--------------------------------------------------------------------
   // body
   //
-  // Sned transactions to the driver via the sequencer handles.
+  // Send transactions to the driver via the sequencer handles.
   //--------------------------------------------------------------------
   task body();
 

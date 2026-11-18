@@ -42,6 +42,9 @@ class mem_driver extends uvm_component;
     super.new(name, parent);
   endfunction
 
+  //--------------------------------------------------------------------
+  // build_phase
+  //--------------------------------------------------------------------
   function void build_phase(uvm_phase phase);
     string strnum;
     
@@ -72,7 +75,9 @@ class mem_driver extends uvm_component;
 
   endfunction
 
-
+  //--------------------------------------------------------------------
+  // run_phase
+  //--------------------------------------------------------------------
   task run_phase(uvm_phase phase);
 
     mem_txn txn;
