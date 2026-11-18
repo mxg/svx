@@ -63,65 +63,78 @@ class cfg_driver extends uvm_component;
   task run_phase(uvm_phase phase);
 
     cfg_txn txn;
+    logic [3:0] act;
+    logic [3:0]	ro;    
 
     forever begin
       seq_item_port.get_next_item(txn);
       ok_to_shutdown.disagree(this);
 
       if(txn.channel > 3) begin
-	`uvm_warning("CFG/RUN", "Illegal channel")
+	`uvm_warning("CFG/RUN", $sformatf("Illegal channel %0d", txn.channel))
 	ok_to_shutdown.agree(this);
 	seq_item_port.item_done();
+	continue;
       end
-
-      vif.configure = 1'b1;
-      @(posedge vif.clk);
 
       $display("cfg: %s @ %0d", txn.txn_type.name(), txn.channel);
 
+      // Save the current values as temporaries.
+      act = vif.activate;
+      ro  = vif.read_only;      
+
+      // Update the temporaries based on the command from the
+      // transaction object.
       case(txn.txn_type)
 	cfg_txn::CFG_ACTIVATE_RW:
 	  begin
-	    vif.activate[txn.channel] = 1'b1;
-	    vif.read_only[txn.channel] = 1'b0;
+	    act[txn.channel] = 1'b1;
+	    ro[txn.channel] = 1'b0;
 	  end
 	
 	cfg_txn::CFG_ACTIVATE_RO:
 	  begin
-	    vif.activate[txn.channel] = 1;
-	    vif.read_only[txn.channel] = 1'b1;
+	    act[txn.channel] = 1;
+	    ro[txn.channel] = 1'b1;
 	  end
 	
 	cfg_txn::CFG_DEACTIVATE:
 	  begin
-	    vif.activate[txn.channel] = 1'b0;
+	    act[txn.channel] = 1'b0;
 	  end
 
 	cfg_txn::CFG_ACTIVATE_ALL_RW:
 	  begin
-	    vif.activate = 4'b1111;
-	    vif.read_only = 4'b0000;
+	    act = 4'b1111;
+	    ro = 4'b0000;
 	  end
 	
 	cfg_txn::CFG_ACTIVATE_ALL_RO:
 	  begin
-	    vif.activate = 4'b1111;
-	    vif.read_only = 4'b1111;
+	    act = 4'b1111;
+	    ro = 4'b1111;
 	  end
 	
 	cfg_txn::CFG_DEACTIVATE_ALL:
 	  begin
-	    vif.activate = 4'b0000;
+	    act = 4'b0000;
 	  end
 
       endcase
-      @(negedge vif.clk);
-      vif.configure = 1'b0;
+
+      // Post the temporaries to the real signals based on the timing
+      // in the clocking block.
+      @(vif.cb);
+      vif.cb.activate  <= act;
+      vif.cb.read_only <= ro;
+      vif.cb.configure <= 1'b1;
+      @(vif.cb);                       // DUT samples here
+      vif.cb.configure <= 1'b0;      
+      
       seq_item_port.item_done();
       ok_to_shutdown.agree(this);
     end
     
   endtask
-  
 
 endclass

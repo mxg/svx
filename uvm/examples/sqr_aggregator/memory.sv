@@ -52,6 +52,7 @@ module mem_channel (input  logic [31:0] addr,
 
   // Execute the transaction
   always @(posedge clk) begin
+    // 2-state variables
     bit [31:0] addr2;
     bit [31:0] data2;
 
@@ -61,6 +62,7 @@ module mem_channel (input  logic [31:0] addr,
       // write
       if(rw == 1) begin
         sem.get();
+	// convert 4-state to 2-state
         addr2 = addr;
         data2 = data_in;
         $display("%10t: mem_channel: write addr = %8x  data = %8x", $time, addr2, data2);
@@ -111,11 +113,11 @@ module memory (input logic clk,
   reg [3:0] rw_reg;
   reg [3:0] en_reg;
 
-  // Asynchronous reset
+  // Reset
   always @(posedge clk) begin
     if(rst_n == 1'b0) begin
-      activate_reg[3:0]  <= 4'b0;
-      read_only_reg[3:0] <= 4'b1; // default to read_only
+      activate_reg[3:0]  <= 4'b0000;
+      read_only_reg[3:0] <= 4'b1111; // default to read_only
       @(negedge clk);
     end
   end
@@ -129,8 +131,7 @@ module memory (input logic clk,
     end
   end
 
-  assign activate_reg = activate;
-  assign rw_reg = ~read_only & rw;
+  assign rw_reg = ~read_only_reg & rw;
   assign en_reg = activate_reg & en;
 
   initial begin

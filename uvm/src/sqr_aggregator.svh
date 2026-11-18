@@ -89,12 +89,15 @@ class sqr_aggregator;
 	  $sformat(msg, "Sequencer %s is duplicated in kind %s",
 		   sqr.get_full_name(), kind);
 	  `uvm_error(MSG_ID, msg)
-	  return;
+	  break;
 	end
-	void'(deque_iter.next());
+
+	  void'(deque_iter.next());
       end
 
-      q.push_back(sqr);
+      // Only add to queue if not a duplicate sqr for this kind.
+      if(deque_iter.at_end())
+	q.push_back(sqr);
     end
 
     if(name != "") begin
@@ -193,7 +196,7 @@ class sqr_aggregator;
 	$display("      %s", sqr.get_full_name());
 	void'(q_iter.next());
       end
-      void'(iter.next());
+      void'(kind_iter.next());
     end
 
     // Dump sequencer table

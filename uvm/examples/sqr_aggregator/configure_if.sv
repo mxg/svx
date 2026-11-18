@@ -34,5 +34,10 @@ interface configure_if (output logic [3:0] activate,
 			output logic	   configure,
 			input  logic	   clk);
 
+  clocking cb @(posedge clk);
+    default output #1step;
+    output activate, read_only, configure;
+  endclocking
+  
 endinterface
 

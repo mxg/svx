@@ -31,6 +31,8 @@
 //----------------------------------------------------------------------
 class trivial_seq extends uvm_sequence#(mem_txn);
 
+  localparam string MSG_ID = "TRIVIAL_SEQ/PRE_BODY";
+
   typedef class_traits#(uvm_sequencer_base) sequencer_traits;
   typedef deque#(uvm_sequencer_base, sequencer_traits) deque_t;  
 
@@ -49,29 +51,29 @@ class trivial_seq extends uvm_sequence#(mem_txn);
     if(!uvm_resource_db#(agreement)::read_by_name(get_full_name(),
 						  "ok_to_shutdown",
 						  ok_to_shutdown, this)) begin
-      `uvm_error("TRIVIAL_SEQ/PRE_BODY", "Unable to locate agreement.")
+      `uvm_error(MSG_ID, "Unable to locate agreement.")
       errors = 1;
     end
 
     // Locate the sequencer aggregator
     if(!uvm_resource_db#(sqr_aggregator)::read_by_name(get_full_name(),
 						       "sqrs", sqrs, this)) begin
-      `uvm_error("TRIVIAL_SEQ/PRE_BODY", "Unable to locate sequencer aggregator.")
+      `uvm_error(MSG_ID, "Unable to locate sequencer aggregator.")
       errors = 1;
-      return;  // cannot proceed if read_by_name fails.
+      return;  // cannot proceed if read_by_name() fails.
     end
 
     // Locate the sequencers in the sequencer aggregator
     cfg_sqr = sqrs.lookup_name("cfg");
     if(cfg_sqr == null) begin
-      `uvm_error("TRIVIAL_SEQ/PRE_BODY",
+      `uvm_error(MSG_ID,
 		 "No cfg sequencer in the sequencer aggregator")
       errors = 1;
     end
     
     mem_sqrs = sqrs.lookup_kind("mem");
     if(mem_sqrs == null || mem_sqrs.size() == 0) begin
-      `uvm_error("TRIVIAL_SEQ/PRE_BODY",
+      `uvm_error(MSG_ID,
 		 "No mem sequencers in the sequencer aggregator")
       errors = 1;
     end
@@ -93,12 +95,14 @@ class trivial_seq extends uvm_sequence#(mem_txn);
 
     ok_to_shutdown.disagree(this);
 
+    // Configure thr 
     cfg = new();
     cfg.txn_type = cfg_txn::CFG_ACTIVATE_RW;
     cfg.channel = 1;
     start_item(cfg, -1, cfg_sqr);
     finish_item(cfg);
 
+    // Launch a bunch of write transactions.
     for(uint32_t idx = 0; idx < 100; idx++) begin
       index_t channel = index_t'($urandom_range(3,0));
       mem = new();
