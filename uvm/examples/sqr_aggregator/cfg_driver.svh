@@ -65,14 +65,10 @@ class cfg_driver extends uvm_component;
     cfg_txn txn;
     logic [3:0] act = 4'b0000;
     logic [3:0]	ro = 4'b0000;
-    bit	has_been_reset;
 
     // Wait until the device is out of reset before proceeding.
-    if(!has_been_reset) begin
-      @(negedge vif.rst_n);
-      @(posedge vif.rst_n);
-      has_been_reset = 1;
-    end
+    @(negedge vif.rst_n);
+    @(posedge vif.rst_n);
     
     // Put known values on the pins to start things out.
     vif.cb.activate  <= act;
@@ -91,10 +87,6 @@ class cfg_driver extends uvm_component;
       end
 
       $display("cfg: %s @ %0d", txn.txn_type.name(), txn.channel);
-
-      // Save the current values as temporaries.
-      act = vif.activate;
-      ro  = vif.read_only;
 
       // Update the temporaries based on the command from the
       // transaction object.
