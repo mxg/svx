@@ -28,6 +28,13 @@
 
 //----------------------------------------------------------------------
 // trivial_seq
+//
+// This sequence is expected to NOT be bound to a sequencer when it is
+// launched, making it a virtual sequence.  As such it is responsible
+// for obtaininbg sequencer handles to launch sequence items.  We use
+// a data structure called a sequencer aggregator to locate the
+// sequencer handles.  The sequencer aggregator is available in the
+// resource database.
 //----------------------------------------------------------------------
 class trivial_seq extends uvm_sequence#(mem_txn);
 
@@ -97,8 +104,6 @@ class trivial_seq extends uvm_sequence#(mem_txn);
     cfg_txn cfg;
     mem_txn mem;
     mem_txn mem_rsp;
-
-    $display("launching sequence");
 
     // No need to print a message, error messages have already been
     // printed (above).

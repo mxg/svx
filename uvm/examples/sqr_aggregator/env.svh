@@ -76,15 +76,21 @@ class env extends uvm_component;
   //--------------------------------------------------------------------
   // connect_phase
   //
-  // Put the sequencers into the sequencer aggregator.
+  // Put the sequencers into the sequencer aggregator.  We do this in
+  // the connect_phase so we can be sure that all the agents and their
+  // subordinate components, specifically the sequencers, are in
+  // place.
   //--------------------------------------------------------------------
   function void connect_phase(uvm_phase phase);
+    
     sqrs.add(cfg_agt.sqr, "cfg", "cfg");
+    
     for(uint32_t idx = 0; idx < 4; idx++) begin
       string strnum;
       strnum.itoa(idx);
       sqrs.add(mem_agt[idx].sqr, {"mem_", strnum}, "mem");
     end
+    
   endfunction
 
   //--------------------------------------------------------------------
@@ -92,7 +98,6 @@ class env extends uvm_component;
   //--------------------------------------------------------------------
   task run_phase(uvm_phase phase);
 
-    $display("running...");
     phase.raise_objection(this);
 
     // Run the test with a timeout. One of the processes will finish
@@ -105,7 +110,7 @@ class env extends uvm_component;
       end
       
       begin
-	#100000000;
+	#100000000ns;
 	`uvm_error("ENV", "*** TIMEOUT!! ***");
       end
     join_any
@@ -123,11 +128,16 @@ class env extends uvm_component;
   //--------------------------------------------------------------------
   task do_stuff();
     trivial_seq seq;
-    
+
+    // Create a sequence and launch it.
     seq = new("trivial_seq");
     #20ns;
+    // A sequence not bound to a sequencer is a "virtual sequence." By
+    // supplying null as the sequencer argument we are launching our
+    // sequence as a virtual sequence.
     seq.start(null);
-    
+
+    // Wait for the work to be done.
     ok_to_shutdown.wait_for_agreement(this);
     $display("%10t: shutting down", $time);
   endtask
