@@ -37,10 +37,11 @@ module binder();
   `include "svx_macros.svh"
 
   bind memory configure_if cfg_if (
-				   .activate (activate),
+				   .activate  (activate),
 				   .read_only (read_only),
 				   .configure (configure),
-				   .clk(clk)
+				   .rst_n     (rst_n),
+				   .clk       (clk)
 				   );
   
   bind memory mem_channel_if mem_if_0 (

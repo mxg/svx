@@ -36,9 +36,9 @@ module clk_gen(output logic clk,
   initial begin
     // Reset the device
     rst_n <= 1;
-    #5ns;
+    #7ns;
     rst_n <= 0;
-    #30ns;
+    #29ns;
     rst_n <= 1;
   end
 

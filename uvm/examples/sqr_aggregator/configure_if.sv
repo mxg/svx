@@ -32,7 +32,8 @@
 interface configure_if (output logic [3:0] activate,
 			output logic [3:0] read_only,
 			output logic	   configure,
-			input  logic	   clk);
+			input logic        rst_n,
+			input logic	   clk);
 
   clocking cb @(posedge clk);
     output activate, read_only, configure;
