@@ -112,7 +112,7 @@ link the SVX library along with other SystemVerilog code in the usual
 
 location where you installed the SVX library.  E.g.,
 
-% setenv SVX_HOME /home/tools/svx-2.1.3-beta
+% setenv SVX_HOME /home/tools/svx-2.2.0-beta
 
 In your make file add the svx and svx_uvm_pkg package files to the
 list of source files:
@@ -151,8 +151,8 @@ DOCUMENTATION
 The documentation for the SystemVerilog Extension library is delivered
 as three PDF files in the doc directory.
 
-  * svx_catalog_src.pdf --A catalog of all of the elements in the core
-    library and UVM utilities.
+  * svx_catalog_src.pdf -- A catalog of all of the elements in the
+    core library and UVM utilities.
 
   * svx_catalog_apps.pdf -- A catalog of the apps in the core library.
 
