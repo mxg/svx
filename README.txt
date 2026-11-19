@@ -49,9 +49,9 @@ SystemVerilog.  However, there is still plenty of opportunity to build
 generic elements. While using STL as an inspiration, SVX has its own
 language-specific flavor.
 
-The UVM tuilities are a et of tools for building sophisticated UVM
+The UVM utilities are a set of tools for building sophisticated UVM
 testbenches.  These utilities are built on top of or along side UVM
-and do not interfer with UVM itself.  Many of the utilities are
+and do not interfere with UVM itself.  Many of the utilities are
 written in a generic style and rely on the core library.
 
 This version has been ported to Verilator, an increasingly important
@@ -72,8 +72,9 @@ core     - The core library
 
 uvm     - uvm utilities
 
-make    - a comman makefile used in building all the tests and
-          examples
+make    - a common makefile used in building all the tests and
+          examples.
+	  
 doc     - contains the documentation PDF files as well as the
           documentation source.
 
@@ -111,15 +112,16 @@ link the SVX library along with other SystemVerilog code in the usual
 
 location where you installed the SVX library.  E.g.,
 
-% setenv SVX_HOME /home/tools/svx-2.0.0
+% setenv SVX_HOME /home/tools/svx-2.1.3-beta
 
-In your make file add the svx package file to the list of source files
+In your make file add the svx and svx_uvm_pkg package files to the
+list of source files:
 
-SRC += ${SVX_HOME}/src/svx.sv
+SRC += ${SVX_HOME}/core/src/svx.sv ${SVX_HOME}/uvm/src/svx_uvm_pkg.sv
 
-Make sure that the SVX source directory is in your include path.
+Make sure that the SVX source directories is in your include path.
 
-INC += +incdir+${SVX_HOME}/src
+INC += +incdir+${SVX_HOME}/core/src +incdir+${SVX_HOME}/uvm/src
 
 Because Verilator compiles SystemVerilog into C++, building any
 Verilator code requires a C++ compiler.  For our development and
@@ -128,7 +130,7 @@ testing we used C++-17 with the gcc 15.2.0 compiler.
 USAGE
 -----
 
-The library has two package files, one for each macjor componenet of
+The library has two package files, one for each major component of
 the library. Both must be imported to use all the features of SVX.
 
 import svx::*
@@ -137,7 +139,7 @@ import svx_uvm_pkg::*;
 
 You can use the SVX core library without the UVM utilities.  To do so,
 just remove the "import svx_uvm_pkg::*" line.  The UVM utilities have
-a dependency on the core library, os you must import the core library
+a dependency on the core library, so you must import the core library
 to use the UVM utilities.
 
 This will provide access to all of the SVX library features in your
@@ -147,28 +149,15 @@ DOCUMENTATION
 -------------
 
 The documentation for the SystemVerilog Extension library is delivered
-as a single PDF file, doc/svx.pdf.
+as three PDF files in the doc directory.
 
-The documentation was written using LaTeX, a text-based document markup
-language, and dot, a text-based language for describing graphs.  A
-Makefile is included in the doc directory for re-building the PDF.
+  * svx_catalog_src.pdf --A catalog of all of the elements in the core
+    library and UVM utilities.
 
-To build the documentation, cd to the doc directory and run the
-Makefile.
+  * svx_catalog_apps.pdf -- A catalog of the apps in the core library.
 
-% make
-
-To remove all of the generated files type
-
-% make clean
-
-To remove all the generated files, leaving the final PDF file(s), type
-
-% make dist_clean
-
-You may have to adjust the make file to account for the locations of
-latex, dot, and related programs in your environment.
-
+  * svx_catalog_examples.pdf -- A catalog of examples that illustrate
+    how to use the core library and the UVM utilities.
 
 TEST SUITE
 ----------
@@ -182,7 +171,7 @@ Verification Gentleman).  You can download a copy from Github from the
 repository svunit/svunit.
 
 
-To run the tests and examples, simply execute the makefile:
+To run the tests and examples, simply execute the makefile: 
 
 % make
 
