@@ -2,7 +2,20 @@
 
 RELEASE NOTES
 
-Version svx-2.1 <beta 3>
+Version svx-2.2 <beta 1>
+
+November 2026
+
+----------------------------------------------------------------------
+
+* ADDED: Cached resource, along with a usage example and a
+  README-cached_resouece.md file that explains its use model.
+
+----------------------------------------------------------------------
+
+RELEASE NOTES
+
+Version svx-2.2 <beta 0>
 
 November 2026
 
