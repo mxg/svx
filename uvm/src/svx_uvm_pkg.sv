@@ -55,4 +55,7 @@ package svx_uvm_pkg;
   // Sequencer Aggregator
   `include "sqr_aggregator.svh"
 
+  // Cached Resource
+  `include "cached_resource.svh"
+
 endpackage

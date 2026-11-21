@@ -406,6 +406,7 @@ module cl_parse_unit_test;
       int32_t v;
       string n;
 
+      cl_mgr::clr_parse_flag();
       n = opt#(int32_t)::add();
       parse_args({"+verilator+seed+5",
                   "+ntb_random_seed=1",
