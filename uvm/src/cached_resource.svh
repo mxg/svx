@@ -40,7 +40,7 @@ endclass
 class cached_resource#(type T=int) extends cached_resource_base;
 
   typedef uvm_resource#(T) rsrc_t;
-  local static rsrc_t rsrc;
+  local rsrc_t rsrc;
 
   //--------------------------------------------------------------------
   // is_empty
@@ -107,7 +107,7 @@ class cached_resource#(type T=int) extends cached_resource_base;
   function bit read(inout T val, input uvm_object accessor);
     if(rsrc == null)
       return 0;
-    val = rsrc.read(null);
+    val = rsrc.read(accessor);
     return 1;    
   endfunction    
 
@@ -126,12 +126,15 @@ class cached_resource#(type T=int) extends cached_resource_base;
   // wait_for_change
   //--------------------------------------------------------------------
   task wait_for_change();
+    time t = $time;
 
     if(is_empty())
       return;
 
-    rsrc.modified = 0;
     rsrc.wait_modified();
+    uvm_wait_for_nba_region();
+    if(t == $time)
+      rsrc.wait_modified();
     
   endtask
   

@@ -117,6 +117,11 @@ class env extends uvm_component;
     cr.write(866, this);
     #48ns;
     cr.write(1122, this);
+    #0;
+    cr.write(34, this);
+    #0;
+    cr.write(942, this);
+
   endtask
 
   //--------------------------------------------------------------------
