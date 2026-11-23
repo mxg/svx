@@ -52,10 +52,10 @@ class env extends uvm_component;
     uint32_t number;
     uint32_t new_number;
     uint32_t old_number;
-    cached_resource#(uint32_t) cr = new();
+    cached_resource#(uint32_t) cr = new("number", get_full_name());
 
     // Retrieve the resourvce and cache it.
-    if(!cr.read_by_name(get_full_name(), "number", number, this))
+    if(!cr.read(number, this))
       `uvm_error("CR/ENV", "Resource is not available")
 
     if(number != 382)
@@ -66,7 +66,7 @@ class env extends uvm_component;
     uvm_resource_db#(uint32_t)::set_override("*", "number", new_number, this);
 
     // Retrieve the value from the cached resource.
-    if(!cr.read_by_name(get_full_name(), "number", old_number, this))
+    if(!cr.read(old_number, this))
       `uvm_error("CR/ENV", "Resource is not available")    
 
     // The number in the cached resource should reflect the old value,
@@ -75,7 +75,7 @@ class env extends uvm_component;
       `uvm_error("CR/ENV", "We didn't get the cached value.")
 
     // Update the cache.
-    if(!cr.get_the_latest(get_full_name(), "number", old_number, this))
+    if(!cr.get_the_latest(old_number, this))
       `uvm_error("CR/ENV", "Resource is not available")    
 
     if(old_number != 67)
@@ -100,14 +100,11 @@ class env extends uvm_component;
   endtask
 
   //--------------------------------------------------------------------
-  // firat_process
+  // first_process
   //--------------------------------------------------------------------
   task first_process();
     uint32_t number;
-    cached_resource#(uint32_t) cr = new();
-    
-    if(!cr.read_by_name(get_full_name(), "number", number, this))
-      `uvm_error("CR/FIRST", "Resource is not available")
+    cached_resource#(uint32_t) cr = new("number", get_full_name());
     
     #100ns;
     cr.write(265, this);
@@ -125,15 +122,12 @@ class env extends uvm_component;
   endtask
 
   //--------------------------------------------------------------------
-  // second_proces
+  // second_process
   //--------------------------------------------------------------------
   task second_process();
     uint32_t number;
-    cached_resource#(uint32_t) cr = new();
+    cached_resource#(uint32_t) cr = new("number", get_full_name());
     
-    if(!cr.read_by_name(get_full_name(), "number", number, this))
-      `uvm_error("CR/SECOND", "Resource is not available.")
-
     forever begin
       cr.wait_for_change();
       if(!cr.read(number, this))
