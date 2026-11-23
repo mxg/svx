@@ -18,38 +18,57 @@ The cached resource is parameterized like uvm_resource#():
 
 Here is the API:
 
-  function bit is_empty();
+  * new(string _scope, string _name, bit leave_unbound = 0);
 
-  function bit get_the_latest(string scope,
-                              string name,
-                              inout  T val,
-                              input  uvm_object accessor = null);
-
-  function bit read_by_name(string scope,
-                            string name,
-                            inout  T val,
-                            input  uvm_object accessor = null);
+    Constructor for a cached_resource.  If leave_unbound is 1 then do
+    not bind the name and scope to a UVM resource.  If it is 0 then
+    attempt to bind to a resource.
     
-  function bit read(inout T val, uvm_object accessor = null);
-  function void write(T val, uvm_object accessor = null);
+  * bit is_empty();
+
+    Is the cached_resource bound to a resource?
+    
+  * void refresh();
+
+    Update the cache.  If unbound, then bind to a resource.
+
+  * bit get_the_latest(inout T val,
+	               input  uvm_object accessor = null);
+
+    Update the cache and return the latest value through the val
+    argument.
+   
+  * bit read(inout T val, input uvm_object accessor);
+
+    Return the value stored in the bound resource.
+    
+  * void write(T val, input uvm_object accessor);
+
+    Write a new value to the bound resource.
+    
+  * task wait_for_change();
+
+    A blocking task that unblocks when the bound resource changes
+    value.  Note that write the same value to the resource, either
+    through the cached_resource interface or the uvm_resource API does
+    not unblock wait_ror_change.
 
 ** Use Models
 
-
-The primary function is read_by_name().  It will first look to see if
-the cache is empty.  If it is, it will retrieve a new resource from
-the resource database.  If not, it will return the value in the cached
-resource.  Get_the_latest() forces the cache to be update from the
-resource database.  Read() and write() access the cached resource.
-Read() will retrieve the value from the cached resource, and write()
-will change the value in the cached resource.
+A name and a scope represent a resource in the resource database.
+When a new cached_resource is created and the leave_unbound
+coinstructor argument is 0 then the constructor does a search in the
+UVM resource database to retrieve the resource with the matching name
+and scope. If the cached_resource is left unbound it can be bound to a
+resource later by calling refresh().
 
 Two (or more) cached resources can share the same resource.  Consider
 two UVM components, A and B. A instantiate a cached resource an
 populates it with a value.  E.g.
 
-  cached_resource#(uint32_t) cr = new();
-  if(!cr.read_by_name(get_full_name(), "size", size, this)) ...
+  cached_resource#(uint32_t) cr = new(get_full_name(),  name);
+  if(!cr.read(size, this))
+    ...
 
 B can do the same thing.  The underlying cached resource will be the
 same for both cached resource instances. If one issues a write() then
@@ -73,9 +92,9 @@ proc2 consume it.
 ```
   task proc2();
     uint32_t n_bytes;
-    cached_resource#(uint32_t) n_bytes_rsrc = new();
+    cached_resource#(uint32_t) n_bytes_rsrc = new(get_full_name(), "bytes");
 
-    n_bytes_rsrc.read_by_name(get_full_name(), "bytes", n_bytes, this);
+    n_bytes_rsrc.read_by_name(, n_bytes, this);
 
     for(uint32_t idx = 0; idx < 1000; idx++) begin
        n_bytes = $random_range(256, 8);
@@ -90,10 +109,10 @@ proc2 consume it.
 ```
   task proc2();
     uint32_t n_bytes;
-    cached_resource#(uint32_t) n_bytes_rsrc = new();
+    cached_resource#(uint32_t) n_bytes_rsrc = new(get_full_name(), "bytes",);
 
     forever begin
-      n_bytes_rsrc.read_by_name(get_full_name(), "bytes", n_bytes, this);
+      n_bytes_rsrc.read_by_name(n_bytes, this);
       for(uint32_t idx = 0; idx < n_bytes, idx++) begin
       ...
     end
@@ -109,11 +128,11 @@ the same, but proc2 waits for the changed resource.
 ```
   task proc2();
     uint32_t n_bytes;
-    cached_resource#(uint32_t) n_bytes_rsrc = new();
+    cached_resource#(uint32_t) n_bytes_rsrc = new(get_full_name(), "bytes", );
 
     forever begin
       n_bytes_rsrc.wait_for_change();
-      n_bytes_rsrc.read_by_name(get_full_name(), "bytes", n_bytes, this);
+      n_bytes_rsrc.read_by_name(n_bytes, this);
       for(uint32_t idx = 0; idx < n_bytes, idx++) begin
       ...
     end

@@ -52,14 +52,14 @@ class env extends uvm_component;
     uint32_t number;
     uint32_t new_number;
     uint32_t old_number;
-    cached_resource#(uint32_t) cr = new("number", get_full_name());
+    cached_resource#(uint32_t) cr = new(get_full_name(), "number");
 
-    // Retrieve the resourvce and cache it.
+    // Retrieve the resource and cache it.
     if(!cr.read(number, this))
       `uvm_error("CR/ENV", "Resource is not available")
 
     if(number != 382)
-      `uvm_error("CR/ENV", "Uh oh, the resource valud does not match")
+      `uvm_error("CR/ENV", "Uh oh, the resource value does not match")
 
     // Now, let's put a new value in the resource database.
     new_number = 67;
@@ -103,8 +103,7 @@ class env extends uvm_component;
   // first_process
   //--------------------------------------------------------------------
   task first_process();
-    uint32_t number;
-    cached_resource#(uint32_t) cr = new("number", get_full_name());
+    cached_resource#(uint32_t) cr = new(get_full_name(), "number");
     
     #100ns;
     cr.write(265, this);
@@ -126,7 +125,7 @@ class env extends uvm_component;
   //--------------------------------------------------------------------
   task second_process();
     uint32_t number;
-    cached_resource#(uint32_t) cr = new("number", get_full_name());
+    cached_resource#(uint32_t) cr = new(get_full_name(), "number");
     
     forever begin
       cr.wait_for_change();

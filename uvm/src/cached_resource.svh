@@ -27,14 +27,26 @@
 //======================================================================
 
 //----------------------------------------------------------------------
-// cached_resoure_base
+// cached_resource_base
+//
+// Non-parameterized base class for cached resources.
 //----------------------------------------------------------------------
 virtual class cached_resource_base;
+
+  protected string name;
+  protected string scope;
+
   pure virtual function bit is_empty();
-  protected virtual function bit update_cache(string _name,
-					      string _scope);
-    return 0;
+  pure virtual function void refresh();
+
+  protected function string id();
+    return {"Resource ", name, " @ ", scope, ": "};
   endfunction
+
+  function void print();
+    $display("cached resource: scope = %s, name = %s", scope, name);
+  endfunction
+  
 endclass
 
 //----------------------------------------------------------------------
@@ -45,18 +57,19 @@ class cached_resource#(type T=int) extends cached_resource_base;
   typedef uvm_resource#(T) rsrc_t;
   local rsrc_t rsrc;
   local T last_value;
-  local string scope;
-  local string name;
-
+  
   //--------------------------------------------------------------------
   // constructor
+  //
+  // If leave_unbound is set then do not attempt to bind the
+  // cached_resource to a resource.  Binding can be done later by
+  // calling refresh().
   //--------------------------------------------------------------------
-  function new(string _name, string _scope);
-    bit ok = update_cache(_name, _scope);
-    if(ok) begin
-      name = _name;
-      scope = _scope;
-    end
+  function new(string _scope, string _name, bit leave_unbound = 0);
+    name = _name;
+    scope = _scope;
+    if(!leave_unbound)
+      refresh();
   endfunction
 
   //--------------------------------------------------------------------
@@ -65,8 +78,7 @@ class cached_resource#(type T=int) extends cached_resource_base;
   // Update the cached resource.  May or may not change the rsrc
   // handle.
   //--------------------------------------------------------------------
-  protected virtual function bit update_cache(string _name,
-					      string _scope);
+  local virtual function bit update_cache(string _scope, string _name);
     
     uvm_resource_pool rp = uvm_resource_pool::get();
     uvm_resource_base rsrc_base;
@@ -76,7 +88,7 @@ class cached_resource#(type T=int) extends cached_resource_base;
     // Did we find the resource?
     if(rsrc_base == null) begin
       `uvm_error("SVX/CACHED_RSRC/UPDATE",
-		 "Resource not found in the resource database.")
+		{id(), " not found in the resource database."})
       return 0;
     end
     
@@ -98,6 +110,15 @@ class cached_resource#(type T=int) extends cached_resource_base;
   endfunction
 
   //--------------------------------------------------------------------
+  // refresh
+  //
+  // Refresh the cache.
+  //--------------------------------------------------------------------
+  function void refresh();
+    void'(update_cache(scope, name));
+  endfunction
+
+  //--------------------------------------------------------------------
   // get_the_latest
   //
   // Force the resource cache to be updated from the resource
@@ -106,7 +127,7 @@ class cached_resource#(type T=int) extends cached_resource_base;
   function bit get_the_latest(inout  T val,
 			      input  uvm_object accessor = null);
 
-    if(!update_cache(name, scope))
+    if(!update_cache(scope, name))
       return 0;
     
     val = rsrc.read(accessor);
@@ -123,7 +144,7 @@ class cached_resource#(type T=int) extends cached_resource_base;
   function bit read(inout T val, input uvm_object accessor);
     if(rsrc == null) begin
       `uvm_error("SVX/CACHED_RSRC/READ",
-		 "Cache is empty, cannot complete read.")
+		 {id(), "cache is empty, cannot complete read."})
       return 0;
     end
 
@@ -134,12 +155,13 @@ class cached_resource#(type T=int) extends cached_resource_base;
   //--------------------------------------------------------------------
   // write
   //
-  // Update the value of the resource.
+  // Update the value of the resource.  Note that writing the same
+  // value does not trigger wait_for_change().
   //--------------------------------------------------------------------
   function void write(T val, input uvm_object accessor);
     if(rsrc == null) begin
       `uvm_error("SVX/CACHED_RSRC/WRITE",
-		 "Cache is empty, cannot complete write.")
+		 {id(), "cache is empty, cannot complete write."})
       return;
     end
     rsrc.write(val, accessor);
@@ -151,8 +173,13 @@ class cached_resource#(type T=int) extends cached_resource_base;
   task wait_for_change();
     T val;
     
-    if(is_empty())
+    if(is_empty()) begin
+      `uvm_error("SVX/CACHED_RSRC/WAIT",
+		 {id(), "cache is empty, nothing to wait for."})      
       return;
+    end
+
+    last_value = rsrc.read(null);
 
     forever begin
       rsrc.wait_modified();
