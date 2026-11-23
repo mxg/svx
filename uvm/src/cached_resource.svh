@@ -68,8 +68,10 @@ class cached_resource#(type T=int) extends cached_resource_base;
   function new(string _scope, string _name, bit leave_unbound = 0);
     name = _name;
     scope = _scope;
-    if(!leave_unbound)
+    if(!leave_unbound) begin
       refresh();
+      last_value = rsrc.read(null);
+    end
   endfunction
 
   //--------------------------------------------------------------------
@@ -78,7 +80,7 @@ class cached_resource#(type T=int) extends cached_resource_base;
   // Update the cached resource.  May or may not change the rsrc
   // handle.
   //--------------------------------------------------------------------
-  local virtual function bit update_cache(string _scope, string _name);
+  local function bit update_cache(string _scope, string _name);
     
     uvm_resource_pool rp = uvm_resource_pool::get();
     uvm_resource_base rsrc_base;
@@ -88,7 +90,7 @@ class cached_resource#(type T=int) extends cached_resource_base;
     // Did we find the resource?
     if(rsrc_base == null) begin
       `uvm_error("SVX/CACHED_RSRC/UPDATE",
-		{id(), " not found in the resource database."})
+		{id(), "not found in the resource database."})
       return 0;
     end
     
@@ -131,6 +133,7 @@ class cached_resource#(type T=int) extends cached_resource_base;
       return 0;
     
     val = rsrc.read(accessor);
+    last_value = val;
     return 1;
     
   endfunction
@@ -149,6 +152,7 @@ class cached_resource#(type T=int) extends cached_resource_base;
     end
 
     val = rsrc.read(accessor);
+    last_value = val;
     return 1;    
   endfunction    
 
@@ -178,8 +182,6 @@ class cached_resource#(type T=int) extends cached_resource_base;
 		 {id(), "cache is empty, nothing to wait for."})      
       return;
     end
-
-    last_value = rsrc.read(null);
 
     forever begin
       rsrc.wait_modified();

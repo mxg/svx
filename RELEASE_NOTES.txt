@@ -9,7 +9,7 @@ November 2026
 ----------------------------------------------------------------------
 
 * ADDED: Cached resource, along with a usage example and a
-  README-cached_resouece.md file that explains its use model.
+  README-cached_resource.md file that explains its use model.
 
 ----------------------------------------------------------------------
 
@@ -114,8 +114,8 @@ October 2026
 * ADDED: peek_front() and peek_back() functions top the deque
   interface.
 
-* ADDED: multimap container and associated tests.  A multimap is a map that can hold
-  multiple items with the same key.
+* ADDED: multimap container and associated tests.  A multimap is a map
+  that can hold multiple items with the same key.
 
 * ADDED: multimap iterator and associated tests.
 

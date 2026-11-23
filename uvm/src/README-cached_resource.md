@@ -26,7 +26,8 @@ Here is the API:
     
   * bit is_empty();
 
-    Is the cached_resource bound to a resource?
+    Is the cached_resource bound to a resource?  If not, returns 1, 0
+    otherwise.
     
   * void refresh();
 
@@ -49,21 +50,21 @@ Here is the API:
   * task wait_for_change();
 
     A blocking task that unblocks when the bound resource changes
-    value.  Note that write the same value to the resource, either
-    through the cached_resource interface or the uvm_resource API does
-    not unblock wait_ror_change.
+    value.  Note that writing the same value to the resource, either
+    through the cached_resource interface or the uvm_resource API,
+    does not unblock wait_for_change.
 
 ** Use Models
 
 A name and a scope represent a resource in the resource database.
 When a new cached_resource is created and the leave_unbound
-coinstructor argument is 0 then the constructor does a search in the
+constructor argument is 0 then the constructor does a search in the
 UVM resource database to retrieve the resource with the matching name
 and scope. If the cached_resource is left unbound it can be bound to a
 resource later by calling refresh().
 
 Two (or more) cached resources can share the same resource.  Consider
-two UVM components, A and B. A instantiate a cached resource an
+two UVM components, A and B. A instantiates a cached resource an
 populates it with a value.  E.g.
 
   cached_resource#(uint32_t) cr = new(get_full_name(),  name);
@@ -74,7 +75,7 @@ B can do the same thing.  The underlying cached resource will be the
 same for both cached resource instances. If one issues a write() then
 both cached resources will see the same updated value.
 
-The primary use model for a cached resource is for resources whose
+The primary use m<odel for a cached resource is for resources whose
 value changes. There is no need to cache a resource whose value never
 changes.  Because multiple cached resources can share the same UVM
 resource object, a cached resource can be used as a means to
@@ -90,14 +91,14 @@ proc2 consume it.
   -- process 1
 
 ```
-  task proc2();
+  task proc1();
     uint32_t n_bytes;
     cached_resource#(uint32_t) n_bytes_rsrc = new(get_full_name(), "bytes");
 
     n_bytes_rsrc.read_by_name(, n_bytes, this);
 
     for(uint32_t idx = 0; idx < 1000; idx++) begin
-       n_bytes = $random_range(256, 8);
+       n_bytes = $urandom_range(256, 8);
        n_bytes_rsrc.write(n_bytes, this);
        ...
     end
@@ -109,7 +110,7 @@ proc2 consume it.
 ```
   task proc2();
     uint32_t n_bytes;
-    cached_resource#(uint32_t) n_bytes_rsrc = new(get_full_name(), "bytes",);
+    cached_resource#(uint32_t) n_bytes_rsrc = new(get_full_name(), "bytes");
 
     forever begin
       n_bytes_rsrc.read_by_name(n_bytes, this);
@@ -128,7 +129,7 @@ the same, but proc2 waits for the changed resource.
 ```
   task proc2();
     uint32_t n_bytes;
-    cached_resource#(uint32_t) n_bytes_rsrc = new(get_full_name(), "bytes", );
+    cached_resource#(uint32_t) n_bytes_rsrc = new(get_full_name(), "bytes");
 
     forever begin
       n_bytes_rsrc.wait_for_change();
