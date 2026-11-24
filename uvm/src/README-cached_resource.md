@@ -146,6 +146,12 @@ the same, but proc2 waits for the changed resource.
 As its name implies, the wait_for_change() task blocks until the
 resource changes value.
 
+To ensure that wait_for_change triggers correctly, the cached_resource
+tracks changes.  However, it can only trsck changes made through the
+cached_resource interface.  If a resource's value is changed by other
+means then wait_for_change will not operate correctly.  It can be
+re-synchronized bgy calling refresh().
+
                               * * * * *
 
 

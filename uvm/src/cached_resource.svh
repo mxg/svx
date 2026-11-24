@@ -142,6 +142,7 @@ class cached_resource#(type T=int) extends cached_resource_base;
     end
     
     last_seen = rsrc.read(null);
+    seen = shrd.version;
     return 1;
     
   endfunction
@@ -175,7 +176,6 @@ class cached_resource#(type T=int) extends cached_resource_base;
       return 0;
     
     val = rsrc.read(accessor);
-    last_seen = val;
     return 1;
     
   endfunction
@@ -195,6 +195,7 @@ class cached_resource#(type T=int) extends cached_resource_base;
 
     val = rsrc.read(accessor);
     last_seen = val;
+    seen = shrd.version;
     return 1;    
   endfunction    
 
@@ -210,15 +211,19 @@ class cached_resource#(type T=int) extends cached_resource_base;
 		 {id(), "cache is empty, cannot complete write."})
       return;
     end
-    rsrc.write(val, accessor);
+
+    // Are we actually changing the value?
+    if(val == rsrc.read(accessor))
+      return;
+    
     shrd.version++;
+    rsrc.write(val, accessor);
   endfunction
 
   //--------------------------------------------------------------------
   // wait_for_change
   //--------------------------------------------------------------------
   task wait_for_change();
-    T val;
     
     if(is_empty()) begin
       `uvm_error("SVX/CACHED_RSRC/WAIT",
@@ -226,14 +231,10 @@ class cached_resource#(type T=int) extends cached_resource_base;
       return;
     end
 
-    forever begin
-      rsrc.wait_modified();
-      val = rsrc.read(null);
-      // Has the value actually changed?
-      if (val != last_seen)
-	break;
-    end
-    last_seen = val;    
+    wait (shrd.version != seen);
+    uvm_wait_for_nba_region(); // make sure all the changes have settled
+    seen = shrd.version;
+    last_seen = rsrc.read(null);
     
   endtask
   
