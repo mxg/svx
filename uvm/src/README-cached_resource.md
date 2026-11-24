@@ -1,4 +1,4 @@
-Cached Resource
+LCached Resource
 ---------------
 
 Looking up an item in the UVM resource database can be expensive. That
@@ -65,7 +65,6 @@ resource later by calling refresh().
 
 Two (or more) cached resources can share the same resource.  Consider
 two UVM components, A and B. A instantiates a cached resource and
-
 populates it with a value.  E.g.
 
   cached_resource#(uint32_t) cr = new(get_full_name(),  name);
@@ -86,8 +85,8 @@ will.
 The following example has two processes, proc1 and proc2.  Proc1 sends
 bytes (through some channel) to proc2.  Additionally, it informs proc2
 of how many bytes to expect via a cached resource.  This model
-presumes, of course that the value of n_bytes is set by proc1 before
-proc2 consume it. OF course, proc2 requires some blocking statement,
+presumes, of course, that the value of n_bytes is set by proc1 before
+proc2 consumes it. Of course, proc2 requires some blocking statement,
 such as a blocking get to retrieve bytes or a clock control to prevent
 the loop from spinning endlessly.
 
@@ -98,7 +97,7 @@ the loop from spinning endlessly.
     uint32_t n_bytes;
     cached_resource#(uint32_t) n_bytes_rsrc = new(get_full_name(), "bytes");
 
-    n_bytes_rsrc.read(, n_bytes, this);
+    n_bytes_rsrc.read(n_bytes, this);
 
     for(uint32_t idx = 0; idx < 1000; idx++) begin
        n_bytes = $urandom_range(256, 8);
@@ -118,7 +117,8 @@ the loop from spinning endlessly.
     forever begin
       n_bytes_rsrc.read(n_bytes, this);
       for(uint32_t idx = 0; idx < n_bytes; idx++) begin
-      ... // retrieve bytes from channel
+        ... // retrieve bytes from channel
+      end
     end
   endtask
 ```
@@ -136,7 +136,7 @@ the same, but proc2 waits for the changed resource.
 
     forever begin
       n_bytes_rsrc.wait_for_change();
-      n_bytes_rsrc.read_by_name(n_bytes, this);
+      n_bytes_rsrc.read(n_bytes, this);
       for(uint32_t idx = 0; idx < n_bytes, idx++) begin
       ...
     end

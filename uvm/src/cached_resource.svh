@@ -27,7 +27,7 @@
 //======================================================================
 
 
-class shared;
+class cached_resource_shared;
   uint32_t version;
 endclass
 
@@ -40,8 +40,8 @@ virtual class cached_resource_base;
 
   protected string name;
   protected string scope;
-  local static map#(uvm_resource_base, shared, 
-		    class_traits#(shared)) shared_map;
+  local static map#(uvm_resource_base, cached_resource_shared, 
+		    class_traits#(cached_resource_shared)) shared_map;
 
   pure virtual function bit is_empty();
   pure virtual function void refresh();
@@ -54,8 +54,8 @@ virtual class cached_resource_base;
   //--------------------------------------------------------------------
   // get_shared
   //--------------------------------------------------------------------
-  protected static function shared get_shared(uvm_resource_base r);
-    shared shrd;
+  protected static function cached_resource_shared get_shared(uvm_resource_base r);
+    cached_resource_shared shrd;
     if(!shared_map.exists(r)) begin
       shrd = new();
       void'(shared_map.insert(r, shrd));
@@ -94,7 +94,7 @@ class cached_resource#(type T=int) extends cached_resource_base;
   local rsrc_t rsrc;
   local T last_seen;
   local uint32_t seen;
-  local shared shrd;
+  local cached_resource_shared shrd;
   
   //--------------------------------------------------------------------
   // constructor
@@ -126,7 +126,6 @@ class cached_resource#(type T=int) extends cached_resource_base;
     uvm_resource_base rsrc_base;
     
     rsrc_base = rp.get_by_name(_scope, _name, rsrc_t::get_type(), 0);
-    shrd = cached_resource_base::get_shared(rsrc_base);
     
     // Did we find the resource?
     if(rsrc_base == null) begin
@@ -134,13 +133,14 @@ class cached_resource#(type T=int) extends cached_resource_base;
 		 {id(), "not found in the resource database."})
       return 0;
     end
-    
+
     if(!$cast(rsrc, rsrc_base)) begin
       // This failure should never happen.
       `uvm_error("SVX/CACHED_RSRC/UPDATE", "Cast failure.")
       return 0;
     end
     
+    shrd = cached_resource_base::get_shared(rsrc_base);
     last_seen = rsrc.read(null);
     seen = shrd.version;
     return 1;
