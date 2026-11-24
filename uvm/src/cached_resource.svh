@@ -26,6 +26,11 @@
 // permissions and limitations under the License.
 //======================================================================
 
+
+class shared;
+  uint32_t version;
+endclass
+
 //----------------------------------------------------------------------
 // cached_resource_base
 //
@@ -35,14 +40,45 @@ virtual class cached_resource_base;
 
   protected string name;
   protected string scope;
+  local static map#(uvm_resource_base, shared, 
+		    class_traits#(shared)) shared_map;
 
   pure virtual function bit is_empty();
   pure virtual function void refresh();
 
+  function new();
+    if(shared_map == null)
+      shared_map = new();
+  endfunction
+
+  //--------------------------------------------------------------------
+  // get_shared
+  //--------------------------------------------------------------------
+  protected static function shared get_shared(uvm_resource_base r);
+    shared shrd;
+    if(!shared_map.exists(r)) begin
+      shrd = new();
+      void'(shared_map.insert(r, shrd));
+    end
+    else
+      shrd = shared_map.get(r);
+    return shrd;
+  endfunction
+
+  //--------------------------------------------------------------------
+  // id
+  //
+  // Return an ID string for messages
+  //--------------------------------------------------------------------
   protected function string id();
     return {"Resource ", name, " @ ", scope, ": "};
   endfunction
 
+  //--------------------------------------------------------------------
+  // print
+  //
+  // print info about the cached resource.
+  //--------------------------------------------------------------------
   function void print();
     $display("cached resource: scope = %s, name = %s", scope, name);
   endfunction
@@ -56,7 +92,9 @@ class cached_resource#(type T=int) extends cached_resource_base;
 
   typedef uvm_resource#(T) rsrc_t;
   local rsrc_t rsrc;
-  local T last_value;
+  local T last_seen;
+  local uint32_t seen;
+  local shared shrd;
   
   //--------------------------------------------------------------------
   // constructor
@@ -66,11 +104,13 @@ class cached_resource#(type T=int) extends cached_resource_base;
   // calling refresh().
   //--------------------------------------------------------------------
   function new(string _scope, string _name, bit leave_unbound = 0);
+    bit ok;
     name = _name;
     scope = _scope;
     if(!leave_unbound) begin
-      refresh();
-      last_value = rsrc.read(null);
+      ok = update_cache(scope, name);
+      if(ok)
+	last_seen = rsrc.read(null);
     end
   endfunction
 
@@ -86,11 +126,12 @@ class cached_resource#(type T=int) extends cached_resource_base;
     uvm_resource_base rsrc_base;
     
     rsrc_base = rp.get_by_name(_scope, _name, rsrc_t::get_type(), 0);
+    shrd = cached_resource_base::get_shared(rsrc_base);
     
     // Did we find the resource?
     if(rsrc_base == null) begin
       `uvm_error("SVX/CACHED_RSRC/UPDATE",
-		{id(), "not found in the resource database."})
+		 {id(), "not found in the resource database."})
       return 0;
     end
     
@@ -100,6 +141,7 @@ class cached_resource#(type T=int) extends cached_resource_base;
       return 0;
     end
     
+    last_seen = rsrc.read(null);
     return 1;
     
   endfunction
@@ -133,7 +175,7 @@ class cached_resource#(type T=int) extends cached_resource_base;
       return 0;
     
     val = rsrc.read(accessor);
-    last_value = val;
+    last_seen = val;
     return 1;
     
   endfunction
@@ -152,7 +194,7 @@ class cached_resource#(type T=int) extends cached_resource_base;
     end
 
     val = rsrc.read(accessor);
-    last_value = val;
+    last_seen = val;
     return 1;    
   endfunction    
 
@@ -169,6 +211,7 @@ class cached_resource#(type T=int) extends cached_resource_base;
       return;
     end
     rsrc.write(val, accessor);
+    shrd.version++;
   endfunction
 
   //--------------------------------------------------------------------
@@ -187,10 +230,10 @@ class cached_resource#(type T=int) extends cached_resource_base;
       rsrc.wait_modified();
       val = rsrc.read(null);
       // Has the value actually changed?
-      if (val != last_value)
+      if (val != last_seen)
 	break;
     end
-    last_value = val;    
+    last_seen = val;    
     
   endtask
   

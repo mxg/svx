@@ -64,7 +64,8 @@ and scope. If the cached_resource is left unbound it can be bound to a
 resource later by calling refresh().
 
 Two (or more) cached resources can share the same resource.  Consider
-two UVM components, A and B. A instantiates a cached resource an
+two UVM components, A and B. A instantiates a cached resource and
+
 populates it with a value.  E.g.
 
   cached_resource#(uint32_t) cr = new(get_full_name(),  name);
@@ -75,7 +76,7 @@ B can do the same thing.  The underlying cached resource will be the
 same for both cached resource instances. If one issues a write() then
 both cached resources will see the same updated value.
 
-The primary use m<odel for a cached resource is for resources whose
+The primary use model for a cached resource is for resources whose
 value changes. There is no need to cache a resource whose value never
 changes.  Because multiple cached resources can share the same UVM
 resource object, a cached resource can be used as a means to
@@ -83,10 +84,12 @@ communicate information between processes -- a back channel, if you
 will.
 
 The following example has two processes, proc1 and proc2.  Proc1 sends
-bytes (through some channel) to proc2).  Additionally, it informs
-proc2 of how many bytes to expect via a cached resource.  This model
+bytes (through some channel) to proc2.  Additionally, it informs proc2
+of how many bytes to expect via a cached resource.  This model
 presumes, of course that the value of n_bytes is set by proc1 before
-proc2 consume it.
+proc2 consume it. OF course, proc2 requires some blocking statement,
+such as a blocking get to retrieve bytes or a clock control to prevent
+the loop from spinning endlessly.
 
   -- process 1
 
@@ -95,12 +98,12 @@ proc2 consume it.
     uint32_t n_bytes;
     cached_resource#(uint32_t) n_bytes_rsrc = new(get_full_name(), "bytes");
 
-    n_bytes_rsrc.read_by_name(, n_bytes, this);
+    n_bytes_rsrc.read(, n_bytes, this);
 
     for(uint32_t idx = 0; idx < 1000; idx++) begin
        n_bytes = $urandom_range(256, 8);
        n_bytes_rsrc.write(n_bytes, this);
-       ...
+       ... // send bytes through channel
     end
   endtask
 ```
@@ -113,9 +116,9 @@ proc2 consume it.
     cached_resource#(uint32_t) n_bytes_rsrc = new(get_full_name(), "bytes");
 
     forever begin
-      n_bytes_rsrc.read_by_name(n_bytes, this);
-      for(uint32_t idx = 0; idx < n_bytes, idx++) begin
-      ...
+      n_bytes_rsrc.read(n_bytes, this);
+      for(uint32_t idx = 0; idx < n_bytes; idx++) begin
+      ... // retrieve bytes from channel
     end
   endtask
 ```
