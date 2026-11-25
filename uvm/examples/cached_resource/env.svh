@@ -118,6 +118,8 @@ class env extends uvm_component;
     cr.write(34, this);
     #0;
     cr.write(942, this);
+    #5;
+    $display("%10t: first process complete.", $time);
 
   endtask
 
@@ -147,7 +149,7 @@ class env extends uvm_component;
     forever begin
       cr.wait_for_change();
       if(!cr.read(number, this))
-	`uvm_error("CR/SECOND", "Error reading number.")
+	`uvm_error("CR/THIRD", "Error reading number.")
       $display("%10t: third  - number changed to %0d", $time, number);
     end
     

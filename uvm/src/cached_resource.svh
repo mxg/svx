@@ -103,11 +103,10 @@ class cached_resource#(type T=int) extends cached_resource_base;
   // calling refresh().
   //--------------------------------------------------------------------
   function new(string _scope, string _name, bit leave_unbound = 0);
-    bit ok;
     name = _name;
     scope = _scope;
     if(!leave_unbound) begin
-      ok = update_cache(scope, name);
+      void'(update_cache(scope, name));
     end
   endfunction
 
@@ -215,6 +214,9 @@ class cached_resource#(type T=int) extends cached_resource_base;
       rsrc.write(val, accessor);
       shrd.version++;
     end
+    else
+       `uvm_error("SVX/CACHED_RSRC/WRITE",
+		 {id(), "Cannot write to a read-only resource."})
   endfunction
 
   //--------------------------------------------------------------------

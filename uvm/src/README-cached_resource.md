@@ -49,10 +49,10 @@ Here is the API:
     
   * task wait_for_change();
 
-    A blocking task that unblocks when the bound resource changes
-    value.  Note that writing the same value to the resource, either
-    through the cached_resource interface or the uvm_resource API,
-    does not unblock wait_for_change.
+    blocking task that unblocks when the bound resource changes value
+    through write() on any cached_resource bound to it.  Writing the
+    same value does not unblock it.  Changes made through the
+    uvm_resource or uvm_resource_db API do not unblock it at all.
 
 ** Use Models
 
@@ -68,8 +68,9 @@ two UVM components, A and B. A instantiates a cached resource and
 populates it with a value.  E.g.
 
   cached_resource#(uint32_t) cr = new(get_full_name(),  name);
-  if(!cr.read(size, this))
+  if(!cr.read(size, this)) begin
     ...
+  end
 
 B can do the same thing.  The underlying cached resource will be the
 same for both cached resource instances. If one issues a write() then
@@ -108,9 +109,9 @@ the loop from spinning endlessly.
     n_bytes_rsrc.read(n_bytes, this);
 
     for(uint32_t idx = 0; idx < 1000; idx++) begin
-       n_bytes = $urandom_range(256, 8);
-       n_bytes_rsrc.write(n_bytes, this);
-       ... // send bytes through channel
+      n_bytes = $urandom_range(256, 8);
+      n_bytes_rsrc.write(n_bytes, this);
+      ... // send bytes through channel
     end
   endtask
 ```
@@ -146,7 +147,8 @@ the same, but proc2 waits for the changed resource.
       n_bytes_rsrc.wait_for_change();
       n_bytes_rsrc.read(n_bytes, this);
       for(uint32_t idx = 0; idx < n_bytes, idx++) begin
-      ...
+        ...
+      end
     end
   endtask
 ```
@@ -157,9 +159,13 @@ resource changes value.
 To ensure that wait_for_change triggers correctly, the cached_resource
 tracks changes.  However, it can only track changes made through the
 cached_resource interface.  If a resource's value is changed by other
-means then wait_for_change will not operate correctly. Calling refresh
+means then wait_for_change will noit unblock waiters. Calling refresh
 will go back to the resource database to obtain the latest resource
-matching the the name and scope provided to the cached_resource..
+matching the name and scope provided to the cached_resource.
+
+Note that read() and write() are atomic and ordering is not enforced.
+Wait_for_change() will only make the change in the NBA region, after
+all changes have settled for the current time step.
 
                               * * * * *
 
