@@ -49,9 +49,9 @@ Here is the API:
     
   * task wait_for_change();
 
-    blocking task that unblocks when the bound resource changes value
-    through write() on any cached_resource bound to it.  Writing the
-    same value does not unblock it.  Changes made through the
+    A blocking task that unblocks when the bound resource changes
+    value through write() on any cached_resource bound to it.  Writing
+    the same value does not unblock it.  Changes made through the
     uvm_resource or uvm_resource_db API do not unblock it at all.
 
 ** Use Models
@@ -146,7 +146,7 @@ the same, but proc2 waits for the changed resource.
     forever begin
       n_bytes_rsrc.wait_for_change();
       n_bytes_rsrc.read(n_bytes, this);
-      for(uint32_t idx = 0; idx < n_bytes, idx++) begin
+      for(uint32_t idx = 0; idx < n_bytes; idx++) begin
         ...
       end
     end
@@ -159,13 +159,14 @@ resource changes value.
 To ensure that wait_for_change triggers correctly, the cached_resource
 tracks changes.  However, it can only track changes made through the
 cached_resource interface.  If a resource's value is changed by other
-means then wait_for_change will noit unblock waiters. Calling refresh
+means then wait_for_change will not unblock waiters. Calling refresh
 will go back to the resource database to obtain the latest resource
 matching the name and scope provided to the cached_resource.
 
-Note that read() and write() are atomic and ordering is not enforced.
-Wait_for_change() will only make the change in the NBA region, after
-all changes have settled for the current time step.
+Note that read() and write() are atomic and process ordering is not
+enforced.  Wait_for_change() returns after NBA region within the
+current time step, allowing all the changes to settle. The resource
+will have the value of the last write in the time step.
 
                               * * * * *
 
