@@ -1,4 +1,4 @@
-LCached Resource
+Cached Resource
 ---------------
 
 Looking up an item in the UVM resource database can be expensive. That
@@ -82,6 +82,14 @@ resource object, a cached resource can be used as a means to
 communicate information between processes -- a back channel, if you
 will.
 
+You can change the value of a cached resource by calling
+write(). Other cached_resources that have cached the same resource
+will see the new value the next time they call read().  You can also
+use the blocking task wait_for_change() to unblock when the underlying
+resource changes value.  It will not unblock if the new value is the
+same as the old value.  You can have multiple waiters. All will
+unblock when the value changes.
+
 The following example has two processes, proc1 and proc2.  Proc1 sends
 bytes (through some channel) to proc2.  Additionally, it informs proc2
 of how many bytes to expect via a cached resource.  This model
@@ -147,10 +155,11 @@ As its name implies, the wait_for_change() task blocks until the
 resource changes value.
 
 To ensure that wait_for_change triggers correctly, the cached_resource
-tracks changes.  However, it can only trsck changes made through the
+tracks changes.  However, it can only track changes made through the
 cached_resource interface.  If a resource's value is changed by other
-means then wait_for_change will not operate correctly.  It can be
-re-synchronized bgy calling refresh().
+means then wait_for_change will not operate correctly. Calling refresh
+will go back to the resource database to obtain the latest resource
+matching the the name and scope provided to the cached_resource..
 
                               * * * * *
 

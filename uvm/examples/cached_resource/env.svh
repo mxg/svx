@@ -93,6 +93,7 @@ class env extends uvm_component;
     fork
       first_process();
       second_process();
+      third_process();
     join_any
 
     phase.drop_objection(this);
@@ -131,7 +132,23 @@ class env extends uvm_component;
       cr.wait_for_change();
       if(!cr.read(number, this))
 	`uvm_error("CR/SECOND", "Error reading number.")
-      $display("%10t: number changed to %0d", $time, number);
+      $display("%10t: second - number changed to %0d", $time, number);
+    end
+    
+  endtask
+
+  //--------------------------------------------------------------------
+  // third_process
+  //--------------------------------------------------------------------
+  task third_process();
+    uint32_t number;
+    cached_resource#(uint32_t) cr = new(get_full_name(), "number");
+    
+    forever begin
+      cr.wait_for_change();
+      if(!cr.read(number, this))
+	`uvm_error("CR/SECOND", "Error reading number.")
+      $display("%10t: third  - number changed to %0d", $time, number);
     end
     
   endtask

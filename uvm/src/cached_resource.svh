@@ -92,7 +92,6 @@ class cached_resource#(type T=int) extends cached_resource_base;
 
   typedef uvm_resource#(T) rsrc_t;
   local rsrc_t rsrc;
-  local T last_seen;
   local uint32_t seen;
   local cached_resource_shared shrd;
   
@@ -109,8 +108,6 @@ class cached_resource#(type T=int) extends cached_resource_base;
     scope = _scope;
     if(!leave_unbound) begin
       ok = update_cache(scope, name);
-      if(ok)
-	last_seen = rsrc.read(null);
     end
   endfunction
 
@@ -141,7 +138,6 @@ class cached_resource#(type T=int) extends cached_resource_base;
     end
     
     shrd = cached_resource_base::get_shared(rsrc_base);
-    last_seen = rsrc.read(null);
     seen = shrd.version;
     return 1;
     
@@ -194,7 +190,6 @@ class cached_resource#(type T=int) extends cached_resource_base;
     end
 
     val = rsrc.read(accessor);
-    last_seen = val;
     seen = shrd.version;
     return 1;    
   endfunction    
@@ -213,11 +208,13 @@ class cached_resource#(type T=int) extends cached_resource_base;
     end
 
     // Are we actually changing the value?
-    if(val == rsrc.read(accessor))
+    if(val == rsrc.read(null))
       return;
-    
-    shrd.version++;
-    rsrc.write(val, accessor);
+
+    if(!rsrc.is_read_only()) begin
+      rsrc.write(val, accessor);
+      shrd.version++;
+    end
   endfunction
 
   //--------------------------------------------------------------------
@@ -234,7 +231,6 @@ class cached_resource#(type T=int) extends cached_resource_base;
     wait (shrd.version != seen);
     uvm_wait_for_nba_region(); // make sure all the changes have settled
     seen = shrd.version;
-    last_seen = rsrc.read(null);
     
   endtask
   
