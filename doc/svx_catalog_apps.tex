@@ -34,7 +34,7 @@
   \vspace{0.5em}
   {\large Core Library Applications\par}
   \vspace{2em}
-  {\large Version 2.1.3~beta\par}
+  {\large Version 2.2.1~beta\par}
   \vspace{0.5em}
   {\large November 2026\par}
   \vspace{0.5em}
@@ -80,12 +80,19 @@ operation is aborted and an error code is recorded.
 \section*{Error Reporting}
 
 After every read or write operation the caller can inspect whether the
-operation succeeded.  \texttt{last\_operation\_failed()} returns
-\texttt{1} if an error occurred.  \texttt{get\_last\_error()} returns the
-specific \texttt{error\_t} value, and \texttt{get\_last\_op\_string()}
-returns a human-readable string that names the operation, the address, and
-the reason for failure.  This is particularly useful for debug and
-self-checking testbenches.
+operation succeeded:
+
+\begin{itemize}
+  \item \texttt{last\_operation\_failed()} returns \texttt{1} if an
+    error occurred.
+  \item \texttt{get\_last\_error()} returns the specific
+    \texttt{error\_t} value.
+  \item \texttt{get\_last\_op\_string()} returns a human-readable
+    string that names the operation, the address, and the reason for
+    failure.
+\end{itemize}
+
+This is particularly useful for debug and self-checking testbenches.
 
 \section*{Bounded Memory}
 
@@ -462,7 +469,13 @@ extends SVX's \texttt{typed\_container\#(T,P)} and inherits its
 
 \section{Class: \texttt{pri\_queue}}
 
-Declared as \texttt{pri\_queue\#(type T=int, type P=void\_traits)} in \texttt{pri\_queue\_pkg}.  Constructor: \texttt{new()} --- no arguments required.
+Declared in \texttt{pri\_queue\_pkg} as:
+
+\begin{verbatim}
+pri_queue#(type T=int, type P=void_traits)
+\end{verbatim}
+
+Constructor: \texttt{new()} --- no arguments required.
 
 \begin{xltabular}{\linewidth}{lllX}
 \toprule

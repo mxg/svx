@@ -40,7 +40,7 @@
   \vspace{0.5em}
   {\large Core Library and UVM Utilities\par}
   \vspace{2em}
-  {\large Version 2.1.3~beta\par}
+  {\large Version 2.2.1~beta\par}
   \vspace{0.5em}
   {\large November 2026\par}
   \vspace{0.5em}
@@ -406,5 +406,26 @@ The configuration driver waits for reset to end, drives the configuration regist
   \item \texttt{deque\#(T,P)}
   \item \texttt{agreement}
   \item \texttt{mem\#(ADDR\_BITS,PAGE\_BITS,BLOCK\_BITS,WORD\_SIZE)}
+\end{itemize}
+\chapter{Cached Resources}
+
+The cached resource example shows how a cached resource keeps its binding, how to refresh it, and how several processes wait for changes made by another.
+
+\section{Cached Resource Updates and Waiters}
+
+\textit{Source:} \texttt{uvm/examples/cached\_resource}\\
+
+In \texttt{build\_phase} the environment puts a \texttt{uint32\_t} resource named \texttt{"number"} with the value 382 into the resource database. In \texttt{connect\_phase} it creates a cached resource for \texttt{"number"} and reads 382. It then adds a resource with the value 67 using \texttt{set\_override()}, which takes precedence. A second read through the cached resource still returns 382, because the cached resource stays bound to the resource it found first; after \texttt{get\_the\_latest()} it is bound to the new resource and returns 67. Any other result is reported as an error.
+
+In \texttt{run\_phase} three processes each create their own cached resource for \texttt{"number"}. The first writes a series of values at different times, ending with three writes in a single time step, separated only by \texttt{\#0} delays. The second and third processes wait with \texttt{wait\_for\_change()} and print each new value. Both report every change, which shows that any number of processes can wait on the same resource. The three writes in one time step appear as a single change to the last value, because \texttt{wait\_for\_change()} returns only after the changes in that time step have settled. The test ends when the first process finishes.
+
+\textbf{SVX features exhibited:}
+
+\begin{itemize}
+  \item \texttt{cached\_resource\#(T)}
+  \item \texttt{cached\_resource\#(T)::read()}
+  \item \texttt{cached\_resource\#(T)::write()}
+  \item \texttt{cached\_resource\#(T)::get\_the\_latest()}
+  \item \texttt{cached\_resource\#(T)::wait\_for\_change()}
 \end{itemize}
 \end{document}
