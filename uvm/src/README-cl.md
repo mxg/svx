@@ -1,4 +1,4 @@
-Command Line Processor
+# Command Line Processor
 ----------------------
 
 The Command line processor traverses the list of command line
@@ -32,6 +32,8 @@ of cl_parse.
   cl_parse clp = cl_parse::get();
   clp.parse();
 
+## Resource Database
+
 Parse() parses each plusarg on the command line and validates it
 against the table of options.  After all the options and their
 arguments have been validated then they are put into the resource
@@ -46,7 +48,13 @@ uvm_resource_db interface.
   uvm_resource_db#(int)::read_by_name("CL::", "size", size, this);
 
 The synthetic scope "CL::" ensures that command line options do not
-conflict with other items in the resource database.
+conflict with other items in the resource database.  You can define a
+scope other than "CL::" by changing the macro CL_SCOPE.  The best way
+to do this to ensure there are no file ordering issues is to put the
+new defining on the compile command line.  E.g.,
++define+CL_SCOPE=\"NEW_CL::\".
+
+## Order of Operations
 
 Populating the option table and parsing the command line should be
 done as early as possible to ensure that all the phases have access to
@@ -69,6 +77,8 @@ run_test().  E.g.,
     end
 
   endmodule
+
+## Supported Types
 
   The command line parser supports a wide range of scalar and string types:
   
@@ -155,6 +165,8 @@ Note that there are no ticks in the number.  Command shells use ticks
 command line values. As with unsized values, the value must fit into
 the data type specified for the option.
 
+## cl#() Interface
+
 The cl#() interface provides means for retrieving the values of
 command line options.
 
@@ -183,7 +195,14 @@ command line options.
     get_nth() will return value of the nth instance on the command
     line.  The functions returns 1 if the lookup succeeds.  It will
     return 0 if n is out of ranfe or the named option is not in the
-    resource database.	 
+    resource database.
+
+    Note: the order of the compand line options in the resource
+    database is determined by how they are inserted into the database.
+    The mechanism that populates the resource database with the
+    command line options uses uvm_resource_db#()::set_override() to
+    ensure that the newest option is added to the head of the queue
+    and will be the first to be found.
 
 The SVX Command Line Parser has some builtin command line options.
 

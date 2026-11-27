@@ -26,6 +26,8 @@
 // permissions and limitations under the License.
 //======================================================================
 
+`include "svx_uvm_macros.svh"
+
 //----------------------------------------------------------------------
 // svx_uvm_pkg
 //----------------------------------------------------------------------
@@ -59,3 +61,4 @@ package svx_uvm_pkg;
   `include "cached_resource.svh"
 
 endpackage
+

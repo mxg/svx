@@ -209,7 +209,8 @@ class populate_multimap extends accum_fcn#(cl_opt_instance_base, opt_mm_t);
       if(q_size > 0) begin
 	`uvm_error(SVX_CL_MSG_ID, {"Multiple instances of option ",
 				   opt_name,
-				   " are not allowed on the command line"})
+				   " are not allowed on the command line. ",
+				   " Option instance skipped."})
 	return;
       end
     end
@@ -264,8 +265,9 @@ class cl_parse;
   local function void add_builtin_options();
     cl#(bit)::add_with_default("svx_cl_dump", 0, 
 			       "Dump the command line option table");
+    // Allow multiple instances of +plugin on the command line.
     cl#(string)::add("plugin", 
-		     "Specify a plugin to be installed and activated");
+		     "Specify a plugin to be installed and activated", 1);
     cl#(bit)::add("svx_help",
 		  "Dump the command line option table and then exit");
   endfunction
@@ -388,7 +390,9 @@ class cl_parse;
 				 errs);
 
     //------------------------------------------------------------------
-    // Third pass. Put all the option instances into a multimap.
+    // Third pass. Put all the option instances into a multimap.  This
+    // allows us to determine which options have multiple instances on
+    // the command line.
 
     opt_mm = new();
     populate_mm = new();

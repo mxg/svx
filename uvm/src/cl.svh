@@ -406,7 +406,7 @@ class cl #(type T=int);
     // This failure should never happen, but it's prudent to check
     // anyway.
     if(!$cast(r, rsrc)) begin
-      `uvm_error(SVX_CL_MSG_ID, {"Unable to cast value of",
+      `uvm_error(SVX_CL_MSG_ID, {"Unable to cast value of ",
 				 "command line option ",
 				 name})
       return 0;

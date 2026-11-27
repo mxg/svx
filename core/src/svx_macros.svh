@@ -37,6 +37,4 @@
 `include "utils/msg_macros.svh"
 `include "lexer/ctypes_macros.svh"
 
-`define CL_SCOPE "CL::"
-  
 `endif
