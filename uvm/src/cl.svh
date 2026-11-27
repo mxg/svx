@@ -281,7 +281,7 @@ class cl #(type T=int);
   //--------------------------------------------------------------------
   // add
 
-  // Add a new comnmand line option to the option table. The multiple
+  // Add a new comnand line option to the option table. The multiple
   // flag indicates whether the option allows for multiple instances
   // on the command line.
   //--------------------------------------------------------------------
@@ -319,7 +319,7 @@ class cl #(type T=int);
   //
   // Add a new option along with its default value.  Multiple is not
   // supported in this function.  You cannot have a command line
-  // option that acccepts multipole instances and has a default value.
+  // option that acccepts multiple instances and has a default value.
   //--------------------------------------------------------------------
   static function void add_with_default(string name, T def, 
 					string desc="",
@@ -371,7 +371,7 @@ class cl #(type T=int);
   //--------------------------------------------------------------------
   // get
   //
-  // Get the option insetance's value. If there are more than one
+  // Get the option instance's value. If there are more than one
   // instance then return the value of the first one.
   //--------------------------------------------------------------------
   static function bit get(string name, 
@@ -386,7 +386,7 @@ class cl #(type T=int);
   // get_nth
   //
   // For options where there are multiple instance on the command
-  // line, reutnr the nth.  If n > than the number of options, return
+  // line, return the nth.  If n > than the number of options, return
   // 0 representing an error.
   //--------------------------------------------------------------------
   static function bit get_nth(string name, uint32_t n,

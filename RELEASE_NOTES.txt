@@ -11,6 +11,9 @@ November 2026
 * ADDED: Cached resource, along with a usage example and a
   README-cached_resource.md file that explains its use model.
 
+* ADDED: Support for multiple instances of an option on the command
+  line.
+
 * ADDED: new functions to the cl#() command line interface.
     - get() returns the value of a command line option.
     - get_num_opts() returns the number of instances of an option
@@ -19,6 +22,7 @@ November 2026
       line option.
 
 * CHANGED: The order of the arguments for cl#()::add() have changed.
+  The new order is add(name, desc, multiple, fmt).
     
 
 ----------------------------------------------------------------------

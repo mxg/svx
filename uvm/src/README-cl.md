@@ -29,14 +29,14 @@ are optional.
   name - the name of the option
   desc - A string describing the option
   multiple - 1 allows multiple instances of the option on the command
-             line, a disallows multiple instances.
+             line, a 0 disallows multiple instances.
   fmt - An override of the default print format for this option.
 
 Add_with_default is like add, except it also includes a default
 value for the option.  Options with defaults cannot allow multiple
 instances.
 
-``
+```
   void add_with_default(string name, T def, 
                         string desc="",
                         string fmt="")
@@ -222,7 +222,7 @@ the data type specified for the option.
 The cl#() interface provides means for retrieving the values of
 command line options.
 
-'''
+```
     bit get(string name, 
             inout T val, 
             input uvm_object accessor = null);
@@ -239,9 +239,7 @@ command line options.
 
     For options that allow multiple instances on the command line,
     get_num_opts() returns the number of instances -- i.e., the number
-    of times an option appears on the command line.  For options that
-    allow only one instance it will return 1 if there is ansd instance
-    on the command line.
+    of times an option appears on the command line.
 
 ```
     bit get_nth(string name, uint32_t n,
@@ -270,7 +268,7 @@ The SVX Command Line Parser has some builtin command line options.
 
   * `+svx_cl_dump` : dumps the command line option table.
 
-  * `+svx_hel`p    : Prints help information including the SVX version
+  * `+svx_help     : Prints help information including the SVX version
                      number and the command line option table, and then
 		     terminates.
 
