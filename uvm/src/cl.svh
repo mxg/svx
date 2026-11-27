@@ -281,7 +281,7 @@ class cl #(type T=int);
   //--------------------------------------------------------------------
   // add
 
-  // Add a new comnmand line opotion to the option table. The multiple
+  // Add a new comnmand line option to the option table. The multiple
   // flag indicates whether the option allows for multiple instances
   // on the command line.
   //--------------------------------------------------------------------

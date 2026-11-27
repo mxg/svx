@@ -1,10 +1,11 @@
 # Command Line Processor
-----------------------
 
 The Command line processor traverses the list of command line
 arguments provided by uvm_cmdline_processor.  It parses each argument,
 looks for an associated value, and puts the option into the resource
 database.
+
+## Option Table
 
 The set of available command line options is stored in a table managed
 by the class cl.  Cl has two static functions for adding new options
@@ -13,24 +14,55 @@ to the table and add_with_default() adds a new option along with a
 default value.  cl is a parameterized class.  The parameter represents
 the type of the option being added to the table.  For example,
 
+```
   cl#(int)::add("xyz");
+```
 
-adds a new option to the table named "xyz" and has a type of int. The
-command line options are _plusargs_, meaning that the command line
+is the simplest way to add a new option named "xyz" to the table with
+a type of int.  Add() takes four arguments, the last three of which
+are optional.
+
+```
+  void add(string name, string desc="", bit multiple=0, string fmt="")
+```
+
+  name - the name of the option
+  desc - A string describing the option
+  multiple - 1 allows multiple instances of the option on the command
+             line, a disallows multiple instances.
+  fmt - An override of the default print format for this option.
+
+Add_with_default is like add, except it also includes a default
+value for the option.  Options with defaults cannot allow multiple
+instances.
+
+``
+  void add_with_default(string name, T def, 
+                        string desc="",
+                        string fmt="")
+```
+
+## Parsing
+  
+The command line options are _plusargs_, meaning that the command line
 processor identifies them by their leading "+" character.  The plus
 sign does not need to be supplied as part of the name for cl::add()
 and cl::add_with_default().
 
 You can print out the command option table with the following call:
 
+```
   cl_mgr::dump();
+```
 
 To execute the parsing operation you need to get a handle to the
 parser object and call parse().  Get() retrieves the singleton handle
 of cl_parse.
 
+```
   cl_parse clp = cl_parse::get();
   clp.parse();
+```
 
 ## Resource Database
 
@@ -44,15 +76,17 @@ database using the scope "CL::".  E.g.,
 You can retrieve command line options from the database using the
 uvm_resource_db interface.
 
+```
   int size;
   uvm_resource_db#(int)::read_by_name("CL::", "size", size, this);
+```
 
 The synthetic scope "CL::" ensures that command line options do not
 conflict with other items in the resource database.  You can define a
 scope other than "CL::" by changing the macro CL_SCOPE.  The best way
-to do this to ensure there are no file ordering issues is to put the
-new defining on the compile command line.  E.g.,
-+define+CL_SCOPE=\"NEW_CL::\".
+to ensure there are no file ordering issues is to put the new
+definition on the compile command line.  E.g.,
+`+define+CL_SCOPE=\"NEW_CL::\"`.
 
 ## Order of Operations
 
@@ -61,6 +95,7 @@ done as early as possible to ensure that all the phases have access to
 the option values.  We recommend that this be done _before_ calling
 run_test().  E.g.,
 
+```
   module top;
 
     function static void populate();
@@ -77,6 +112,7 @@ run_test().  E.g.,
     end
 
   endmodule
+```
 
 ## Supported Types
 
@@ -107,11 +143,14 @@ or +<option>=<value>.  In the first form the option represents a
 _switch_ whose type is bit.  Without a value the switch is turned on.
 For example,
 
+```
   +x_mode
+```
 
 Turns on the switch x_mode, i.e., sets its value to 1. This is
 semantically equivalent to the following command lines:
 
+```
   +x_mode=1
   +x_mode=ON
   +x_mode=on
@@ -119,9 +158,11 @@ semantically equivalent to the following command lines:
   +x_mode=true
   +x_mode=YES
   +x_mode=yes
+```
 
 Similarly, a switch can be turned off with these command lines:
 
+```
   +x_mode=0
   +x_mode=OFF
   +x_mode=off
@@ -129,26 +170,35 @@ Similarly, a switch can be turned off with these command lines:
   +x_mode=false
   +x_mode=NO
   +x_mode=no
+```
 
 In the second form, +<option>=<value> there cannot be any spaces on
 either side of the equal sign.
 
+```
   +size = 8  !!ILLEGAL!!
   +size=8    Legal
+```
 
 Also, the type of the value must match the type defined when the
 option was added to the option table. E.g., let's add "bias" as byte
 typed option.
 
+```
   cl#(byte)::add("bias");
+```
 
 On the command line we can put
 
+```
   +bias=10
+```
 
 However, a numeric value that does not fit into a byte is illegal:
 
+```
   +bias=2000  !!ILLEGAL!!
+```
 
 Even though it is syntactically correct, 2000 does not fit into 8 bits
 and will be rejected by the parser.
@@ -156,9 +206,11 @@ and will be rejected by the parser.
 Numeric values can be sized and can be specified in different bases,
 much like in SystemVerilog.  Underscores are also legal. E.g.,
 
+```
    32hf77_7003c
    12b011_000_111_010
    8o361
+```
 
 Note that there are no ticks in the number.  Command shells use ticks
 (single quotes) for their own purposes, so we avoided using them in
@@ -170,34 +222,44 @@ the data type specified for the option.
 The cl#() interface provides means for retrieving the values of
 command line options.
 
-  static function bit get(string name, 
-			  inout	 T val, 
-			  input	 uvm_object accessor = null);
+'''
+    bit get(string name, 
+            inout T val, 
+            input uvm_object accessor = null);
+```
 
     get() returns the value of a command line option though the inout
     argument "val."  It is essentially a wrapper around
     uvm_resource_db#()::read_by_name().  The function returns a 1 if
     the lookup succeeded and the value of val is valid, a 0 otherwise.
-    
-  static function uint32_t get_num_opts(string name);
+
+```
+    uint32_t get_num_opts(string name);
+```
 
     For options that allow multiple instances on the command line,
-    get_num_opts() returns the number of instances -- i.e;, the number
+    get_num_opts() returns the number of instances -- i.e., the number
     of times an option appears on the command line.  For options that
     allow only one instance it will return 1 if there is ansd instance
     on the command line.
-    
-  static function bit get_nth(string name, uint32_t n,
-			      inout  T val,
-			      input uvm_object accessor = null);
 
-    For options thjat allow multiple instances on the command line,
+```
+    bit get_nth(string name, uint32_t n,
+                inout  T val,
+		input uvm_object accessor = null);
+```
+
+    For options that allow multiple instances on the command line,
     get_nth() will return value of the nth instance on the command
     line.  The functions returns 1 if the lookup succeeds.  It will
-    return 0 if n is out of ranfe or the named option is not in the
+    return 0 if n is out of range or the named option is not in the
     resource database.
 
-    Note: the order of the compand line options in the resource
+    Get_num_opts() and get_nth() are for use with options that allow
+    multiple instances on the command line.  Use get() to obtain the
+    value of options with single instances.
+
+    Note: the order of the command line options in the resource
     database is determined by how they are inserted into the database.
     The mechanism that populates the resource database with the
     command line options uses uvm_resource_db#()::set_override() to
@@ -206,14 +268,14 @@ command line options.
 
 The SVX Command Line Parser has some builtin command line options.
 
-  * +svx_cl_dump : dumps the command line option table.
+  * `+svx_cl_dump` : dumps the command line option table.
 
-  * +svx_help    : Prints help information including the SVX version
-                   number and the command line option table, and then
-		   terminates.
+  * `+svx_hel`p    : Prints help information including the SVX version
+                     number and the command line option table, and then
+		     terminates.
 
-  * +plugin      : Specifies a UVM plugin to be instantiated and
-                   activated.
+  * `+plugin`      : Specifies a UVM plugin to be instantiated and
+                     activated.
   
 
                               * * * * *
