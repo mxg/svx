@@ -164,7 +164,7 @@ will go back to the resource database to obtain the latest resource
 matching the name and scope provided to the cached_resource.
 
 Note that read() and write() are atomic and process ordering is not
-enforced.  Wait_for_change() returns after NBA region within the
+enforced.  Wait_for_change() returns after the NBA region within the
 current time step, allowing all the changes to settle. The resource
 will have the value of the last write in the time step.
 

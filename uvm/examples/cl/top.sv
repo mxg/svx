@@ -61,11 +61,11 @@ module top;
     cl#(uint32_t)::add_with_default("channels", 4);
     cl#(string)::add_with_default("name", "<none>");
     cl#(int32_t)::add_with_default("bias", 0);
-    cl#(uint32_t)::add("base", "Base address", "%8x");
-    cl#(uint64_t)::add("data", "", "%16x");
-    cl#(int64_t)::add("bignum");
-    cl#(int8_t)::add("smallnum");
-    cl#(string)::add("file");
+    cl#(uint32_t)::add("base", "Base address", 0, "%8x");
+    cl#(uint64_t)::add("data", "", 0, "%16x");
+    cl#(int64_t)::add("bignum", "Big Number", 1);
+    cl#(int8_t)::add("smallnum", "Small Number", 1);
+    cl#(string)::add("file", "File Name", 1);
     
     // Parse the options.  Each option is validated and its value (if
     // there is one) is validated against the specified type.  The

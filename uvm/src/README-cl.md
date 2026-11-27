@@ -155,6 +155,36 @@ Note that there are no ticks in the number.  Command shells use ticks
 command line values. As with unsized values, the value must fit into
 the data type specified for the option.
 
+The cl#() interface provides means for retrieving the values of
+command line options.
+
+  static function bit get(string name, 
+			  inout	 T val, 
+			  input	 uvm_object accessor = null);
+
+    get() returns the value of a command line option though the inout
+    argument "val."  It is essentially a wrapper around
+    uvm_resource_db#()::read_by_name().  The function returns a 1 if
+    the lookup succeeded and the value of val is valid, a 0 otherwise.
+    
+  static function uint32_t get_num_opts(string name);
+
+    For options that allow multiple instances on the command line,
+    get_num_opts() returns the number of instances -- i.e;, the number
+    of times an option appears on the command line.  For options that
+    allow only one instance it will return 1 if there is ansd instance
+    on the command line.
+    
+  static function bit get_nth(string name, uint32_t n,
+			      inout  T val,
+			      input uvm_object accessor = null);
+
+    For options thjat allow multiple instances on the command line,
+    get_nth() will return value of the nth instance on the command
+    line.  The functions returns 1 if the lookup succeeds.  It will
+    return 0 if n is out of ranfe or the named option is not in the
+    resource database.	 
+
 The SVX Command Line Parser has some builtin command line options.
 
   * +svx_cl_dump : dumps the command line option table.

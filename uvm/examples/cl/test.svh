@@ -60,76 +60,71 @@ class test extends uvm_component;
     int64_t bignum;
     int8_t smallnum;
 
+    bit ok;
+    uint32_t n;
+    uint32_t idx;
+
     $display("\n--- Command Line Options stored in the resource database ---");
+   // Let's see if everything is in the resource database.
+
+    ok = cl#(string)::get("name", name, this);
+    $display("name = %s", name);
+
+    ok = cl#(uint32_t)::get("size", size, this);
+    $display("size = %0d", size);
+
+    ok = cl#(int16_t)::get("offset", offset, this);
+    $display("offset = %0d", offset);
+
+    ok = cl#(real)::get("freq", freq, this);
+    $display("freq = %0g", freq);
+
+    ok = cl#(bit)::get("x_mode", x_mode, this);
+    $display("x_mode = %s", ((x_mode==1) ? "ON" : "OFF"));
+
+    ok = cl#(bit)::get("z_mode", z_mode, this);
+    $display("z_mode = %s", ((z_mode==1) ? "ON" : "OFF"));
+
+    ok = cl#(uint32_t)::get("channels", channels, this);
+    $display("channels = %0d", channels);
+
+    ok = cl#(int32_t)::get("bias", bias, this);
+    $display("bias = %0d", bias);
+
+    ok = cl#(uint32_t)::get("base", base, this);
+    $display("base = %8x", base);    
+
+    // File allows multiple instances on the command line, so
+    // let's look at all of them.
+    n = cl#(string)::get_num_opts("file");
+    $display("file:");
+    for(idx = 0; idx < n; idx++) begin
+      string val;
+      bit ok =  cl#(string)::get_nth("file", idx, val, this);
+      $display("  %2d: %s", idx, val);
+    end
+
+    ok = cl#(uint64_t)::get("data", data, this);
+    $display("data = %x", data);    
+
+    ok = cl#(int64_t)::get("bignum", bignum, this);
+    $display("bignum = %0d", bignum);        
+
+    // Smallnum allows multiple instances on the command line, so
+    // let's look at all of them.
+    n = cl#(int8_t)::get_num_opts("smallnum");
+    $display("smallnum:");
+    for(idx = 0; idx < n; idx++) begin
+      int8_t val;
+      bit ok = cl#(int8_t)::get_nth("smallnum", idx, val, this);
+      $display("  %2d: %3d", idx, val);
+    end
     
-    // Let's see if everything is in the resource database.
-    if(!uvm_resource_db#(string)::read_by_name("CL::", "name", name, this))
-      `uvm_error("NOT FOUND", "Not found in the resource database: name")
-    else
-      $display("name = %s", name);
-
-    if(!uvm_resource_db#(uint32_t)::read_by_name("CL::", "size", size, this))
-      `uvm_error("NOT FOUND", "Not found in the resource database: size")
-    else
-      $display("size = %0d", size);
-
-    if(!uvm_resource_db#(int16_t)::read_by_name("CL::", "offset", offset, this))
-      `uvm_error("NOT FOUND", "Not found in the resource database: offset")
-    else
-      $display("offset = %0d", offset);
-
-    if(!uvm_resource_db#(real)::read_by_name("CL::", "freq", freq, this))
-      `uvm_error("NOT FOUND", "Not found in the resource database: freq")
-    else
-      $display("freq = %0g", freq);
-
-    if(!uvm_resource_db#(bit)::read_by_name("CL::", "x_mode", x_mode, this))
-      `uvm_error("NOT FOUND", "Not found in the resource database: x_mode")
-    else
-      $display("x_mode = %s", ((x_mode==1) ? "ON" : "OFF"));
-
-    if(!uvm_resource_db#(bit)::read_by_name("CL::", "z_mode", z_mode, this))
-      `uvm_error("NOT FOUND", "Not found in the resource database: z_mode")
-    else
-      $display("z_mode = %s", ((z_mode==1) ? "ON" : "OFF"));
-
-    if(!uvm_resource_db#(uint32_t)::read_by_name("CL::", "channels", channels, this))
-      `uvm_error("NOT FOUND", "Not found in the resource database: channels")
-    else
-      $display("channels = %0d", channels);
-
-    if(!uvm_resource_db#(int32_t)::read_by_name("CL::", "bias", bias, this))
-      `uvm_error("NOT FOUND", "Not found in the resource database: bias")
-    else
-      $display("bias = %0d", bias);
-
-    if(!uvm_resource_db#(uint32_t)::read_by_name("CL::", "base", base, this))
-      `uvm_error("NOT FOUND", "Not found in the resource database: base")
-    else
-      $display("base = %8x", base);    
-
-    if(!uvm_resource_db#(string)::read_by_name("CL::", "file", file, this))
-      `uvm_error("NOT FOUND", "Not found in the resource database: file")
-    else
-      $display("file = %s", file);
-
-    if(!uvm_resource_db#(uint64_t)::read_by_name("CL::", "data", data, this))
-      `uvm_error("NOT FOUND", "Not found in the resource database: data")
-    else
-      $display("data = %x", data);    
-
-    if(!uvm_resource_db#(int64_t)::read_by_name("CL::", "bignum", bignum, this))
-      `uvm_error("NOT FOUND", "Not found in the resource database: bignum")
-    else
-      $display("bignum = %0d", bignum);        
-    
-    if(!uvm_resource_db#(int8_t)::read_by_name("CL::", "smallnum", smallnum, this))
-      `uvm_error("NOT FOUND", "Not found in the resource database: smallnum")
-    else
-      $display("smallnum = %0d", smallnum);        
+    // ok = cl#(int8_t)::get("smallnum", smallnum, this);
+    // $display("smallnum = %0d", smallnum);        
     
     $display("--- End Command Line Options ---");
-    
+
   endfunction
 
 endclass

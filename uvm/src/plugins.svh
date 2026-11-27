@@ -47,7 +47,7 @@ class plugins;
     uvm_resource_pool rp = uvm_resource_pool::get();
     // Obtain a queue of all "plugin" command line options from the
     // resource database.
-    uvm_resource_types::rsrc_q_t q = rp.lookup_name("CL::", "plugin", th, 0);
+    uvm_resource_types::rsrc_q_t q = rp.lookup_name(`CL_SCOPE, "plugin", th, 0);
 
     // Is there at least one plugin specified on the command line?
     if(q.size() == 0) begin

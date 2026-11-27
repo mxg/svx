@@ -128,6 +128,12 @@ module cl_parse_unit_test;
       return n;
     endfunction
 
+    static function string add_multi();
+      string n = opt_names::next();
+      cl#(T)::add(n, "", 1);
+      return n;
+    endfunction    
+
     static function string add_with_default(T def);
       string n = opt_names::next();
       cl#(T)::add_with_default(n, def);
@@ -431,7 +437,7 @@ module cl_parse_unit_test;
       string n;
 
       cl_mgr::clr_parse_flag();
-      n = opt#(int32_t)::add();
+      n = opt#(int32_t)::add_multi();
       parse_args({$sformatf("+%s=1", n), $sformatf("+%s=2", n)});
       `FAIL_UNLESS(catcher.n_errors == 0)
       `FAIL_UNLESS(opt#(int32_t)::get(n, v))

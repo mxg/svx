@@ -11,6 +11,14 @@ November 2026
 * ADDED: Cached resource, along with a usage example and a
   README-cached_resource.md file that explains its use model.
 
+* ADDED: new functions to the cl#() command line interface.
+    - get() returns the value of a command line option.
+    - get_num_opts() returns the number of instances of an option
+      found on the command line.
+    - get_nth() returns the value of the nth instance of a command
+      line option.
+    
+
 ----------------------------------------------------------------------
 
 RELEASE NOTES

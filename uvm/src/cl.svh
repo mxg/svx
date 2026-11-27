@@ -52,7 +52,6 @@ class cl_mgr;
   local function new();
   endfunction
 
-
   // Keep track of whether the parser has been called once.
   static function void set_parse_flag();
     parse_flag = 1;
@@ -281,9 +280,14 @@ class cl #(type T=int);
 
   //--------------------------------------------------------------------
   // add
+
+  // Add a new comnmand line opotion to the option table. The multiple
+  // flag indicates whether the option allows for multiple instances
+  // on the command line.
   //--------------------------------------------------------------------
   static function void add(string name,
 			   string desc="",
+			   bit	  multiple=0,
 			   string fmt="");
 
     cl_opt_desc_base opt;
@@ -304,6 +308,7 @@ class cl #(type T=int);
     if(fmt != "")
       opt.fmt = fmt;
     opt.desc = desc;
+    opt.multiple = multiple;
     
     void'(cl_mgr::add(name, opt));
     
@@ -311,9 +316,13 @@ class cl #(type T=int);
 
   //--------------------------------------------------------------------
   // add_with_default
+  //
+  // Add a new option along with its default value.  Multiple is not
+  // supported in this function.  You cannot have a command line
+  // option that acccepts multipole instances and has a default value.
   //--------------------------------------------------------------------
   static function void add_with_default(string name, T def, 
-					string desc="", 
+					string desc="",
 					string fmt="");
 
     cl_opt_desc_base opt;
@@ -350,12 +359,75 @@ class cl #(type T=int);
     val.set(def);
     val.set_default_fmt(opt.fmt);
     opt_desc.default_value = val;
+    opt_desc.multiple = 0;
 
     // Add the option into the table and put the default value into
     // the resource database.
     if(cl_mgr::add(name, opt))
-      uvm_resource_db#(T)::set("CL::*", name, def, null);
+      uvm_resource_db#(T)::set({`CL_SCOPE, "*"}, name, def, null);
     
+  endfunction
+
+  //--------------------------------------------------------------------
+  // get
+  //
+  // Get the option insetance's value. If there are more than one
+  // instance then return the value of the first one.
+  //--------------------------------------------------------------------
+  static function bit get(string name, 
+			  inout	 T val, 
+			  input	 uvm_object accessor = null);
+    if(!uvm_resource_db#(T)::read_by_name(`CL_SCOPE, name, val, accessor))
+      return 0;
+    return 1;
+  endfunction
+
+  //--------------------------------------------------------------------
+  // get_nth
+  //
+  // For options where there are multiple instance on the command
+  // line, reutnr the nth.  If n > than the number of options, return
+  // 0 representing an error.
+  //--------------------------------------------------------------------
+  static function bit get_nth(string name, uint32_t n,
+			      inout  T val,
+			      input uvm_object accessor = null);
+    uvm_resource_pool rp = uvm_resource_pool::get();
+    uvm_resource_base th = uvm_resource#(T)::get_type();
+    uvm_resource_types::rsrc_q_t q = rp.lookup_name(`CL_SCOPE, name, th, 0);
+    uvm_resource_base rsrc;
+    uvm_resource#(T) r;
+    
+    if(n >= q.size())
+      return 0;
+
+    // The queue is in reverse order of the command line
+    rsrc = q.get(q.size()-n-1);
+    // This failure should never happen, but it's prudent to check
+    // anyway.
+    if(!$cast(r, rsrc)) begin
+      `uvm_error(SVX_CL_MSG_ID, {"Unable to cast value of",
+				 "command line option ",
+				 name})
+      return 0;
+    end
+
+    val = r.read(accessor);
+    return 1;
+  endfunction
+
+  //--------------------------------------------------------------------
+  // get_num_opts
+  //
+  // How many option instances are on the command line for a
+  // particular option?
+  //--------------------------------------------------------------------
+  static function uint32_t get_num_opts(string name);
+    uvm_resource_pool rp = uvm_resource_pool::get();
+    uvm_resource_base th = uvm_resource#(T)::get_type();
+    uvm_resource_types::rsrc_q_t q = rp.lookup_name(`CL_SCOPE, name, th, 0);
+
+    return q.size();
   endfunction
 
 endclass

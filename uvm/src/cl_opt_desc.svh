@@ -145,7 +145,7 @@ virtual class cl_opt_desc#(type T=int) extends cl_opt_desc_base;
   virtual function void publish(cl_opt_instance_base inst);
     type_container#(T) v;
     if ($cast(v, inst.get_value()))
-      uvm_resource_db#(T)::set_override("CL::*", inst.get_name(), v.get());
+      uvm_resource_db#(T)::set_override({`CL_SCOPE, "*"}, inst.get_name(), v.get());
   endfunction
 
   virtual function type_container_base get_default_value();

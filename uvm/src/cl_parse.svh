@@ -26,6 +26,15 @@
 // permissions and limitations under the License.
 //======================================================================
 
+//  A multimap of command line option instances
+typedef multimap #(string, 
+		   cl_opt_instance_base, 
+		   cl_opt_inst_traits) opt_mm_t;
+// An interator for the multimap of command line option instances.
+typedef multimap_iterator#(string, 
+			   cl_opt_instance_base, 
+			   cl_opt_inst_traits) opt_mm_iter_t;
+
 //----------------------------------------------------------------------
 // parse_opt
 //
@@ -122,7 +131,8 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     // Are we looking for a filename?
     token = opt_desc.lex_value(lex);
     if(token == TOKEN_ERROR) begin
-      $sformat(msg, "Parsing error at command line option +%s", opt_inst.get_name());
+      $sformat(msg, "Parsing error at command line option +%s", 
+	       opt_inst.get_name());
       `uvm_error(SVX_CL_MSG_ID, msg)
       has_errors = 1;
       return;
@@ -130,7 +140,8 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
 
     if(token == TOKEN_EOL) begin
       // Oops -- the value token is missing
-      $sformat(msg, "Missing value for command line option +%s", opt_inst.get_name());
+      $sformat(msg, "Missing value for command line option +%s",
+	       opt_inst.get_name());
       `uvm_error(SVX_CL_MSG_ID, msg)
       has_errors = 1;
       return;
@@ -159,7 +170,8 @@ class parse_opt extends accum_fcn#(string, opt_vector_t);
     if(token == TOKEN_EOL)
       return;
     
-    $sformat(msg, "Extraneous characters after value for command line option +%s",
+    $sformat(msg, {"Extraneous characters after value for ",
+		   "command line option +%s"},
 	     name);
     `uvm_error(SVX_CL_MSG_ID, msg)
     has_errors = 1;
@@ -184,6 +196,31 @@ class validate_opt extends accum_fcn#(cl_opt_instance_base, uint32_t);
 endclass
 
 //----------------------------------------------------------------------
+// populate_multimap
+//----------------------------------------------------------------------
+class populate_multimap extends accum_fcn#(cl_opt_instance_base, opt_mm_t);
+
+  function void f(cl_opt_instance_base t, ref opt_mm_t mm);
+    string opt_name = t.get_name();
+    cl_opt_desc_base opt_desc = t.opt_desc;
+
+    if(!opt_desc.multiple) begin
+      size_t q_size = mm.count(opt_name);
+      if(q_size > 0) begin
+	`uvm_error(SVX_CL_MSG_ID, {"Multiple instances of option ",
+				   opt_name,
+				   " are not allowed on the command line"})
+	return;
+      end
+    end
+    
+    mm.insert(opt_name, t);
+  endfunction
+
+endclass
+
+
+//----------------------------------------------------------------------
 // populate_resource_db
 //
 // A function class that puts each command line option into the
@@ -204,9 +241,10 @@ endclass
 // Parse the command line args
 //----------------------------------------------------------------------
 class cl_parse;
-
+  
   local uvm_cmdline_processor clp;
   local static cl_parse inst;
+  local opt_mm_t opt_mm;
 
   // Arguments supplied by set_args().  When use_supplied_args is set,
   // these are parsed instead of the real command line.
@@ -224,9 +262,12 @@ class cl_parse;
   // These options come with the SVX library package
   //--------------------------------------------------------------------
   local function void add_builtin_options();
-    cl#(bit)::add_with_default("svx_cl_dump", 0, "Dump the command line option table");
-    cl#(string)::add("plugin", "Specify a plugin to be installed and activated");
-    cl#(bit)::add("svx_help", "Dump the command line option table and then exit");
+    cl#(bit)::add_with_default("svx_cl_dump", 0, 
+			       "Dump the command line option table");
+    cl#(string)::add("plugin", 
+		     "Specify a plugin to be installed and activated");
+    cl#(bit)::add("svx_help",
+		  "Dump the command line option table and then exit");
   endfunction
   
   //--------------------------------------------------------------------
@@ -279,7 +320,7 @@ class cl_parse;
   // Drive the command line parsing process.
   //--------------------------------------------------------------------
   function void parse();
-
+    
     uint32_t errs;
     bit svx_cl_dump;
 
@@ -289,13 +330,15 @@ class cl_parse;
 
     // Iterators
     list_string_iterator iter;
-    opt_iterator_t opt_iter;
+    opt_iterator_t opt_vec_iter;
+    opt_mm_iter_t opt_mm_iter;
 
     // Function classes
     parse_opt parse;
     print_opt print;
     validate_opt validate;
     populate_resource_db populate;
+    populate_multimap populate_mm;
 
     // Users can specify +svx_help to get a dump of the command line
     // option table along with some other useful help information.
@@ -336,14 +379,38 @@ class cl_parse;
     // Second pass. Validate the options.
 
     errs = 0;
-    opt_iter = new(opt_vec);
+    opt_vec_iter = new(opt_vec);
     validate = new();
-    accum#(cl_opt_instance_base, cl_opt_inst_traits, uint32_t)::accumulate(opt_iter, 
-									   validate, 
-									   errs);
+    accum#(cl_opt_instance_base, 
+	   cl_opt_inst_traits, 
+	   uint32_t)::accumulate(opt_vec_iter, 
+				 validate, 
+				 errs);
 
     //------------------------------------------------------------------
-    // Third pass. Populate values into the resource database
+    // Third pass. Put all the option instances into a multimap.
+
+    opt_mm = new();
+    populate_mm = new();
+    accum#(cl_opt_instance_base, 
+	   cl_opt_inst_traits,
+	   opt_mm_t)::accumulate(opt_vec_iter, 
+				 populate_mm, 
+				 opt_mm);
+
+    // Dump the multimap. Uncomment the following code to debug the
+    // multimap
+    
+    // $display("--- Multimap ---");
+    // print = new();
+    // opt_mm_iter = new(opt_mm);
+    // algo#(cl_opt_instance_base, 
+    // 	  cl_opt_inst_traits)::for_each(opt_mm_iter,
+    //  					print);    
+    // $display("--- END Multimap ---");
+
+    //------------------------------------------------------------------
+    // Fourth pass. Populate values into the resource database
     
     if(errs > 0) begin
       `uvm_error(SVX_CL_MSG_ID,
@@ -354,21 +421,23 @@ class cl_parse;
     end
 
     populate = new();
-    algo#(cl_opt_instance_base, cl_opt_inst_traits)::for_each(opt_iter,
+    algo#(cl_opt_instance_base, cl_opt_inst_traits)::for_each(opt_vec_iter,
 							      populate);
 
     // Print the list of options.  Use this for debugging the command
     // line parser.
+    
     // $display("\n--- Parsed Command Line Options  ---");
     // print = new();
-    // algo#(cl_opt_instance_base, cl_opt_inst_traits)::for_each(opt_iter,
+    // algo#(cl_opt_instance_base, cl_opt_inst_traits)::for_each(opt_vec_iter,
     // 							      print);
     // $display("--- END Parsed Command Line Options  ---");
 
     // All done
     cl_mgr::set_parse_flag();
 
-    if(uvm_resource_db#(bit)::read_by_name("CL::",
+    // Was +svx_cl_dump supplied on the command line?
+    if(uvm_resource_db#(bit)::read_by_name(`CL_SCOPE,
 					   "svx_cl_dump", 
 					   svx_cl_dump, null)) begin
       if(svx_cl_dump)
