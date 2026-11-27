@@ -304,17 +304,20 @@ The command line example shows the complete use model for reading plusargs into 
 
 \textit{Source:} \texttt{uvm/examples/cl}\\
 
-The top module registers thirteen options of different types --- integers of several widths and signedness, \texttt{real}, \texttt{bit} switches, and \texttt{string} --- some with default values, some with descriptions, and some with custom print formats. It then obtains the singleton parser with \texttt{cl\_parse::get()} and calls \texttt{parse()}, all before calling \texttt{run\_test()}, so the values are available to every phase.
+The top module registers thirteen options of different types --- integers of several widths and signedness, \texttt{real}, \texttt{bit} switches, and \texttt{string} --- some with default values, some with descriptions, some with custom print formats, and three --- \texttt{bignum}, \texttt{smallnum}, and \texttt{file} --- that may appear more than once. It then obtains the singleton parser with \texttt{cl\_parse::get()} and calls \texttt{parse()}, all before calling \texttt{run\_test()}, so the values are available to every phase.
 
-The makefile supplies a command line that exercises the value forms the parser accepts: unsized decimal and negative values, a real in exponent notation, a \texttt{bit} given in switch form, sized hexadecimal values (one with underscores), a file path, and an option given twice, where the last value wins. Options not on the command line keep their defaults. The command line ends with the built-in option \texttt{+svx\_cl\_dump}, which prints the option table after parsing; running with \texttt{+svx\_help} instead prints the version, the option table, and a syntax summary, and then ends the simulation.
+The makefile supplies a command line that exercises the value forms the parser accepts: unsized decimal and negative values, a real in exponent notation, a \texttt{bit} given in switch form, sized hexadecimal values (one with underscores), and repeated options: \texttt{+file} twice, once with a path, and \texttt{+smallnum} three times. Options not on the command line keep their defaults. The command line ends with the built-in option \texttt{+svx\_cl\_dump}, which prints the option table after parsing; running with \texttt{+svx\_help} instead prints the version, the option table, and a syntax summary, and then ends the simulation.
 
-In \texttt{build\_phase}, the test reads every option back with \texttt{uvm\_resource\_db\#(T)::read\_by\_name()} using the \texttt{CL::} scope and prints its value, reporting an error for any option that was not found. Reading the values in \texttt{build\_phase} shows that they are available before the component hierarchy is built --- for example, to decide how many agents to create.
+In \texttt{build\_phase}, the test reads every option back with \texttt{cl\#(T)::get()} and prints its value. For \texttt{file} and \texttt{smallnum} it uses \texttt{get\_num\_opts()} and \texttt{get\_nth()} to print every instance in command line order. Reading the values in \texttt{build\_phase} shows that they are available before the component hierarchy is built --- for example, to decide how many agents to create.
 
 \textbf{SVX features exhibited:}
 
 \begin{itemize}
   \item \texttt{cl\#(T)::add()}
   \item \texttt{cl\#(T)::add\_with\_default()}
+  \item \texttt{cl\#(T)::get()}
+  \item \texttt{cl\#(T)::get\_num\_opts()}
+  \item \texttt{cl\#(T)::get\_nth()}
   \item \texttt{cl\_parse::get()}
   \item \texttt{cl\_parse::parse()}
   \item \texttt{+svx\_cl\_dump}

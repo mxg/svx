@@ -1709,7 +1709,7 @@ The command line processor reads the plusargs on the simulator command line --- 
 
 \subsection*{Use Model}
 
-Register each option with \texttt{cl\#(T)::add()} or \texttt{cl\#(T)::add\_with\_default()}, where T is the type of the option's value, then call \texttt{parse()} on the singleton parser. Do both before calling \texttt{run\_test()} so every phase, including \texttt{build\_phase}, has access to the values. Options can be registered anywhere --- in any module, package, or class --- and in any order, as long as it is before the command line is parsed.
+Register each option with \texttt{cl\#(T)::add()} or \texttt{cl\#(T)::add\_with\_default()}, where T is the type of the option's value, then call \texttt{parse()} on the singleton parser. An option registered with \texttt{add()} may be allowed to appear more than once on the command line; an option with a default value may not. Do both before calling \texttt{run\_test()} so every phase, including \texttt{build\_phase}, has access to the values. Options can be registered anywhere --- in any module, package, or class --- and in any order, as long as it is before the command line is parsed.
 
 \begin{verbatim}
 module top;
@@ -1718,7 +1718,8 @@ module top;
     cl_parse clp = cl_parse::get();
     cl#(uint32_t)::add_with_default("size", 4, "Size of things");
     cl#(bit)::add("x_mode", "Enable X mode");
-    cl#(uint32_t)::add("base", "Base address", "%8x");
+    cl#(uint32_t)::add("base", "Base address", 0, "%8x");
+    cl#(string)::add("file", "Input file", 1);  // may repeat
     clp.parse();
   endfunction
 
@@ -1730,12 +1731,19 @@ module top;
 endmodule
 \end{verbatim}
 
-The parser puts each option into the resource database under the scope \texttt{CL::}, which keeps command line options from conflicting with other resources. Retrieve a value with the standard \texttt{uvm\_resource\_db} interface, using the same type the option was registered with:
+The parser puts each option into the resource database under the scope \texttt{CL::}, which keeps command line options from conflicting with other resources. Retrieve a value with \texttt{cl\#(T)::get()}, using the same type the option was registered with. For an option that may repeat, \texttt{get\_num\_opts()} gives the number of instances and \texttt{get\_nth()} the value of each, in command line order. These functions look only in the command line scope; the values can also be read with the standard \texttt{uvm\_resource\_db} interface:
 
 \begin{verbatim}
 uint32_t size;
+string   file;
+void'(cl#(uint32_t)::get("size", size, this));
+for (int i = 0; i < cl#(string)::get_num_opts("file"); i++)
+  void'(cl#(string)::get_nth("file", i, file, this));
+
 uvm_resource_db#(uint32_t)::read_by_name("CL::", "size", size, this);
 \end{verbatim}
+
+The scope is set by the macro \texttt{\`{}CL\_SCOPE}, which defaults to \texttt{"CL::"}. To use another scope, define it on the compile command line, for example \verb|+define+CL_SCOPE=\"MY_CL::\"|, so that it is defined before the SVX UVM package is compiled.
 
 \subsection*{Command Line Syntax}
 
@@ -1761,7 +1769,7 @@ A value must fit the option's type; \texttt{+bias=2000} is rejected for a \textt
 +bias=-100
 \end{verbatim}
 
-\texttt{string} values are taken exactly as written, so file paths and other text need no quoting. If an option appears more than once, the last value wins. Plusargs that are not registered options --- simulator and UVM options, or plusargs used by other code --- are ignored. If any registered option has an invalid value, the parser reports an error and puts none of the command line values into the resource database, and UVM stops the run at the end of elaboration.
+\texttt{string} values are taken exactly as written, so file paths and other text need no quoting. An option registered as allowing multiple instances may appear any number of times, and every value is kept. Repeating any other option is reported as an error; the run then stops at the end of elaboration. Plusargs that are not registered options --- simulator and UVM options, or plusargs used by other code --- are ignored. If any registered option has an invalid value, the parser reports an error and puts none of the command line values into the resource database, and UVM stops the run at the end of elaboration.
 
 Supported types are \texttt{string}, \texttt{real}, \texttt{bit}, \texttt{byte}, \texttt{shortint}, \texttt{int}, \texttt{longint}, and their \texttt{unsigned} forms, along with the aliases \texttt{int8\_t} through \texttt{int64\_t} and \texttt{uint8\_t} through \texttt{uint64\_t}.
 
@@ -1796,8 +1804,11 @@ Static functions for adding options to the option table. The type parameter is t
 \endhead
 \bottomrule
 \endfoot
-\texttt{add} & void & \texttt{string name, string desc="", string fmt=""} & Add option \texttt{name} of type T to the table. \texttt{desc} is a one-line description shown by \texttt{+svx\_help} and \texttt{+svx\_cl\_dump}. \texttt{fmt} optionally sets the format used to print the value. Static. \\
-\texttt{add\_with\_default} & void & \texttt{string name, T def, string desc="", string fmt=""} & Add an option with a default value. The default goes into the resource database immediately and is replaced by a value given on the command line. Static. \\
+\texttt{add} & void & \texttt{string name, string desc="", bit multiple=0, string fmt=""} & Add option \texttt{name} of type T to the table. \texttt{desc} is a one-line description shown by \texttt{+svx\_help} and \texttt{+svx\_cl\_dump}. With \texttt{multiple} set to 1 the option may appear more than once on the command line. \texttt{fmt} optionally sets the format used to print the value. Static. \\
+\texttt{add\_with\_default} & void & \texttt{string name, T def, string desc="", string fmt=""} & Add an option with a default value. The default goes into the resource database immediately and is replaced by a value given on the command line. Such an option may not repeat. Static. \\
+\texttt{get} & \texttt{bit} & \texttt{string name, inout T val, uvm\_object accessor=null} & Read the value of option \texttt{name} into val. For an option that repeats, returns the last instance. Returns 0 if the option is not in the resource database. Static. \\
+\texttt{get\_num\_opts} & \texttt{uint32\_t} & \texttt{string name} & Return the number of instances of an option that may repeat. For an option with a default, the default is counted as well; use \texttt{get()} for such options. Static. \\
+\texttt{get\_nth} & \texttt{bit} & \texttt{string name, uint32\_t n, inout T val, uvm\_object accessor=null} & Read the value of instance n (from 0, in command line order) of an option that may repeat. Returns 0 if n is out of range or the option is not in the resource database. Static. \\
 \end{xltabular}
 
 \section{cl\_parse --- Parser}
