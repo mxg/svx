@@ -228,10 +228,10 @@ command line options.
             input uvm_object accessor = null);
 ```
 
-    get() returns the value of a command line option though the inout
-    argument "val."  It is essentially a wrapper around
-    uvm_resource_db#()::read_by_name().  The function returns a 1 if
-    the lookup succeeded and the value of val is valid, a 0 otherwise.
+`Get()` returns the value of a command line option through the inout
+argument "val."  It is essentially a wrapper around
+uvm_resource_db#()::read_by_name().  The function returns a 1 if the
+lookup succeeded and the value of val is valid, a 0 otherwise.
 
 ```
     uint32_t get_num_opts(string name);
@@ -247,28 +247,27 @@ command line options.
 		input uvm_object accessor = null);
 ```
 
-    For options that allow multiple instances on the command line,
-    get_nth() will return value of the nth instance on the command
-    line.  The functions returns 1 if the lookup succeeds.  It will
-    return 0 if n is out of range or the named option is not in the
-    resource database.
+For options that allow multiple instances on the command line,
+get_nth() will return value of the nth instance on the command line.
+The functions returns 1 if the lookup succeeds.  It will return 0 if n
+is out of range or the named option is not in the resource database.
 
-    Get_num_opts() and get_nth() are for use with options that allow
-    multiple instances on the command line.  Use get() to obtain the
-    value of options with single instances.
+Get_num_opts() and get_nth() are for use with options that allow
+multiple instances on the command line.  Use get() to obtain the value
+of options with single instances.
 
-    Note: the order of the command line options in the resource
-    database is determined by how they are inserted into the database.
-    The mechanism that populates the resource database with the
-    command line options uses uvm_resource_db#()::set_override() to
-    ensure that the newest option is added to the head of the queue
-    and will be the first to be found.
+Note: the order of the command line options in the resource database
+is determined by how they are inserted into the database.  The
+mechanism that populates the resource database with the command line
+options uses uvm_resource_db#()::set_override() to ensure that the
+newest option is added to the head of the queue and will be the first
+to be found.
 
 The SVX Command Line Parser has some builtin command line options.
 
   * `+svx_cl_dump` : dumps the command line option table.
 
-  * `+svx_help     : Prints help information including the SVX version
+  * `+svx_help`    : Prints help information including the SVX version
                      number and the command line option table, and then
 		     terminates.
 

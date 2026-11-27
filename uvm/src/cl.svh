@@ -319,7 +319,7 @@ class cl #(type T=int);
   //
   // Add a new option along with its default value.  Multiple is not
   // supported in this function.  You cannot have a command line
-  // option that acccepts multiple instances and has a default value.
+  // option that accepts multiple instances and has a default value.
   //--------------------------------------------------------------------
   static function void add_with_default(string name, T def, 
 					string desc="",
