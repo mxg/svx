@@ -21,7 +21,7 @@ November 2026
     - get_nth() returns the value of the nth instance of a command
       line option.
 
-* CHANGED: The order of the arguments for cl#()::add() have changed.
+* CHANGED: The order of the arguments for cl#()::add() has changed.
   The new order is add(name, desc, multiple, fmt).
     
 

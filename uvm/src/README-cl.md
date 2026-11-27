@@ -237,9 +237,9 @@ lookup succeeded and the value of val is valid, a 0 otherwise.
     uint32_t get_num_opts(string name);
 ```
 
-    For options that allow multiple instances on the command line,
-    get_num_opts() returns the number of instances -- i.e., the number
-    of times an option appears on the command line.
+For options that allow multiple instances on the command line,
+get_num_opts() returns the number of instances -- i.e., the number of
+times an option appears on the command line.
 
 ```
     bit get_nth(string name, uint32_t n,
