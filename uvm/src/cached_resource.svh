@@ -217,6 +217,9 @@ class cached_resource#(type T=int) extends cached_resource_base;
     else
        `uvm_error("SVX/CACHED_RSRC/WRITE",
 		 {id(), "Cannot write to a read-only resource."})
+
+    seen = shrd.version;
+    
   endfunction
 
   //--------------------------------------------------------------------

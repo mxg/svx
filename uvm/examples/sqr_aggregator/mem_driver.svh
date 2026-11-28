@@ -61,7 +61,7 @@ class mem_driver extends uvm_component;
     strnum.itoa(mem_idx);
     vif_name = {"mem_if_", strnum};
     if(!uvm_resource_db#(virtual mem_channel_if)::read_by_name(get_full_name(), 
-							   vif_name, vif, this)) begin
+							       vif_name, vif, this)) begin
       `uvm_error("MEM/BUILD", {"Missing virtual interface for ", vif_name})
       return;
     end
