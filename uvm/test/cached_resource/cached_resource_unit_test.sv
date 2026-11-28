@@ -464,6 +464,27 @@ module cached_resource_unit_test;
       `FAIL_UNLESS(value_of(cr) == 77)
     `SVTEST_END
 
+  //--------------------------------------------------------------------
+  // own_write_no_wake
+  //
+  // A write marks the writer as having seen the change: the writing
+  // instance does not wake itself, but other instances do wake.
+  //--------------------------------------------------------------------
+    `SVTEST(own_write_no_wake)
+      string n = publish(0);
+      cr_t crw = new(SCOPE, n);
+      cr_t cr = new(SCOPE, n);
+      waiter w_self = new();
+      waiter w_other = new();
+
+      crw.write(4, null);
+      w_self.start(crw);
+      w_other.start(cr);
+      #5;
+      `FAIL_IF(w_self.released())
+      `FAIL_UNLESS(w_other.n_wakes == 1)
+    `SVTEST_END
+
   `SVUNIT_TESTS_END
 
 endmodule
