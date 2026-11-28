@@ -1771,7 +1771,31 @@ A value must fit the option's type; \texttt{+bias=2000} is rejected for a \textt
 
 \texttt{string} values are taken exactly as written, so file paths and other text need no quoting. An option registered as allowing multiple instances may appear any number of times, and every value is kept. Repeating any other option is reported as an error; the run then stops at the end of elaboration. Plusargs that are not registered options --- simulator and UVM options, or plusargs used by other code --- are ignored. If any registered option has an invalid value, the parser reports an error and puts none of the command line values into the resource database, and UVM stops the run at the end of elaboration.
 
-Supported types are \texttt{string}, \texttt{real}, \texttt{bit}, \texttt{byte}, \texttt{shortint}, \texttt{int}, \texttt{longint}, and their \texttt{unsigned} forms, along with the aliases \texttt{int8\_t} through \texttt{int64\_t} and \texttt{uint8\_t} through \texttt{uint64\_t}.
+\subsection*{Supported Types}
+
+The type parameter T of \texttt{cl\#(T)} must be one of the types below. The SVX aliases in the second column are the same types as the SystemVerilog types beside them and may be used interchangeably. Adding an option of any other type --- for example \texttt{shortreal}, a packed vector, an enum, or a class --- is reported as an error.
+
+\begin{xltabular}{\linewidth}{>{\small}p{1.3in} >{\small}p{0.75in} >{\small}X}
+\toprule
+\textbf{Type} & \textbf{SVX alias} & \textbf{Values} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\texttt{string} & --- & Any text, taken exactly as written. \\
+\texttt{real} & --- & A real number, in decimal or exponent notation, e.g.\ \texttt{1.5e9}. \\
+\texttt{bit} & --- & \texttt{+name} alone (on), or \texttt{1}, \texttt{on}, \texttt{true}, \texttt{yes}, \texttt{0}, \texttt{off}, \texttt{false}, \texttt{no}. \\
+\texttt{byte} & \texttt{int8\_t} & $-128$ to $127$ \\
+\texttt{byte unsigned} & \texttt{uint8\_t} & $0$ to $255$ \\
+\texttt{shortint} & \texttt{int16\_t} & $-32{,}768$ to $32{,}767$ \\
+\texttt{shortint unsigned} & \texttt{uint16\_t} & $0$ to $65{,}535$ \\
+\texttt{int} & \texttt{int32\_t} & $-2{,}147{,}483{,}648$ to $2{,}147{,}483{,}647$ \\
+\texttt{int unsigned} & \texttt{uint32\_t} & $0$ to $4{,}294{,}967{,}295$ \\
+\texttt{longint} & \texttt{int64\_t} & $-9{,}223{,}372{,}036{,}854{,}775{,}808$ to $9{,}223{,}372{,}036{,}854{,}775{,}807$ \\
+\texttt{longint unsigned} & \texttt{uint64\_t} & $0$ to $18{,}446{,}744{,}073{,}709{,}551{,}615$ \\
+\end{xltabular}
+
+Integer values may be given in any of the forms described above: unsized decimal, or sized in base \texttt{h}, \texttt{o}, \texttt{b}, or \texttt{d}, with optional underscores between digits. A negative value is accepted only for a signed type. A value outside the type's range, or a sized value whose digits do not fit its stated size, is rejected rather than truncated.
 
 \subsection*{Built-in Options}
 
