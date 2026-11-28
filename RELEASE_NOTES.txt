@@ -23,6 +23,8 @@ November 2026
 
 * CHANGED: The order of the arguments for cl#()::add() has changed.
   The new order is add(name, desc, multiple, fmt).
+
+* ADDED: Comprehensive test suite for UVM utilities.
     
 
 ----------------------------------------------------------------------

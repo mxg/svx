@@ -30,7 +30,6 @@
 TOP		= ../..
 TOP_MODULE	= testrunner
 
-# The command line processor is a UVM utility, so compile in UVM.
 UVM		= 1
 
 SVUNIT_SRC	:= ${SVUNIT_INSTALL}/svunit_base/svunit_pkg.sv \
