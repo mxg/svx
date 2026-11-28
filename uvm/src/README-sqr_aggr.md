@@ -1,5 +1,4 @@
-Sequencer Aggregator
---------------------
+# Sequencer Aggregator
 
 A sequencer aggregator is a container used to store sequencer handles
 so they can be retrieved by virtual sequences. You can learn more
@@ -14,8 +13,10 @@ Techniques" by Cliff Cummings, Smita Kulkarni, and Mark Glasser.
 A virtual sequence is a sequence launched without being bound to a
 sequencer.  For example:
 
-  seq1.start(sqr);  // normal
-  seq2.start(null); // virtual
+```
+seq1.start(sqr);  // normal
+seq2.start(null); // virtual
+```
 
 Seq1 is a normal sequence.  It is bound to the sequencer sqr as it's
 being launched.  Seq1 can send sequence items to the driver via the
@@ -53,43 +54,55 @@ sequencer handle can have the same kind.  The sequencer aggregator
 stores all the sequencers with the same kind in a list.  You can
 retrieve the list to get all the sequencers of the same kind.
 
-The API for a sequencer aggregator is:
+## API
 
-  * add(sqr, name, kind)
+```
+add(sqr, name, kind)
+```
 
-    Adds a new sequencer handle to the sequencer aggregator container.
-    The new handle is stored by name, path, and kind.
+Adds a new sequencer handle to the sequencer aggregator container.
+The new handle is stored by name, path, and kind.
 
-  * lookup_name(name)
+```
+lookup_name(name)
+```
 
-    Find a sequencer handle by its name. Returns null if no sequencer
-    handle is found.
+Find a sequencer handle by its name. Returns null if no sequencer
+handle is found.
 
-  * lookup_path(path)
+```
+lookup_path(path)
+```
 
-    Find a sequencer handle by its path in the UVM component
-    hierarchy. Returns null if no sequencer handle is found.
+Find a sequencer handle by its path in the UVM component
+hierarchy. Returns null if no sequencer handle is found.
 
-  * lookup_path_regex(regex)
+```
+lookup_path_regex(regex)
+```
 
-    Find one or more sequencer handles using a regular expression that
-    matches paths.  The regex string must conform to the POSIX
-    definition of a regular expression.
+Find one or more sequencer handles using a regular expression that
+matches paths.  The regex string must conform to the POSIX definition
+of a regular expression.
 
-  * lookup_kind(kind)
+```
+lookup_kind(kind)
+```
 
-    Find one or more sequencer handles by kind.
+Find one or more sequencer handles by kind.
 
-  * dump()
+```
+dump()
+```
 
-    Dumps the contents of the sequencer aggregator for debugging
-    purposes.
+Dumps the contents of the sequencer aggregator for debugging
+purposes.
 
-Lookup_path_regex() and lookup_kind() return a deque#() containing the
-located sequencer handles.  If there are no handles found then the
-deque will be empty (i.e., size() == 0).
+`Lookup_path_regex()` and `lookup_kind()` return a `deque#()`
+containing the located sequencer handles.  If there are no handles
+found then the deque will be empty (i.e., `size() == 0`).
 
-The example at uvm/examples/sqr_aggregator demonstrates how to use a
+The example at `uvm/examples/sqr_aggregator` demonstrates how to use a
 sequencer aggregator to provide sequencer handles to virtual
 sequences.
 

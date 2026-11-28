@@ -1,5 +1,4 @@
-Pipelined Testbenches
----------------------
+# Pipelined Testbenches
 
 Pipelines are constructed of stages, where each stage operates
 independently of and thus concurrently with other stages. Each stage

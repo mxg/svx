@@ -15,7 +15,7 @@ default value.  cl is a parameterized class.  The parameter represents
 the type of the option being added to the table.  For example,
 
 ```
-  cl#(int)::add("xyz");
+cl#(int)::add("xyz");
 ```
 
 is the simplest way to add a new option named "xyz" to the table with
@@ -23,7 +23,7 @@ a type of int.  Add() takes four arguments, the last three of which
 are optional.
 
 ```
-  void add(string name, string desc="", bit multiple=0, string fmt="")
+void add(string name, string desc="", bit multiple=0, string fmt="")
 ```
 
   name - the name of the option
@@ -37,9 +37,9 @@ value for the option.  Options with defaults cannot allow multiple
 instances.
 
 ```
-  void add_with_default(string name, T def, 
-                        string desc="",
-                        string fmt="")
+void add_with_default(string name, T def, 
+                      string desc="",
+                      string fmt="")
 ```
 
 ## Parsing
@@ -52,7 +52,7 @@ and cl::add_with_default().
 You can print out the command option table with the following call:
 
 ```
-  cl_mgr::dump();
+cl_mgr::dump();
 ```
 
 To execute the parsing operation you need to get a handle to the
@@ -60,8 +60,8 @@ parser object and call parse().  Get() retrieves the singleton handle
 of cl_parse.
 
 ```
-  cl_parse clp = cl_parse::get();
-  clp.parse();
+cl_parse clp = cl_parse::get();
+clp.parse();
 ```
 
 ## Resource Database
@@ -71,14 +71,16 @@ against the table of options.  After all the options and their
 arguments have been validated then they are put into the resource
 database using the scope "CL::".  E.g.,
 
-  uvm_resource_db#(T)::set("CL::*", name, value);
+```
+uvm_resource_db#(T)::set("CL::*", name, value);
+```
 
 You can retrieve command line options from the database using the
 uvm_resource_db interface.
 
 ```
-  int size;
-  uvm_resource_db#(int)::read_by_name("CL::", "size", size, this);
+int size;
+uvm_resource_db#(int)::read_by_name("CL::", "size", size, this);
 ```
 
 The synthetic scope "CL::" ensures that command line options do not
@@ -185,7 +187,7 @@ option was added to the option table. E.g., let's add "bias" as byte
 typed option.
 
 ```
-  cl#(byte)::add("bias");
+cl#(byte)::add("bias");
 ```
 
 On the command line we can put
@@ -207,9 +209,9 @@ Numeric values can be sized and can be specified in different bases,
 much like in SystemVerilog.  Underscores are also legal. E.g.,
 
 ```
-   32hf77_7003c
-   12b011_000_111_010
-   8o361
+32hf77_7003c
+12b011_000_111_010
+8o361
 ```
 
 Note that there are no ticks in the number.  Command shells use ticks
@@ -223,9 +225,9 @@ The cl#() interface provides means for retrieving the values of
 command line options.
 
 ```
-    bit get(string name, 
-            inout T val, 
-            input uvm_object accessor = null);
+bit get(string name, 
+        inout T val, 
+        input uvm_object accessor = null);
 ```
 
 `Get()` returns the value of a command line option through the inout
@@ -234,7 +236,7 @@ uvm_resource_db#()::read_by_name().  The function returns a 1 if the
 lookup succeeded and the value of val is valid, a 0 otherwise.
 
 ```
-    uint32_t get_num_opts(string name);
+uint32_t get_num_opts(string name);
 ```
 
 For options that allow multiple instances on the command line,
@@ -242,9 +244,9 @@ get_num_opts() returns the number of instances -- i.e., the number of
 times an option appears on the command line.
 
 ```
-    bit get_nth(string name, uint32_t n,
-                inout  T val,
-		input uvm_object accessor = null);
+bit get_nth(string name, uint32_t n,
+            inout  T val,
+            input uvm_object accessor = null);
 ```
 
 For options that allow multiple instances on the command line,
@@ -269,7 +271,7 @@ The SVX Command Line Parser has some builtin command line options.
 
   * `+svx_help`    : Prints help information including the SVX version
                      number and the command line option table, and then
-		     terminates.
+                     terminates.
 
   * `+plugin`      : Specifies a UVM plugin to be instantiated and
                      activated.
