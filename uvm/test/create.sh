@@ -43,9 +43,41 @@ create_testsuite.pl -add cl/cl_parse_unit_test.sv                     \
                     -out cl/cl_testsuite.sv                           \
                     -overwrite
 
+# create agreement test suite
+echo
+echo "*** Create agreement test suite"
+create_testsuite.pl -add agreement/agreement_unit_test.sv             \
+                    -out agreement/agreement_testsuite.sv             \
+                    -overwrite
+
+# create sequencer aggregator test suite
+echo
+echo "*** Create sequencer aggregator test suite"
+create_testsuite.pl -add sqr_aggregator/sqr_aggregator_unit_test.sv   \
+                    -out sqr_aggregator/sqr_aggregator_testsuite.sv   \
+                    -overwrite
+
+# create cached resource test suite
+echo
+echo "*** Create cached resource test suite"
+create_testsuite.pl -add cached_resource/cached_resource_unit_test.sv \
+                    -out cached_resource/cached_resource_testsuite.sv \
+                    -overwrite
+
+# create plugins test suite
+echo
+echo "*** Create plugins test suite"
+create_testsuite.pl -add plugins/plugins_unit_test.sv                 \
+                    -out plugins/plugins_testsuite.sv                 \
+                    -overwrite
+
 # create testrunner
 echo
 echo "*** Create top-level test runner"
 create_testrunner.pl -add cl/cl_testsuite.sv                          \
+                     -add agreement/agreement_testsuite.sv            \
+                     -add sqr_aggregator/sqr_aggregator_testsuite.sv  \
+                     -add cached_resource/cached_resource_testsuite.sv \
+                     -add plugins/plugins_testsuite.sv                \
                      -out testrunner.sv                               \
                      -overwrite

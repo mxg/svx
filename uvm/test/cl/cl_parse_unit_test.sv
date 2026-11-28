@@ -234,7 +234,6 @@ module cl_parse_unit_test;
   function void build();
     svunit_ut = new(name);
     catcher = new();
-    uvm_report_cb::add(null, catcher);
   endfunction
 
 
@@ -243,6 +242,10 @@ module cl_parse_unit_test;
   //===================================
   task setup();
     svunit_ut.setup();
+    // Catchers are global and are consulted in the order they were
+    // added, so each test file's catcher is active only during its
+    // own tests.
+    uvm_report_cb::add(null, catcher);
   endtask
 
 
@@ -251,6 +254,7 @@ module cl_parse_unit_test;
   // need after running the Unit Tests
   //===================================
   task teardown();
+    uvm_report_cb::delete(null, catcher);
     svunit_ut.teardown();
   endtask
 
@@ -500,6 +504,96 @@ module cl_parse_unit_test;
       `FAIL_UNLESS(catcher.n_errors == 0)
       `FAIL_UNLESS(opt#(int32_t)::get(n, v))
       `FAIL_UNLESS(v == 99)
+    `SVTEST_END
+
+  //--------------------------------------------------------------------
+  // multiple_instances
+  //
+  // An option registered with multiple = 1 keeps every instance, in
+  // command line order.  get() returns the last one.
+  //--------------------------------------------------------------------
+    `SVTEST(multiple_instances)
+      int32_t v;
+      string n;
+
+      cl_mgr::clr_parse_flag();
+      n = opt#(int32_t)::add_multi();
+      parse_args({$sformatf("+%s=10", n),
+                  $sformatf("+%s=20", n),
+                  $sformatf("+%s=30", n)});
+      `FAIL_UNLESS(catcher.n_errors == 0)
+      `FAIL_UNLESS(cl#(int32_t)::get_num_opts(n) == 3)
+      `FAIL_UNLESS(cl#(int32_t)::get_nth(n, 0, v))
+      `FAIL_UNLESS(v == 10)
+      `FAIL_UNLESS(cl#(int32_t)::get_nth(n, 1, v))
+      `FAIL_UNLESS(v == 20)
+      `FAIL_UNLESS(cl#(int32_t)::get_nth(n, 2, v))
+      `FAIL_UNLESS(v == 30)
+      `FAIL_IF(cl#(int32_t)::get_nth(n, 3, v))
+      `FAIL_UNLESS(cl#(int32_t)::get(n, v))
+      `FAIL_UNLESS(v == 30)
+    `SVTEST_END
+
+  //--------------------------------------------------------------------
+  // single_instance
+  //
+  // get(), get_num_opts(), and get_nth() for an option given once,
+  // and for one not given at all.
+  //--------------------------------------------------------------------
+    `SVTEST(single_instance)
+      int32_t v;
+      string n;
+      string absent;
+
+      cl_mgr::clr_parse_flag();
+      n = opt#(int32_t)::add_multi();
+      absent = opt#(int32_t)::add_multi();
+      parse_one(n, "=5");
+      `FAIL_UNLESS(catcher.n_errors == 0)
+      `FAIL_UNLESS(cl#(int32_t)::get(n, v))
+      `FAIL_UNLESS(v == 5)
+      `FAIL_UNLESS(cl#(int32_t)::get_num_opts(n) == 1)
+      `FAIL_UNLESS(cl#(int32_t)::get_nth(n, 0, v))
+      `FAIL_UNLESS(v == 5)
+
+      `FAIL_IF(cl#(int32_t)::get(absent, v))
+      `FAIL_UNLESS(cl#(int32_t)::get_num_opts(absent) == 0)
+      `FAIL_IF(cl#(int32_t)::get_nth(absent, 0, v))
+    `SVTEST_END
+
+  //--------------------------------------------------------------------
+  // repeat_not_allowed
+  //
+  // Repeating an option that was not registered with multiple = 1 is
+  // an error.
+  //--------------------------------------------------------------------
+    `SVTEST(repeat_not_allowed)
+      string n;
+
+      cl_mgr::clr_parse_flag();
+      n = opt#(int32_t)::add();
+      parse_args({$sformatf("+%s=1", n), $sformatf("+%s=2", n)});
+      `FAIL_IF(catcher.n_errors == 0)
+    `SVTEST_END
+
+  //--------------------------------------------------------------------
+  // get_with_default
+  //
+  // get() returns the default when the option is not on the command
+  // line.  As documented, get_num_opts() also counts the default.
+  //--------------------------------------------------------------------
+    `SVTEST(get_with_default)
+      int32_t v;
+      string n;
+      string args[$];
+
+      cl_mgr::clr_parse_flag();
+      n = opt#(int32_t)::add_with_default(17);
+      parse_args(args);
+      `FAIL_UNLESS(catcher.n_errors == 0)
+      `FAIL_UNLESS(cl#(int32_t)::get(n, v))
+      `FAIL_UNLESS(v == 17)
+      `FAIL_UNLESS(cl#(int32_t)::get_num_opts(n) == 1)
     `SVTEST_END
 
   `SVUNIT_TESTS_END
